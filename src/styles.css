@@ -1214,6 +1214,11 @@
       color: var(--ink-soft);
     }
 
+    .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .submit-btn:disabled { opacity: .7; cursor: progress; }
+    .form-status { min-height: 20px; margin-top: 14px; font-size: 13px; line-height: 1.4; color: #b9e8d2; }
+    .form-status.is-error { color: #ffb4a6; }
+
     .cert-list {
       display: flex;
       flex-direction: column;
