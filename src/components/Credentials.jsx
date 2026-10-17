@@ -7,7 +7,6 @@ const EDUCATION = [
 ];
 
 const CERTS = [
-  { mark: '1st', title: '1st Prize — College Project Expo', sub: "St. Peter's Engineering College" },
   { mark: 'AI', title: 'AI Engineer Associate Certificate Course', sub: 'Udemy · Sep 2026', url: 'https://www.udemy.com/certificate/UC-0d473352-ad8a-4e7a-a42f-340ef7b065b7/' },
   { mark: 'ML', title: 'Machine Learning & AI Foundations Course', sub: 'Data Science Academy · Udemy · Sep 2026', url: 'https://www.udemy.com/certificate/UC-421f46bc-f392-4f4e-b9c3-9c3966ce9469/' }
 ];
@@ -39,7 +38,7 @@ export default function Credentials() {
         </Reveal>
 
         <Reveal delay={0.08}>
-          <div className="cred-col-label mono">Certifications &amp; awards</div>
+          <div className="cred-col-label mono">Certifications</div>
           <div className="cert-list">
             {CERTS.map((c) => {
               const inner = (
