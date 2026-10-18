@@ -103,7 +103,8 @@ export default function App() {
           <Footer />
         </main>
       )}
-      {!loading && <ChatBot />}
+      {/* chatbot only runs locally (npm run dev); hidden on the live site */}
+      {!loading && import.meta.env.DEV && <ChatBot />}
       <SkillModal open={skillOpen} onClose={closeSkill} />
     </>
   );
