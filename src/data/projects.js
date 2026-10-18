@@ -143,6 +143,144 @@ export const PROJECTS = {
     ]
   },
 
+  securecloud: {
+    title: 'Secure Cloud ML',
+    category: 'Machine Learning · Security',
+    lead:
+      'A Flask web app that sorts network traffic into normal or four kinds of attack, running five different models side by side on every upload, with AES-256 encryption on the upload path and a token-protected API.',
+    github: 'https://github.com/praneeth-hari/Secure-Cloud-Ml',
+    cover: 'projects/secure-cloud-ml.png',
+    shotsTitle: { eyebrow: 'See it work', heading: 'Upload traffic, get five verdicts' },
+    shots: [
+      {
+        src: 'projects/secure-cloud-predict.webp',
+        alt: 'Prediction results table where five models classify 11 network traffic samples as normal, dos, r2l or u2r',
+        caption: 'The prediction page after uploading the 11-row sample. Every model labels every row, so you can see where they agree and where they split: on 4 of the 11 rows at least one model disagrees.',
+      },
+      {
+        src: 'projects/secure-cloud-dashboard.webp',
+        alt: 'Model performance dashboard with accuracy, F1, precision and recall cards and bar and radar charts for five models',
+        caption: 'The model dashboard: the best scores up top, then bar and radar charts that put all five models on the same axes.',
+      },
+    ],
+    stack: [
+      'Python', 'Flask', 'scikit-learn', 'XGBoost', 'TensorFlow / Keras', 'pandas', 'pycryptodome',
+      'Flask-JWT-Extended', 'Chart.js', 'Docker', 'Waitress'
+    ],
+    stats: [
+      { value: '5', label: 'models compared on every upload', note: 'KNN · ANN · ANN + ABC · Random Forest · XGBoost' },
+      { value: '99.99%', label: 'XGBoost accuracy', note: '20% held-out split' },
+      { value: '125,973', label: 'traffic records, 41 features each', note: 'NSL-KDD training set, 5 classes' },
+      { value: '256-bit', label: 'AES encryption on the upload path', note: 'random IV on every message' }
+    ],
+    problem:
+      'In the NSL-KDD intrusion data, 125,973 records include 67,343 normal ones but only 995 R2L attacks and just 52 U2R attacks, so a single accuracy number can look great while the model misses the attacks that matter. I wanted to see how five classic models handle that on the same data, side by side, and wrap them in the basics a real service needs: a login, an API with tokens, and encrypted uploads.',
+    rows: [
+      {
+        title: '1 · Train the models',
+        nodes: [
+          {
+            id: 'data', label: 'Dataset', sub: '125,973 rows · 41 features',
+            what: 'The NSL-KDD training set: labelled network connections with 41 features such as protocol, service, connection flag and byte counts, plus an Attack_Type label. Text columns are label-encoded and the encoders are saved so predictions use the same mapping.',
+            facts: ['normal 67,343 · dos 45,927 · probe 11,656', 'r2l 995 · u2r 52', 'Only an 11-row sample is in the repo'],
+            files: ['train.py', 'Dataset/testData.csv']
+          },
+          {
+            id: 'split', label: 'Split and scale', sub: 'Stratified 80 / 20',
+            what: 'The data is split 80 / 20 with the class mix kept the same in both halves, so rare attack types appear in the test set. Features are scaled with a min-max scaler.',
+            why: 'The original notebook fitted the scaler on all the data, which lets test-set information leak into training. It is now fitted on the training split only.',
+            facts: ['Fixed random seed 42', 'Scaler fitted on training data only'],
+            files: ['train.py']
+          },
+          {
+            id: 'models', label: 'Five models', sub: 'Compared on equal terms',
+            what: 'K-nearest neighbours, a small neural network, the same network on a searched feature subset, a 200-tree Random Forest and XGBoost are all trained on the same split and scored with the same four metrics.',
+            facts: ['ANN: 32 → 16 → softmax, 10 epochs', 'Random Forest: 200 trees', 'Accuracy, precision, recall and F1 saved to metrics.json'],
+            files: ['train.py', 'model/metrics.json']
+          },
+          {
+            id: 'abc', label: 'Bee-colony search', sub: 'Feature subsets for the ANN',
+            what: 'A simplified Artificial Bee Colony search tries random subsets of about 80% of the features, nudges one feature at a time and keeps the subset that scores best. The neural network is then trained on that subset.',
+            facts: ['3 candidate subsets, up to 10 rounds', 'Stops at the first improvement', 'Best subset saved and reused at prediction time'],
+            files: ['train.py', 'model/best_features.pckl']
+          }
+        ]
+      },
+      {
+        title: '2 · Serve and protect',
+        nodes: [
+          {
+            id: 'login', label: 'Login and tokens', sub: 'Session + JWT',
+            what: 'The web pages use a normal login session. Scripts get a JWT from /api/login and send it with each request. Passwords are compared in constant time. In production mode the app refuses to start unless every secret is set.',
+            facts: ['SECRET_KEY, JWT_SECRET_KEY, AES_KEY, API_USERNAME and API_PASSWORD required in production', 'Secrets live in .env, which is not committed'],
+            files: ['app.py', 'config.py']
+          },
+          {
+            id: 'aes', label: 'AES-256-CBC', sub: 'Encrypt, then decrypt',
+            what: 'An uploaded CSV is encrypted with a fresh random IV, then decrypted on the server before it reaches the models. It demonstrates the secure-transmission idea the project is named for.',
+            facts: ['256-bit key from the environment', 'IV prepended, output base64', 'PKCS7 padding'],
+            files: ['encryption.py']
+          },
+          {
+            id: 'predict', label: 'Predict', sub: 'All five models at once',
+            what: 'The saved encoders and scaler prepare the rows, every model predicts, and the page shows one badge per model for each traffic sample so disagreements are easy to spot. The API does the same for JSON rows and checks that each row has exactly the expected number of numeric features.',
+            facts: ['Web upload: POST /PredictAction', 'API: POST /api/predict with a Bearer token', 'On the 11-row sample the five models agree on 7 rows and differ on 4'],
+            files: ['app.py']
+          },
+          {
+            id: 'dash', label: 'Dashboard', sub: 'Bar and radar charts',
+            what: 'Reads model/metrics.json and draws accuracy, precision, recall and F1 for every model, so the comparison is visible before anything is uploaded.',
+            facts: ['Chart.js bar and radar charts', 'Docker image runs as a non-root user'],
+            files: ['templates/index.html', 'Dockerfile']
+          }
+        ]
+      }
+    ],
+    challenge: {
+      title: 'Accuracy told only half the story',
+      text:
+        'KNN scores 96.3% accuracy and the plain neural network 97.4%, which sounds fine. Averaged across the five traffic classes, their F1 scores are only 67.8% and 69.4%. The confusion matrices show why: on the test split neither model caught a single one of the 10 U2R attacks, and both missed about half of the 199 R2L attacks. XGBoost is the only model that stays high on both. Putting accuracy and F1 side by side for every model is what made that visible.',
+      unit: '%', max: 100,
+      series: [
+        { label: 'Accuracy', key: 'acc', tone: 'is-clean' },
+        { label: 'Macro F1 (all five classes)', key: 'f1', tone: 'is-swap' }
+      ],
+      bars: [
+        { name: 'KNN', acc: 96.32, f1: 67.83 },
+        { name: 'ANN', acc: 97.37, f1: 69.43 },
+        { name: 'ANN + ABC', acc: 98.98, f1: 88.46 },
+        { name: 'Random Forest', acc: 99.95, f1: 99.76 },
+        { name: 'XGBoost', acc: 99.99, f1: 99.99 }
+      ]
+    },
+    decisions: [
+      {
+        title: 'Fixing a leak in the original notebook',
+        text: 'The first version fitted the scaler on the whole dataset before splitting, so the test rows had already influenced the training. I moved to a stratified 80 / 20 split and fitted the scaler on the training half only.'
+      },
+      {
+        title: 'Train once, serve many times',
+        text: 'Training moved out of the notebook into train.py. The app trains only if no saved models exist, otherwise it loads the saved scaler, encoders and all five models at startup, so each upload only runs predictions.'
+      },
+      {
+        title: 'Two logins for two kinds of user',
+        text: 'People using the pages get a session login. Scripts get short-lived JWT tokens from a separate endpoint. Both compare credentials in constant time, and the API rejects any row with the wrong number of features before it reaches a model.'
+      },
+      {
+        title: 'Refusing to start without secrets',
+        text: 'Development has clearly labelled throwaway defaults so it runs out of the box. In production mode the app raises an error unless every secret is set, so a missing key can never fall back to a default.'
+      }
+    ],
+    limits: [
+      'Scores come from a random 80 / 20 split of one dataset file, not a separate test set from another network, so real-world results would be lower.',
+      'The ANN + ABC feature search picks features using the same held-out split it is scored on, so its score is slightly optimistic. The bee-colony search is also a simplified version.',
+      'The AES step encrypts and decrypts inside the same server to demonstrate secure transmission. Protecting real traffic still needs HTTPS.',
+      'The test split holds only 10 U2R and 199 R2L records, so the per-class scores for those two attacks rest on very few examples.',
+      'The full dataset file is not in the repository, only an 11-row sample, so it has to be downloaded before retraining.',
+      'There are no automated tests yet.'
+    ]
+  },
+
   mediplant: {
     title: 'Medicinal Plant Detection',
     category: 'Computer Vision + RAG',

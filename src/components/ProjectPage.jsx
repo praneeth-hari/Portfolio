@@ -188,16 +188,18 @@ export default function ProjectPage({ slug }) {
           </section>
         )}
 
-        {p.shot && (
+        {(p.shots || (p.shot ? [p.shot] : [])).length > 0 && (
           <section className="pj-sec">
-            <Reveal className="eyebrow">The dashboard</Reveal>
-            <Reveal as="h2" className="pj-h2 disp">Where I watch it run</Reveal>
-            <Reveal>
-              <figure className="pj-demo">
-                <img className="pj-demo-video pj-shot" src={import.meta.env.BASE_URL + p.shot.src} alt={p.shot.alt} loading="lazy" />
-                <figcaption className="pj-demo-cap">{p.shot.caption}</figcaption>
-              </figure>
-            </Reveal>
+            <Reveal className="eyebrow">{(p.shotsTitle || {}).eyebrow || 'The dashboard'}</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">{(p.shotsTitle || {}).heading || 'Where I watch it run'}</Reveal>
+            {(p.shots || [p.shot]).map((sh) => (
+              <Reveal key={sh.src} className="pj-shot-wrap">
+                <figure className="pj-demo">
+                  <img className="pj-demo-video pj-shot" src={import.meta.env.BASE_URL + sh.src} alt={sh.alt} loading="lazy" />
+                  <figcaption className="pj-demo-cap">{sh.caption}</figcaption>
+                </figure>
+              </Reveal>
+            ))}
           </section>
         )}
 
@@ -227,20 +229,22 @@ export default function ProjectPage({ slug }) {
           </Reveal>
         </section>
 
-        <section className="pj-sec">
-          <Reveal className="eyebrow">{p.rag.eyebrow || 'Retrieval quality'}</Reveal>
-          <Reveal as="h2" className="pj-h2 disp">{p.rag.title}</Reveal>
-          <Reveal as="p" className="pj-body">{p.rag.text}</Reveal>
-          <div className="pj-stats pj-stats-tight">
-            {p.rag.stats.map((s) => (
-              <Reveal className="pj-stat" key={s.label}>
-                <div className="pj-stat-value disp">{s.value}</div>
-                <div className="pj-stat-label">{s.label}</div>
-                <div className="pj-stat-note mono">{s.note}</div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
+        {p.rag && (
+          <section className="pj-sec">
+            <Reveal className="eyebrow">{p.rag.eyebrow || 'Retrieval quality'}</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">{p.rag.title}</Reveal>
+            <Reveal as="p" className="pj-body">{p.rag.text}</Reveal>
+            <div className="pj-stats pj-stats-tight">
+              {p.rag.stats.map((s) => (
+                <Reveal className="pj-stat" key={s.label}>
+                  <div className="pj-stat-value disp">{s.value}</div>
+                  <div className="pj-stat-label">{s.label}</div>
+                  <div className="pj-stat-note mono">{s.note}</div>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="pj-sec">
           <Reveal className="eyebrow">Decisions</Reveal>

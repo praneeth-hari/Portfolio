@@ -2721,3 +2721,6 @@
 .pj-demo-cap { margin-top: 14px; font-size: 14px; line-height: 1.5; opacity: .65; max-width: 62ch; }
 
 .pj-shot { height: auto; aspect-ratio: auto; background: #fff; object-fit: contain; }
+
+.pj-shot-wrap { margin-top: 28px; }
+.pj-shot-wrap:first-of-type { margin-top: 0; }
