@@ -61,6 +61,8 @@ function limited(ip) {
 }
 
 export default async function handler(req, res) {
+  // Local only: the live site (Vercel) does not serve the chatbot.
+  if (process.env.VERCEL) { res.statusCode = 404; return res.end('Not found'); }
   res.setHeader('Content-Type', 'application/json');
   if (req.method !== 'POST') { res.statusCode = 405; return res.end(JSON.stringify({ error: 'POST only' })); }
 
