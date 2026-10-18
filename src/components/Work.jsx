@@ -41,9 +41,10 @@ const PROJECTS = [
     image: 'projects/bob-assistant.png',
     category: 'Local LLM · Automation',
     name: 'BOB Personal AI Assistant',
-    desc: 'A 100% offline Windows assistant: local LLM through Ollama, 11 PC-control tools, and voice in and out with Whisper and Piper.',
+    desc: 'A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA’s cloud decides, and 11 tools act, with allow-listed apps and protected system processes.',
     meta: 'Python · Ollama · faster-whisper · Piper · 2026',
-    href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant'
+    href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
+    study: 'bob' // opens the case-study page inside this site
   }
 ];
 

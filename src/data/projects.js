@@ -281,6 +281,143 @@ export const PROJECTS = {
     ]
   },
 
+  bob: {
+    title: 'BOB Personal AI Assistant',
+    category: 'Local LLM · Voice · Automation',
+    lead:
+      'A voice assistant for Windows that listens with Whisper, decides with a local Ollama model or NVIDIA’s cloud, and acts through 11 tools. Apps are allow-listed and system processes are protected, so it can open, close and adjust things but cannot delete files or shut the PC down.',
+    github: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
+    cover: 'projects/bob-assistant.png',
+    stack: [
+      'Python', 'faster-whisper', 'Ollama', 'Qwen 2.5 3B', 'NVIDIA NIM', 'Piper TTS', 'ONNX Runtime',
+      'sounddevice', 'pywin32', 'pycaw', 'psutil', 'DuckDuckGo search', 'pytest'
+    ],
+    stats: [
+      { value: '11', label: 'tools BOB can call', note: '10 PC controls + web search' },
+      { value: '19 / 20', label: 'spoken commands routed to the right tool', note: 'local qwen2.5 3B' },
+      { value: '728', label: 'automated tests passing', note: '0 failed, 1 skipped' },
+      { value: '0', label: 'tools that can delete files or shut down', note: 'apps are allow-listed' }
+    ],
+    problem:
+      'BOB is a local-first assistant: it should run on my own laptop without a paid API, keep the conversation on the machine when it uses the local model, and only be able to do safe things on the PC, even when the language model makes a mistake.',
+    rows: [
+      {
+        title: '1 · Hear and decide',
+        nodes: [
+          {
+            id: 'mic', label: 'Microphone', sub: 'Voice activity detection',
+            what: 'Typing "voice" in the terminal starts listening. BOB records 16 kHz mono audio and decides a phrase has ended after 1.2 seconds of silence, measured by audio energy. Saying "stop listening" ends voice mode.',
+            facts: ['Silence threshold 0.015 RMS', 'Up to 30 seconds per phrase', 'Stops voice mode after 3 audio-device errors in a row'],
+            files: ['app/voice/audio_recorder.py', 'app/interfaces/cli.py']
+          },
+          {
+            id: 'stt', label: 'faster-whisper', sub: 'base model · 141 MB',
+            what: 'Turns speech into text and detects the language automatically. On start-up it runs a 100 ms silent test clip on the GPU; if the CUDA libraries are missing it falls back to the CPU with int8 instead of crashing.',
+            why: 'The app keeps working on machines without a full CUDA setup. The cost on my laptop: 4.79 seconds to transcribe a 5-second clip on the CPU.',
+            facts: ['GPU float16, or CPU int8 as the fallback', 'Median 4.79 s for a 5-second clip (CPU)'],
+            files: ['app/voice/stt.py']
+          },
+          {
+            id: 'llm', label: 'LLM', sub: 'Ollama local · NVIDIA cloud',
+            what: 'Either qwen2.5 3B (1.9 GB) running in Ollama on the laptop, or gpt-oss-20b on NVIDIA NIM. When the cloud is the main model, the local one is registered as a silent fallback: if the cloud call fails, BOB rolls the turn back and retries locally.',
+            why: 'The assistant only depends on a small client interface, so switching between cloud, local or a test client needs no change to the assistant code.',
+            facts: ['Local model talks to Ollama on localhost only', 'Up to 4,096 tokens per cloud reply'],
+            files: ['app/llm/factory.py', 'app/llm/ollama_client.py', 'app/llm/nvidia_client.py']
+          },
+          {
+            id: 'calls', label: 'Tool calling', sub: 'Native + text fallback',
+            what: 'The model gets a schema for every tool and replies with a structured tool call. Small models sometimes write the call as JSON text instead, so a fallback parser reads it and only accepts it if the name matches a real tool.',
+            why: 'Without the fallback, a 3B model that writes {"name": "get_system_info"} as text would simply fail to act.',
+            facts: ['19 of 20 test commands picked the right tool', 'Unknown tool names are rejected'],
+            files: ['app/core/assistant.py']
+          }
+        ]
+      },
+      {
+        title: '2 · Act and answer',
+        nodes: [
+          {
+            id: 'tools', label: '11 tools', sub: '10 PC controls + web search',
+            what: 'System info (CPU, RAM, disk, GPU), open and close apps, list running apps, search files, search the whole computer, battery status, volume, screen brightness, window control and web search.',
+            facts: ['Read-only: system info, running apps, file search, battery, web search', 'Changes things: open / close apps, volume, brightness, windows', 'Windows APIs through pywin32, pycaw and psutil'],
+            files: ['app/tools/registry.py', 'app/tools/']
+          },
+          {
+            id: 'rails', label: 'Safety rails', sub: 'Allow-list · blocklist',
+            what: 'Only 7 allow-listed apps can be opened (Notepad, Calculator, Paint, Explorer, WordPad, VS Code, Snipping Tool), always without a shell. 14 system processes, including Ollama itself, cannot be closed. File search skips Windows, Program Files, AppData and other system folders.',
+            why: 'The model decides what to do, but the code decides what is possible. No tool can delete or move files, format drives or shut down.',
+            facts: ['subprocess with shell=False', '14 protected processes', '7 protected folder names'],
+            files: ['app/tools/open_application.py', 'app/tools/close_application.py', 'app/tools/search_computer.py']
+          },
+          {
+            id: 'answer', label: 'Reply', sub: 'Result back to the model',
+            what: 'The tool result goes back into the conversation and the model writes the answer. Before it is spoken, code blocks, URLs, markdown symbols and emojis are stripped so the voice does not read out "backtick backtick".',
+            facts: ['Conversation history kept in memory for the session'],
+            files: ['app/core/assistant.py', 'app/voice/tts.py']
+          },
+          {
+            id: 'tts', label: 'Piper TTS', sub: 'en_US-lessac-medium · 60 MB',
+            what: 'A neural voice running on ONNX Runtime turns the reply into 22,050 Hz audio and plays it through the speakers.',
+            facts: ['Median 0.34 s to synthesise a 14-word sentence', 'Runs locally'],
+            files: ['app/voice/tts.py']
+          }
+        ]
+      }
+    ],
+    challenge: {
+      title: 'The small local model beat the cloud',
+      text:
+        'BOB can use a 20B model on NVIDIA’s cloud or a 3B model running in Ollama on the laptop. For a short command like "open notepad", the local model finished its reply in a median of 1.03 seconds, against 16.28 seconds for the cloud model, which also took 7.7 seconds before its first word. Cloud times swing with the network and rate limits (one run took 48 seconds), which is why the local model is kept as an automatic fallback.',
+      unit: ' s', max: 17,
+      series: [
+        { label: 'Local: qwen2.5 3B in Ollama', key: 'local', tone: 'is-clean' },
+        { label: 'Cloud: gpt-oss-20b on NVIDIA NIM', key: 'cloud', tone: 'is-swap' }
+      ],
+      bars: [
+        { name: 'Time to first token', local: 0.03, cloud: 7.72 },
+        { name: 'Full reply to "open notepad"', local: 1.03, cloud: 16.28 }
+      ]
+    },
+    rag: {
+      eyebrow: 'Measured on my laptop',
+      title: 'Where a voice turn spends its time',
+      text:
+        'Median of 5 runs each on a Ryzen 7 4800H with an RTX 3050 (4 GB) and 16 GB of RAM, using the local stack. Whisper fell back to the CPU because a CUDA library was missing, which makes listening the slowest step.',
+      stats: [
+        { value: '4.79 s', label: 'speech to text', note: '5-second clip, CPU int8' },
+        { value: '1.03 s', label: 'local model reply', note: '"open notepad", qwen2.5 3B' },
+        { value: '0.34 s', label: 'text to speech', note: '14-word sentence' },
+        { value: '12.8 s', label: 'full voice turn', note: 'end of speech to reply ready' }
+      ]
+    },
+    decisions: [
+      {
+        title: 'A fallback parser for small models',
+        text: 'Small local models do not always return a proper tool call; some write it as a JSON block in plain text. BOB reads those blocks and accepts them only when the name matches a registered tool, so a 3B model can still act reliably.'
+      },
+      {
+        title: 'The cloud is optional, the laptop is not',
+        text: 'When the NVIDIA cloud is the main model, the local Ollama model is registered as a silent fallback. A rate limit or dropped connection rolls the turn back and retries locally, so the session keeps going.'
+      },
+      {
+        title: 'Test the GPU before trusting it',
+        text: 'Instead of failing when CUDA libraries are missing, the speech model runs a 100 ms silent clip at start-up and falls back to the CPU with int8 if the GPU path breaks.'
+      },
+      {
+        title: 'Clean text before speaking it',
+        text: 'Model replies are full of markdown, code, links and emojis. A normaliser strips them before the voice model sees the text, so the spoken answer sounds like a sentence, not a document.'
+      }
+    ],
+    limits: [
+      'There is no confirmation step: once the model picks a tool such as close_application it runs straight away, so unsaved work in that app can be lost.',
+      'It is fully offline only with the local Ollama model and no web search. The NVIDIA cloud mode and web search need the internet.',
+      'On my laptop speech recognition fell back to the CPU, so a full voice turn takes about 13 seconds.',
+      'There is no wake word, and BOB cannot be interrupted while it is speaking except with Ctrl+C.',
+      'It is Windows only and terminal only, with an English voice and no memory between sessions.',
+      'The 19 / 20 tool score comes from a small set of test commands. The one miss sent a request for a poem to web search.'
+    ]
+  },
+
   mediplant: {
     title: 'Medicinal Plant Detection',
     category: 'Computer Vision + RAG',
