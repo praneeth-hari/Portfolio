@@ -7,7 +7,7 @@ import SplitHeading from './SplitHeading.jsx';
 const POSTS = [
   {
     date: 'Feb 2023',
-    title: '1st Prize at Project Expo, and a finished B.Tech',
+    title: '1st Prize at Project Expo',
     excerpt: 'What the win taught me about pressure, teamwork and defending an idea.',
     image: 'awards/expo-1.jpg',
     href: 'https://www.linkedin.com/posts/kurapati-hari-praneeth-0a6699259_btech-projectexpo-engineering-ugcPost-7481316427795271680-vfcR'

@@ -87,7 +87,7 @@ const KNOWLEDGE = [
   {
     id: 'awards',
     title: 'Awards',
-    text: "Hari won 1st Prize at his college Project Expo at St. Peter's Engineering College, presenting his medicinal plant detection app. He wrote about the win, and finishing his B.Tech, on LinkedIn in July 2026."
+    text: "Hari won 1st Prize at his college Project Expo at St. Peter's Engineering College in February 2023, in the first year of his B.Tech. He wrote about the win, and finishing his B.Tech, on LinkedIn in July 2026."
   },
   {
     id: 'volunteering',
