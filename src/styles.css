@@ -1536,7 +1536,9 @@
 
     .status-strip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; margin-bottom: 36px; border: 1px solid rgba(240,238,230,.2); border-radius: 100px; font-size: 13px; color: #cfccbf; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #3ddc97; box-shadow: 0 0 0 0 rgba(61,220,151,.6); animation: statusPulse 2s infinite; }
-    .role-rot { display: inline-block; overflow: hidden; height: 1.35em; line-height: 1.35em; vertical-align: bottom; min-width: 10.6em; }
+    .role-rot { display: inline-block; position: relative; overflow: hidden; height: 1.35em; line-height: 1.35em; vertical-align: bottom; }
+    .role-measure { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
+    .role-measure .role-word { width: max-content; }
     .role-word { display: block; color: var(--paper); font-weight: 600; white-space: nowrap; }
     .status-sep { opacity: .5; }
     .status-time { font-family: 'Geist Mono', monospace; font-size: 12px; }

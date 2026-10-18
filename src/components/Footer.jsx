@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Reveal from './Reveal.jsx';
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 
@@ -21,13 +21,28 @@ const ROLES = ['AI Engineer', 'Software Engineer', 'Generative AI Engineer'];
 function RoleRotator() {
   const reduce = useReducedMotion();
   const [i, setI] = useState(0);
+  // measure every role once so the chip can shrink and grow to fit the word that is showing
+  const measure = useRef([]);
+  const [widths, setWidths] = useState(null);
+  useLayoutEffect(() => {
+    const read = () => setWidths(measure.current.map((el) => (el ? Math.ceil(el.getBoundingClientRect().width) : 0)));
+    read();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(read);
+    window.addEventListener('resize', read);
+    return () => window.removeEventListener('resize', read);
+  }, []);
   useEffect(() => {
     if (reduce) return;
     const id = setInterval(() => setI((n) => (n + 1) % ROLES.length), 2400);
     return () => clearInterval(id);
   }, [reduce]);
   return (
-    <span className="role-rot" aria-live="off">
+    <motion.span
+      className="role-rot"
+      aria-live="off"
+      animate={widths ? { width: widths[i] } : undefined}
+      transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+    >
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={ROLES[i]}
@@ -40,7 +55,12 @@ function RoleRotator() {
           {ROLES[i]}
         </motion.span>
       </AnimatePresence>
-    </span>
+      <span className="role-measure" aria-hidden="true">
+        {ROLES.map((r, k) => (
+          <span key={r} className="role-word" ref={(el) => { measure.current[k] = el; }}>{r}</span>
+        ))}
+      </span>
+    </motion.span>
   );
 }
 

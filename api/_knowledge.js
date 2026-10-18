@@ -47,7 +47,7 @@ const KNOWLEDGE = [
   {
     id: 'proj-overview',
     title: 'Projects overview',
-    text: 'Hari has four main projects. 1) MediPlant AI: identifies 78 medicinal plant species from a photo, with a local RAG assistant that cites sources (PyTorch, FastAPI, FAISS, Ollama, React). 2) Secure Cloud ML: a Flask network intrusion detection system on the NSL-KDD dataset where XGBoost reached 99.99% accuracy, with AES-256 encryption, JWT APIs and Docker. 3) AI Stock Trader: a paper-trading system for 25 US stocks with ML signals, a risk engine and a live dashboard (paper trading only, not real money). 4) BOB Personal AI Assistant: a 100% offline Windows assistant with a local LLM, 11 PC-control tools and voice input and output. Code for the projects is on github.com/praneeth-hari.'
+    text: 'Hari has four main projects. 1) MediPlant AI: identifies 78 medicinal plant species from a photo, with a local RAG assistant that cites sources (PyTorch, FastAPI, FAISS, Ollama, React). 2) Secure Cloud ML: a Flask network intrusion detection system on the NSL-KDD dataset where XGBoost reached 99.99% accuracy, with AES-256 encryption, JWT APIs and Docker. 3) AI Stock Trader: a paper-trading system for 25 US stocks with ML signals, a risk engine and a live dashboard (paper trading only, not real money). 4) BOB Personal AI Assistant: a local-first Windows voice assistant that runs on a local Ollama model or NVIDIA’s cloud, with 11 tools (10 PC controls plus web search) and voice input and output. Code for the projects is on github.com/praneeth-hari.'
   },
   {
     id: 'proj-mediplant',
@@ -72,7 +72,7 @@ const KNOWLEDGE = [
   {
     id: 'proj-bob',
     title: 'Project: BOB Personal AI Assistant',
-    text: 'BOB Personal AI Assistant (2026) is a 100% offline Windows assistant: a local LLM through Ollama, 11 PC-control tools, and voice input and output with faster-whisper and Piper. Code: github.com/praneeth-hari/BOB-Personal-AI-Assistant.'
+    text: 'BOB Personal AI Assistant (2026) is a local-first Windows voice assistant. It listens with faster-whisper, decides with a local Ollama model (qwen2.5 3B) or NVIDIA NIM in the cloud, and acts through 11 tools: 10 PC controls plus web search. Apps are allow-listed and system processes are protected, so no tool can delete files or shut the PC down. It speaks with Piper. It is fully offline only in local mode without web search. On 20 test commands it picked the right tool 19 times, and 728 automated tests pass. Code: github.com/praneeth-hari/BOB-Personal-AI-Assistant.'
   },
   {
     id: 'education',
