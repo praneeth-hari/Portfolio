@@ -31,7 +31,7 @@ const PROJECTS = [
     image: 'projects/secure-cloud-ml.png',
     category: 'Machine Learning · Security',
     name: 'Secure Cloud ML',
-    desc: 'Network intrusion detection comparing 5 models side by side (XGBoost 99.99% accuracy), with AES-256 encrypted data transfer and a JWT-secured API.',
+    desc: 'Network intrusion detection comparing 5 models side by side (XGBoost 99.99% accuracy), with AES-256 encryption on uploads and a JWT-secured API.',
     meta: 'Flask · XGBoost · TensorFlow · Docker · 2026',
     href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml',
     study: 'securecloud' // opens the case-study page inside this site
