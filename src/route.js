@@ -1,3 +1,11 @@
+// refreshing (F5) on a case-study page goes back to the home page; shared links still open the case study
+try {
+  const nav = performance.getEntriesByType('navigation')[0];
+  if (nav && nav.type === 'reload' && /^#\/project\//.test(window.location.hash)) {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+} catch { /* ignore */ }
+
 /*
  * Tiny hash router: "#/project/<slug>" shows a case-study page, anything else shows the home page.
  * (No router library needed.)
