@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
+import SplitHeading from './SplitHeading.jsx';
+import { openProject } from '../route.js';
 
 const PROJECTS = [
   {
@@ -20,7 +22,8 @@ const PROJECTS = [
     desc: 'Identifies 78 medicinal plants from a photo in about 9 ms, then answers questions with a local RAG assistant that cites its sources.',
     meta: 'PyTorch · FastAPI · React · FAISS · Ollama · 2025',
     href: 'https://github.com/praneeth-hari/Medicinal-Plant-Detection',
-    demo: 'https://ai-medicinal-plant-identification.vercel.app/'
+    demo: 'https://ai-medicinal-plant-identification.vercel.app/',
+    study: 'mediplant' // opens the case-study page inside this site
   },
   {
     cls: 'work-3',
@@ -86,7 +89,7 @@ export default function Work() {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Selected work</Reveal>
-          <Reveal as="h2" className="disp">Featured Projects</Reveal>
+          <SplitHeading>{"Featured Projects"}</SplitHeading>
         </div>
         <Reveal as="a" href="https://github.com/praneeth-hari" target="_blank" rel="noopener noreferrer" className="view-all">View GitHub ↗</Reveal>
       </div>
@@ -99,14 +102,24 @@ export default function Work() {
               <h3 className="disp">{p.name}</h3>
               <p className="work-desc">{p.desc}</p>
               <div className="sub">{p.meta}</div>
-              {/* whole card opens the live demo if there is one, otherwise the repo */}
-              <a
-                className="card-hit"
-                href={p.demo || p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={p.name + (p.demo ? ' live demo' : ' on GitHub')}
-              />
+              {/* whole card opens the case study (if there is one), the live demo, or the repo */}
+              {p.study ? (
+                <a
+                  className="card-hit"
+                  href={'#/project/' + p.study}
+                  aria-label={p.name + ' case study'}
+                  onClick={(e) => { e.preventDefault(); openProject(p.study); }}
+                />
+              ) : (
+                <a
+                  className="card-hit"
+                  href={p.demo || p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={p.name + (p.demo ? ' live demo' : ' on GitHub')}
+                />
+              )}
+              {p.study && <span className="card-case">Case study →</span>}
               <span className="card-links">
                 {p.demo && (
                   <a href={p.demo} target="_blank" rel="noopener noreferrer">Live demo ↗</a>

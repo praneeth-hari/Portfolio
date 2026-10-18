@@ -4,7 +4,8 @@ import { BotAvatar } from 'bot-avatars';
 
 /*
  * "Ask about Hari" chat. Sends the conversation to /api/chat (RAG over
- * api/_knowledge.js with Gemini) and shows the answer plus its sources.
+ * api/_knowledge.js with Claude Haiku). The answer streams in word by word and is
+ * followed by the sources it used.
  */
 const SUGGESTIONS = [
   'What does Hari work on at Breviq AI?',
@@ -14,9 +15,12 @@ const SUGGESTIONS = [
 ];
 
 const HELLO = {
+  id: 0,
   role: 'assistant',
   content: "Hi! I'm a bot that answers questions about Hari's work, projects and skills. What would you like to know?"
 };
+
+let nextId = 1;
 
 export default function ChatBot() {
   const reduce = useReducedMotion();
@@ -30,7 +34,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     const el = listRef.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce ? 'auto' : 'smooth' });
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce || busy ? 'auto' : 'smooth' });
   }, [messages, busy, reduce]);
 
   useEffect(() => {
@@ -40,26 +44,70 @@ export default function ChatBot() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
+  const patch = (id, fn) => setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, ...fn(m) } : m)));
+
   const ask = async (text) => {
     const q = text.trim();
     if (!q || busy) return;
-    const next = [...messages, { role: 'user', content: q }];
-    setMessages(next);
+    const userMsg = { id: nextId++, role: 'user', content: q };
+    const botId = nextId++;
+    const history = [...messages, userMsg];
+    // the greeting is UI only and failed answers are not worth sending back
+    const payload = history.slice(1).filter((m) => !m.error).map(({ role, content }) => ({ role, content }));
+    setMessages([...history, { id: botId, role: 'assistant', content: '', streaming: true }]);
     setInput('');
     setBusy(true);
+
+    const fail = (message) => patch(botId, () => ({ content: message, error: true, streaming: false }));
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // the greeting is UI only, so it is not sent
-        body: JSON.stringify({ messages: next.slice(1).map(({ role, content }) => ({ role, content })) })
+        body: JSON.stringify({ stream: true, messages: payload })
       });
-      const data = await res.json().catch(() => ({}));
-      setMessages((m) => [...m, res.ok
-        ? { role: 'assistant', content: data.answer, sources: data.sources }
-        : { role: 'assistant', content: data.error || 'The bot could not answer right now.', error: true }]);
+      const ctype = res.headers.get('content-type') || '';
+
+      if (!res.ok || !ctype.includes('ndjson') || !res.body) {
+        // plain JSON: an error, or a server that does not stream
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.answer) patch(botId, () => ({ content: data.answer, sources: data.sources, streaming: false }));
+        else fail(data.error || 'The bot could not answer right now.');
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let sawDone = false;
+      const handle = (evt) => {
+        if (evt.type === 'delta') {
+          patch(botId, (m) => ({ content: m.content + evt.text }));
+        } else if (evt.type === 'done') {
+          sawDone = true;
+          patch(botId, () => ({ streaming: false, sources: evt.sources }));
+        } else if (evt.type === 'error') {
+          sawDone = true;
+          patch(botId, (m) => (m.content ? { streaming: false } : { content: evt.message, error: true, streaming: false }));
+        }
+      };
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl;
+        while ((nl = buf.indexOf('\n')) >= 0) {
+          const line = buf.slice(0, nl).trim();
+          buf = buf.slice(nl + 1);
+          if (!line) continue;
+          try { handle(JSON.parse(line)); } catch { /* ignore a broken line */ }
+        }
+      }
+      if (!sawDone) patch(botId, (m) => (m.content ? { streaming: false } : { content: 'The bot could not answer right now.', error: true, streaming: false }));
     } catch {
-      setMessages((m) => [...m, { role: 'assistant', content: 'Could not reach the bot. Check your connection and try again.', error: true }]);
+      patch(botId, (m) => (m.content
+        ? { streaming: false }
+        : { content: 'Could not reach the bot. Check your connection and try again.', error: true, streaming: false }));
     } finally {
       setBusy(false);
     }
@@ -67,6 +115,7 @@ export default function ChatBot() {
 
   const onSubmit = (e) => { e.preventDefault(); ask(input); };
   const showSuggestions = messages.length === 1 && !busy;
+  const lastDone = [...messages].reverse().find((m) => m.role === 'assistant' && !m.streaming && m.id !== 0);
 
   return (
     <>
@@ -103,22 +152,25 @@ export default function ChatBot() {
               <button className="chat-x" onClick={() => setOpen(false)} aria-label="Close chat">×</button>
             </header>
 
-            <div className="chat-list" ref={listRef} data-lenis-prevent aria-live="polite">
-              {messages.map((m, i) => (
-                <div key={i} className={'chat-msg ' + m.role + (m.error ? ' error' : '')}>
-                  <div className="chat-bubble">{m.content}</div>
+            {/* the list is not a live region (it would read out every streamed word); the finished answer is announced below */}
+            <div className="chat-list" ref={listRef} data-lenis-prevent aria-busy={busy}>
+              {messages.map((m) => (
+                <div key={m.id} className={'chat-msg ' + m.role + (m.error ? ' error' : '')}>
+                  {m.streaming && !m.content ? (
+                    <div className="chat-bubble chat-typing" aria-label="Thinking"><i /><i /><i /></div>
+                  ) : (
+                    <div className="chat-bubble">
+                      {m.content}
+                      {m.streaming && <span className="chat-caret" aria-hidden="true" />}
+                    </div>
+                  )}
                   {m.sources?.length > 0 && (
                     <div className="chat-sources">
-                      {m.sources.map((s) => <span key={s}>{s}</span>)}
+                      {m.sources.map((src) => <span key={src}>{src}</span>)}
                     </div>
                   )}
                 </div>
               ))}
-              {busy && (
-                <div className="chat-msg assistant">
-                  <div className="chat-bubble chat-typing" aria-label="Thinking"><i /><i /><i /></div>
-                </div>
-              )}
               {showSuggestions && (
                 <div className="chat-suggest">
                   {SUGGESTIONS.map((s) => (
@@ -127,6 +179,7 @@ export default function ChatBot() {
                 </div>
               )}
             </div>
+            <div className="chat-sr" role="status" aria-live="polite">{lastDone ? lastDone.content : ''}</div>
 
             <form className="chat-form" onSubmit={onSubmit}>
               <input

@@ -2,9 +2,10 @@ import { useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 const TEXT =
-  "Hi, I'm Hari Praneeth, an aspiring AI Engineer and Software Engineer passionate about building " +
-  'intelligent systems that solve real-world problems. I work with LLMs, RAG, machine learning, and ' +
-  'modern software engineering to turn ideas into reliable, practical applications.';
+  "Hi, I\u2019m Hari Praneeth, a Generative AI Engineer building LLM and RAG applications in Python. " +
+  'As an AI Engineering Intern at Breviq AI, I work on clinical AI workflows with FastAPI, LangGraph ' +
+  'and Pinecone, from retrieval and evaluation to real-time voice. I care about systems that are ' +
+  'measured, reliable and useful.';
 
 const WORDS = TEXT.split(' ');
 const N = WORDS.length;
@@ -45,8 +46,8 @@ export default function About() {
       </p>
 
       <div className="cv-actions">
-        <a href="./Hari_Praneeth_Resume.pdf" target="_blank" rel="noopener noreferrer" className="cv-btn cv-btn-primary">Read My CV</a>
-        <a href="./Hari_Praneeth_Resume.pdf" download="Hari_Praneeth_Resume.pdf" className="cv-btn cv-btn-secondary">Download CV ↓</a>
+        <a href="./Hari_Praneeth_Resume.pdf" target="_blank" rel="noopener noreferrer" className="cv-btn cv-btn-primary" data-magnetic>Read My CV</a>
+        <a href="./Hari_Praneeth_Resume.pdf" download="Hari_Praneeth_Resume.pdf" className="cv-btn cv-btn-secondary" data-magnetic>Download CV ↓</a>
       </div>
     </section>
   );

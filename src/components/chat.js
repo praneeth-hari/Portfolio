@@ -95,6 +95,9 @@ export default async function handler(req, res) {
   const question = typeof last?.content === 'string' ? last.content.trim().slice(0, MAX_QUESTION) : '';
   if (!question || last.role !== 'user') { res.statusCode = 400; return res.end(JSON.stringify({ error: 'Please type a question.' })); }
 
+  const wantsStream = body.stream === true;
+  let started = false; // true once the first streamed line has been written
+  const send = (obj) => { started = true; res.write(JSON.stringify(obj) + '\n'); };
   try {
     const chunks = retrieve(question);
     const context = chunks.map((c) => `[${c.title}] ${c.text}`).join('\n\n');
@@ -114,6 +117,7 @@ export default async function handler(req, res) {
         model: CHAT_MODEL,
         max_tokens: 500,
         temperature: 0.2,
+        stream: wantsStream,
         system: SYSTEM + '\n\nCONTEXT:\n' + context,
         messages: turns
       })
@@ -124,13 +128,52 @@ export default async function handler(req, res) {
       res.statusCode = 502;
       return res.end(JSON.stringify({ error: r.status === 429 ? 'The bot is busy right now. Please try again in a minute.' : 'The bot could not answer right now.' }));
     }
-    const data = await r.json();
-    const answer = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
-    if (!answer) { res.statusCode = 502; return res.end(JSON.stringify({ error: 'The bot could not answer right now.' })); }
+    if (!wantsStream) {
+      const data = await r.json();
+      const answer = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
+      if (!answer) { res.statusCode = 502; return res.end(JSON.stringify({ error: 'The bot could not answer right now.' })); }
+      res.statusCode = 200;
+      return res.end(JSON.stringify({ answer, sources: chunks.slice(0, 3).map((c) => c.title) }));
+    }
+
+    // streaming: one JSON object per line (the answer word by word, then a final "done" line)
     res.statusCode = 200;
-    return res.end(JSON.stringify({ answer, sources: chunks.slice(0, 3).map((c) => c.title) }));
+    res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('X-Accel-Buffering', 'no');
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let got = false;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+      let idx;
+      while ((idx = buf.indexOf('\n\n')) >= 0) {
+        const evt = buf.slice(0, idx);
+        buf = buf.slice(idx + 2);
+        const line = evt.split('\n').find((l) => l.startsWith('data:'));
+        if (!line) continue;
+        let j;
+        try { j = JSON.parse(line.slice(5).trim()); } catch { continue; }
+        if (j.type === 'content_block_delta' && j.delta?.type === 'text_delta' && j.delta.text) {
+          got = true;
+          send({ type: 'delta', text: j.delta.text });
+        } else if (j.type === 'error') {
+          throw new Error('stream error ' + (j.error?.type || ''));
+        }
+      }
+    }
+    if (!got) { send({ type: 'error', message: 'The bot could not answer right now.' }); return res.end(); }
+    send({ type: 'done', sources: chunks.slice(0, 3).map((c) => c.title) });
+    return res.end();
   } catch (e) {
     console.error(e);
+    if (started) { // already streaming: report the problem inside the stream
+      try { send({ type: 'error', message: 'Something went wrong. Please try again.' }); } catch {}
+      return res.end();
+    }
     res.statusCode = 500;
     return res.end(JSON.stringify({ error: 'Something went wrong. Please try again.' }));
   }

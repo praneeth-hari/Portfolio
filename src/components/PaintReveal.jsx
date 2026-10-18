@@ -219,7 +219,7 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
 
   return (
     <div className={'paint' + (armed ? ' is-armed' : '') + (painted ? ' is-painted' : '')} ref={boxRef}>
-      <img className="paint-base" src={base} alt={alt} draggable="false" />
+      <img className="paint-base" src={base} alt={alt} draggable="false" loading="eager" decoding="async" fetchPriority="high" />
       {!reduce && (
         <>
           <canvas className="paint-canvas" ref={canvasRef} aria-hidden="true" />
