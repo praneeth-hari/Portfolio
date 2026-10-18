@@ -1,4 +1,7 @@
+import { useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Reveal from './Reveal.jsx';
+import SplitHeading from './SplitHeading.jsx';
 
 const JOBS = [
   {
@@ -18,13 +21,49 @@ const JOBS = [
   }
 ];
 
+// wrap the numbers in a bullet so the impact stands out
+const hi = (text) =>
+  text.split(/((?<![A-Za-z])\d+(?:\.\d+)?%?)/g).map((part, i) => (i % 2 ? <b key={i} className="num">{part}</b> : part));
+
+function Timeline({ points }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 65%', 'end 55%'] });
+  const fill = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4 });
+  return (
+    <div className="tl" ref={ref}>
+      <div className="tl-track" aria-hidden="true">
+        <motion.div className="tl-fill" style={{ scaleY: fill }} />
+      </div>
+      {points.map((p) => (
+        <motion.div
+          key={p}
+          className="tl-item"
+          initial={{ opacity: 0.25 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ margin: '0px 0px -38% 0px' }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.span
+            className="tl-dot"
+            initial={{ scale: 0.6, backgroundColor: 'var(--paper)' }}
+            whileInView={{ scale: 1, backgroundColor: '#2f5cff' }}
+            viewport={{ margin: '0px 0px -38% 0px' }}
+            transition={{ duration: 0.35 }}
+          />
+          <p>{hi(p)}</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
 export default function Experience() {
   return (
     <section className="wrap" id="experience">
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Experience</Reveal>
-          <Reveal as="h2" className="disp">Where I&rsquo;ve worked</Reveal>
+          <SplitHeading>{"Where I’ve worked"}</SplitHeading>
         </div>
       </div>
 
@@ -40,11 +79,7 @@ export default function Experience() {
             <div className="exp-body">
               <h3 className="exp-role disp">{j.role}</h3>
               <div className="exp-project">{j.project}</div>
-              <ul className="exp-points">
-                {j.points.map((p) => (
-                  <li key={p}>{p}</li>
-                ))}
-              </ul>
+              <Timeline points={j.points} />
               <div className="exp-tags">
                 {j.stack.map((t) => (
                   <span key={t}>{t}</span>

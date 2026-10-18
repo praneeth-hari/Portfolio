@@ -44,17 +44,21 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
   const reduce = useReducedMotion();
   const boxRef = useRef(null);
   const canvasRef = useRef(null);
+  const baseCvRef = useRef(null);
   const ringRef = useRef(null);
   const [painted, setPainted] = useState(false);
+  const [baseReady, setBaseReady] = useState(false);
   const [armed, setArmed] = useState(false); // touch mode switched on
 
   useEffect(() => {
     if (reduce) return;
     const box = boxRef.current;
     const canvas = canvasRef.current;
+    const baseCv = baseCvRef.current;
     const ring = ringRef.current;
-    if (!box || !canvas) return;
+    if (!box || !canvas || !baseCv) return;
     const ctx = canvas.getContext('2d');
+    const bctx = baseCv.getContext('2d');
     const mask = document.createElement('canvas');
     const mctx = mask.getContext('2d');
     const stamps = makeStamps(128);
@@ -62,6 +66,27 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
     let imgReady = false;
     img.onload = () => { imgReady = true; };
     img.src = reveal;
+    // The base photo is drawn on its own canvas so the brush can ERASE it where it paints.
+    // Otherwise the real photo's hair and shoulders stay visible around the revealed helmet.
+    const baseImg = new Image();
+    let baseReady = false;
+    baseImg.onload = () => {
+      baseReady = true;
+      setBaseReady(true);
+      drawBase(false);
+    };
+    baseImg.src = base;
+    const drawBase = (erase) => {
+      if (!baseReady) return;
+      bctx.globalCompositeOperation = 'source-over';
+      bctx.clearRect(0, 0, W, H);
+      bctx.drawImage(baseImg, 0, 0, W, H);
+      if (erase) {
+        bctx.globalCompositeOperation = 'destination-out';
+        bctx.drawImage(mask, 0, 0);
+        bctx.globalCompositeOperation = 'source-over';
+      }
+    };
 
     let W = 0, H = 0;
     let dabs = [];
@@ -78,8 +103,9 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       W = Math.max(1, Math.round(r.width * dpr));
       H = Math.max(1, Math.round(r.height * dpr));
-      canvas.width = mask.width = W;
-      canvas.height = mask.height = H;
+      canvas.width = mask.width = baseCv.width = W;
+      canvas.height = mask.height = baseCv.height = H;
+      drawBase(false);
     };
     size();
     const ro = new ResizeObserver(size);
@@ -110,6 +136,7 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
         ctx.drawImage(img, 0, 0, W, H);
         ctx.globalCompositeOperation = 'source-over';
       }
+      drawBase(dabs.length > 0 && imgReady);
       if (dabs.length) raf = requestAnimationFrame(frame);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
@@ -215,13 +242,14 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
       canvas.removeEventListener('pointerleave', onLeave);
       canvas.removeEventListener('touchmove', onTouchMove);
     };
-  }, [reduce, reveal]);
+  }, [reduce, reveal, base]);
 
   return (
-    <div className={'paint' + (armed ? ' is-armed' : '') + (painted ? ' is-painted' : '')} ref={boxRef}>
+    <div className={'paint' + (armed ? ' is-armed' : '') + (painted ? ' is-painted' : '') + (baseReady ? ' base-ready' : '')} ref={boxRef}>
       <img className="paint-base" src={base} alt={alt} draggable="false" loading="eager" decoding="async" fetchPriority="high" />
       {!reduce && (
         <>
+          <canvas className="paint-basecv" ref={baseCvRef} aria-hidden="true" />
           <canvas className="paint-canvas" ref={canvasRef} aria-hidden="true" />
           <div className="paint-ring" ref={ringRef} aria-hidden="true" />
           <div className="paint-hint mono" aria-hidden="true">

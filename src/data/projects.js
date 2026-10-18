@@ -11,6 +11,11 @@ export const PROJECTS = {
     github: 'https://github.com/praneeth-hari/Medicinal-Plant-Detection',
     demo: 'https://ai-medicinal-plant-identification.vercel.app/',
     cover: 'projects/medicinal-plant.png',
+    video: {
+      src: 'projects/medicinal-plant-demo.mp4',
+      poster: 'projects/medicinal-plant-demo-poster.jpg',
+      caption: 'One minute, start to finish: upload a leaf photo, get the species with a confidence score, then ask the cited RAG assistant about its uses.',
+    },
     stack: [
       'Python', 'PyTorch', 'MobileNetV3', 'FastAPI', 'SQLite', 'SQLAlchemy', 'sentence-transformers',
       'FAISS', 'Ollama', 'Qwen 2.5 3B', 'React', 'Vite', 'Tailwind CSS'

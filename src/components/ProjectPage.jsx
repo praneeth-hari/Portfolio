@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import { PROJECTS } from '../data/projects.js';
@@ -103,6 +103,40 @@ function CoverBg({ src }) {
   );
 }
 
+// demo video: poster first, plays muted when scrolled into view, pauses when it leaves
+function Demo({ video }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); },
+      { threshold: 0.5 }
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  const base = import.meta.env.BASE_URL;
+  return (
+    <figure className="pj-demo">
+      <video
+        ref={ref}
+        className="pj-demo-video"
+        src={base + video.src}
+        poster={base + video.poster}
+        muted
+        loop
+        playsInline
+        controls
+        preload="metadata"
+      />
+      <figcaption className="pj-demo-cap">{video.caption}</figcaption>
+    </figure>
+  );
+}
+
 export default function ProjectPage({ slug }) {
   const p = PROJECTS[slug];
 
@@ -145,6 +179,14 @@ export default function ProjectPage({ slug }) {
           <Reveal className="eyebrow">The problem</Reveal>
           <Reveal as="p" className="pj-body pj-body-lg">{p.problem}</Reveal>
         </section>
+
+        {p.video && (
+          <section className="pj-sec">
+            <Reveal className="eyebrow">See it work</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">The whole flow, live</Reveal>
+            <Reveal><Demo video={p.video} /></Reveal>
+          </section>
+        )}
 
         <section className="pj-sec">
           <Reveal className="eyebrow">How it works</Reveal>
