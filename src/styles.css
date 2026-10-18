@@ -2719,3 +2719,5 @@
   box-shadow: 0 30px 60px -30px rgba(18,18,16,.35);
 }
 .pj-demo-cap { margin-top: 14px; font-size: 14px; line-height: 1.5; opacity: .65; max-width: 62ch; }
+
+.pj-shot { height: auto; aspect-ratio: auto; background: #fff; object-fit: contain; }

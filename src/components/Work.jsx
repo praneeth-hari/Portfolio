@@ -12,7 +12,8 @@ const PROJECTS = [
     name: 'AI Stock Trader',
     desc: 'Paper-trading system for 25 US stocks: ML signals, a risk engine that can veto any trade, walk-forward backtests and a live dashboard. Benchmarked honestly against SPY.',
     meta: 'Python · scikit-learn · Streamlit · SQLAlchemy · 2026',
-    href: 'https://github.com/praneeth-hari/ai-stock-trader'
+    href: 'https://github.com/praneeth-hari/ai-stock-trader',
+    study: 'trader' // opens the case-study page inside this site
   },
   {
     cls: 'work-2',

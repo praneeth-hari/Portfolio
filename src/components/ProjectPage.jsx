@@ -7,7 +7,7 @@ import { goHome } from '../route.js';
 /* ---------- clickable architecture diagram ---------- */
 function Architecture({ rows }) {
   const reduce = useReducedMotion();
-  const [sel, setSel] = useState('cnn');
+  const [sel, setSel] = useState(rows[0].nodes[0].id);
   const all = rows.flatMap((r) => r.nodes);
   const node = all.find((n) => n.id === sel) || all[0];
 
@@ -73,7 +73,7 @@ function Architecture({ rows }) {
   );
 }
 
-function Bar({ label, value, tone }) {
+function Bar({ label, value, tone, max = 100, unit = '%' }) {
   const reduce = useReducedMotion();
   return (
     <div className="bar-row">
@@ -82,12 +82,12 @@ function Bar({ label, value, tone }) {
         <motion.div
           className={'bar-fill ' + tone}
           initial={reduce ? false : { width: 0 }}
-          whileInView={{ width: value + '%' }}
+          whileInView={{ width: Math.max(1.5, (value / max) * 100) + '%' }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
         />
       </div>
-      <span className="bar-val">{value}%</span>
+      <span className="bar-val">{value}{unit}</span>
     </div>
   );
 }
@@ -188,6 +188,19 @@ export default function ProjectPage({ slug }) {
           </section>
         )}
 
+        {p.shot && (
+          <section className="pj-sec">
+            <Reveal className="eyebrow">The dashboard</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">Where I watch it run</Reveal>
+            <Reveal>
+              <figure className="pj-demo">
+                <img className="pj-demo-video pj-shot" src={import.meta.env.BASE_URL + p.shot.src} alt={p.shot.alt} loading="lazy" />
+                <figcaption className="pj-demo-cap">{p.shot.caption}</figcaption>
+              </figure>
+            </Reveal>
+          </section>
+        )}
+
         <section className="pj-sec">
           <Reveal className="eyebrow">How it works</Reveal>
           <Reveal as="h2" className="pj-h2 disp">Architecture</Reveal>
@@ -202,15 +215,20 @@ export default function ProjectPage({ slug }) {
             {p.challenge.bars.map((b) => (
               <div className="bars-group" key={b.name}>
                 <div className="bars-name">{b.name}</div>
-                <Bar label="Normal test photos" value={b.clean} tone="is-clean" />
-                <Bar label="Backgrounds swapped" value={b.swapped} tone="is-swap" />
+                {(p.challenge.series || [
+                  { label: 'Normal test photos', key: 'clean', tone: 'is-clean' },
+                  { label: 'Backgrounds swapped', key: 'swapped', tone: 'is-swap' }
+                ]).map((sr) => (
+                  <Bar key={sr.key} label={sr.label} value={b[sr.key]} tone={sr.tone}
+                    max={p.challenge.max || 100} unit={p.challenge.unit || '%'} />
+                ))}
               </div>
             ))}
           </Reveal>
         </section>
 
         <section className="pj-sec">
-          <Reveal className="eyebrow">Retrieval quality</Reveal>
+          <Reveal className="eyebrow">{p.rag.eyebrow || 'Retrieval quality'}</Reveal>
           <Reveal as="h2" className="pj-h2 disp">{p.rag.title}</Reveal>
           <Reveal as="p" className="pj-body">{p.rag.text}</Reveal>
           <div className="pj-stats pj-stats-tight">
