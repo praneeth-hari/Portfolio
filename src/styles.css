@@ -2725,3 +2725,8 @@
 
 .pj-shot-wrap { margin-top: 28px; }
 .pj-shot-wrap:first-of-type { margin-top: 0; }
+
+/* Highlights: two landscape cards so the group photos show everyone (tall cards on phones) */
+.thought-grid { grid-template-columns: repeat(2, 1fr); }
+.thought { aspect-ratio: 4 / 3; }
+@media (max-width: 900px) { .thought-grid { grid-template-columns: 1fr; } .thought { aspect-ratio: 3 / 3.6; } }

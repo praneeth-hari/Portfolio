@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 
-// Three cards. Edit the 2nd and 3rd when your posts are ready.
+// Highlight cards. Add a new object here when you have another highlight.
 // A card with an `href` becomes a link; `image` is optional (file in public/).
 const POSTS = [
   {
@@ -18,8 +18,7 @@ const POSTS = [
     excerpt: 'Explained the app, helped run the event and spoke on stage, and learned to make a product simple for anyone.',
     image: 'awards/volunteer-1.jpg'
     // href: 'paste your LinkedIn post link here once it is posted'
-  },
-  { date: 'Coming soon', title: 'Next post', excerpt: '' }
+  }
 ];
 
 function CardImage({ src }) {
