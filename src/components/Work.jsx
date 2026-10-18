@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
@@ -60,25 +60,52 @@ function CardImage({ src, alt }) {
   );
 }
 
-// Card tilts back and grows into place as it scrolls up the screen (Salix-style)
-function RiseCard({ className, children }) {
-  const ref = useRef(null);
+// Pinned horizontal scroll: the section sticks to the screen and the cards slide sideways
+// as you scroll down. On phones it falls back to a normal vertical list.
+function HScroll({ children, count }) {
+  const outer = useRef(null);
+  const track = useRef(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'start 0.55'] });
-  const p = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.5 });
-  const rotateX = useTransform(p, [0, 1], [14, 0]);
-  const scale = useTransform(p, [0, 1], [0.9, 1]);
-  const opacity = useTransform(p, [0, 0.6], [0.35, 1]);
+  const [dist, setDist] = useState(0);   // how far the track must travel
+  const distRef = useRef(0);
+  const [on, setOn] = useState(false);   // horizontal mode active?
+
+  useEffect(() => {
+    const measure = () => {
+      const wide = window.innerWidth > 900 && !reduce;
+      setOn(wide);
+      if (wide && track.current) {
+        const pad = Math.max(24, (window.innerWidth - 1240) / 2 + 24);
+        const d = Math.max(0, track.current.scrollWidth - window.innerWidth + pad);
+        distRef.current = d;
+        setDist(d);
+      }
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    const t = setTimeout(measure, 400);
+    return () => { window.removeEventListener('resize', measure); clearTimeout(t); };
+  }, [reduce, count]);
+
+  const { scrollYProgress } = useScroll({ target: outer, offset: ['start start', 'end end'] });
+  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const x = useTransform(p, (v) => -v * distRef.current);
+  const bar = useTransform(p, [0, 1], ['0%', '100%']);
+  const [idx, setIdx] = useState(0);
+  useEffect(() => p.on('change', (v) => setIdx(Math.min(count - 1, Math.round(v * (count - 1))))), [p, count]);
+
   return (
-    <div ref={ref} className="rise-wrap">
-      <motion.div
-        className={className}
-        style={reduce ? undefined : { rotateX, scale, opacity, transformPerspective: 1200 }}
-        whileHover={{ y: -6 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-      >
-        {children}
-      </motion.div>
+    <div ref={outer} className={on ? 'hs-outer' : 'work-grid'} style={on ? { height: `calc(100vh + ${dist}px)` } : undefined}>
+      {on ? (
+        <div className="hs-stick">
+          <div className="hs-meta">
+            <span className="hs-count"><b>{String(idx + 1).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}</span>
+            <span className="hs-line"><motion.i style={{ width: bar }} /></span>
+            <span className="hs-hint">Keep scrolling</span>
+          </div>
+          <motion.div ref={track} className="hs-track" style={{ x }}>{children}</motion.div>
+        </div>
+      ) : children}
     </div>
   );
 }
@@ -94,9 +121,10 @@ export default function Work() {
         <Reveal as="a" href="https://github.com/praneeth-hari" target="_blank" rel="noopener noreferrer" className="view-all">View GitHub ↗</Reveal>
       </div>
 
-      <div className="work-grid">
+      <HScroll count={PROJECTS.length}>
         {PROJECTS.map((p, i) => (
-          <RiseCard key={i} className={'work-card ' + p.cls}>
+          <div key={i} className={'work-card hs-card ' + p.cls}>
+              <span className="hs-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <CardImage src={p.image} alt={p.name + ' preview'} />
               <span className="card-badge">{p.category}</span>
               <h3 className="disp">{p.name}</h3>
@@ -126,9 +154,9 @@ export default function Work() {
                 )}
                 <a href={p.href} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
               </span>
-          </RiseCard>
+          </div>
         ))}
-      </div>
+      </HScroll>
     </section>
   );
 }

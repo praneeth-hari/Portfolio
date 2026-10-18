@@ -2,7 +2,7 @@ import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 
 const EDUCATION = [
-  { years: '2022–2026', title: 'B.Tech, Information Technology', sub: "St. Peter's Engineering College · CGPA 7.0/10" },
+  { years: '2022–2026', title: 'B.Tech, Information Technology', sub: "St. Peter's Engineering College" },
   { years: '2020–2022', title: 'Intermediate Education', sub: "Bhavan's Sri Aurobindo Junior College · Science, Mathematics" }
 ];
 

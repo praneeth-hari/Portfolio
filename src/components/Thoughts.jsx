@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import Reveal from './Reveal.jsx';
+import SplitHeading from './SplitHeading.jsx';
 
 // Three cards. Edit the 2nd and 3rd when your posts are ready.
 // A card with an `href` becomes a link; `image` is optional (file in public/).
 const POSTS = [
   {
-    date: 'Jul 2026 · LinkedIn',
+    date: 'Feb 2023',
     title: '1st Prize at Project Expo, and a finished B.Tech',
     excerpt: 'What the win taught me about pressure, teamwork and defending an idea.',
     image: 'awards/expo-1.jpg',
@@ -32,8 +33,8 @@ export default function Thoughts() {
     <section className="wrap" id="thoughts">
       <div className="section-head">
         <div>
-          <Reveal className="eyebrow">Writing</Reveal>
-          <Reveal as="h2" className="disp">Thoughts</Reveal>
+          <Reveal className="eyebrow">Moments</Reveal>
+          <SplitHeading>{"Highlights"}</SplitHeading>
         </div>
       </div>
 

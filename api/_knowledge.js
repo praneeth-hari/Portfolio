@@ -45,6 +45,11 @@ const KNOWLEDGE = [
     text: 'Hari extended the Navent AI FastAPI backend with event-loop offloading, S3/STS storage, SQS batch processing, PostgreSQL persistence and document merging.'
   },
   {
+    id: 'proj-overview',
+    title: 'Projects overview',
+    text: 'Hari has four main projects. 1) MediPlant AI: identifies 78 medicinal plant species from a photo, with a local RAG assistant that cites sources (PyTorch, FastAPI, FAISS, Ollama, React). 2) Secure Cloud ML: a Flask network intrusion detection system on the NSL-KDD dataset where XGBoost reached 99.99% accuracy, with AES-256 encryption, JWT APIs and Docker. 3) AI Stock Trader: a paper-trading system for 25 US stocks with ML signals, a risk engine and a live dashboard (paper trading only, not real money). 4) BOB Personal AI Assistant: a 100% offline Windows assistant with a local LLM, 11 PC-control tools and voice input and output. Code for the projects is on github.com/praneeth-hari.'
+  },
+  {
     id: 'proj-mediplant',
     title: 'Project: MediPlant AI',
     text: 'MediPlant AI (Medicinal Plant Detection, Jun 2025 to Nov 2025) identifies 78 medicinal plant species from a photo in about 9 ms, then a local RAG assistant answers plant-specific questions with source citations. Stack: Python, PyTorch, FastAPI, FAISS, Sentence-Transformers, Ollama and React. A live demo is at ai-medicinal-plant-identification.vercel.app and the code is at github.com/praneeth-hari/Medicinal-Plant-Detection.'
@@ -72,7 +77,7 @@ const KNOWLEDGE = [
   {
     id: 'education',
     title: 'Education',
-    text: "Hari completed a B.Tech in Information Technology at St. Peter's Engineering College, Hyderabad (2022 to 2026) with a CGPA of 7.0/10. Before that he did Intermediate education (Science, Mathematics) at Bhavan's Sri Aurobindo Junior College (2020 to 2022)."
+    text: "Hari completed a B.Tech in Information Technology at St. Peter's Engineering College, Hyderabad (2022 to 2026). Before that he did Intermediate education (Science, Mathematics) at Bhavan's Sri Aurobindo Junior College (2020 to 2022)."
   },
   {
     id: 'certs',

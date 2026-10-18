@@ -17,6 +17,7 @@ import useSmoothScroll from './components/useSmoothScroll.js';
 import useMagnetic from './components/useMagnetic.js';
 import ScrollProgress from './components/ScrollProgress.jsx';
 import ChatBot from './components/ChatBot.jsx';
+import SectionRail from './components/SectionRail.jsx';
 import SkillModal from './components/SkillModal.jsx';
 import ProjectPage from './components/ProjectPage.jsx';
 import { getProjectSlug, onRouteChange } from './route.js';
@@ -87,6 +88,7 @@ export default function App() {
       <GradientBackground palette="aurora" />
       <ScrollProgress />
       <Nav />
+      {!slug && !loading && <SectionRail />}
       {slug ? (
         <ProjectPage slug={slug} />
       ) : (

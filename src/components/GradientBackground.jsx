@@ -34,6 +34,10 @@ const PALETTES = {
   }
 };
 
+// each section tints the background differently; the colours glide between them as you scroll
+const SECTION_PAL = { top: 'aurora', about: 'mint', experience: 'ocean', work: 'aurora', stack: 'sunset', credentials: 'mint', thoughts: 'rose', contact: 'ocean' };
+const SECTION_IDS = Object.keys(SECTION_PAL);
+
 const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 const FRAG = `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
@@ -89,9 +93,25 @@ export default function GradientBackground({ palette = 'aurora' }) {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     const U = (n) => gl.getUniformLocation(prog, n);
-    gl.uniform3fv(U('uBase'), pal.base); gl.uniform3fv(U('uA'), pal.a);
-    gl.uniform3fv(U('uB'), pal.b); gl.uniform3fv(U('uC'), pal.c);
-    gl.uniform3fv(U('uGlow'), pal.glow); gl.uniform1f(U('uStr'), pal.strength);
+    const cur = { a: [...pal.a], b: [...pal.b], c: [...pal.c], glow: [...pal.glow] };
+    let target = pal;
+    const push = () => {
+      gl.uniform3fv(U('uBase'), pal.base); gl.uniform3fv(U('uA'), cur.a);
+      gl.uniform3fv(U('uB'), cur.b); gl.uniform3fv(U('uC'), cur.c);
+      gl.uniform3fv(U('uGlow'), cur.glow); gl.uniform1f(U('uStr'), pal.strength);
+    };
+    push();
+    const pick = () => {
+      let id = 'top';
+      for (const k of SECTION_IDS) {
+        const el = document.getElementById(k);
+        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) id = k;
+      }
+      target = PALETTES[SECTION_PAL[id]] || pal;
+      if (reduce) { ['a', 'b', 'c', 'glow'].forEach((k) => { cur[k] = [...target[k]]; }); push(); }
+    };
+    window.addEventListener('scroll', pick, { passive: true });
+    pick();
 
     const size = () => {
       const scale = 0.6; // soft by design, so a lower resolution is plenty
@@ -105,6 +125,10 @@ export default function GradientBackground({ palette = 'aurora' }) {
 
     let raf = 0, t0 = performance.now(), running = true;
     const draw = (now) => {
+      if (!reduce) {
+        ['a', 'b', 'c', 'glow'].forEach((k) => { for (let i = 0; i < 3; i++) cur[k][i] += (target[k][i] - cur[k][i]) * 0.035; });
+        push();
+      }
       gl.uniform1f(U('uT'), reduce ? 8 : (now - t0) / 1000 + 8);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (!reduce && running) raf = requestAnimationFrame(draw);
@@ -119,6 +143,7 @@ export default function GradientBackground({ palette = 'aurora' }) {
       running = false;
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', size);
+      window.removeEventListener('scroll', pick);
       document.removeEventListener('visibilitychange', onVis);
     };
   }, [palette]);
