@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
+import SplitHeading from './SplitHeading.jsx';
+import { openProject } from '../route.js';
 
 /*
  * Tech stack as a bento grid. Edit the tiles below to change what shows up.
@@ -7,43 +10,51 @@ import Reveal from './Reveal.jsx';
  *  - tags:  small chips at the bottom of each tile
  *  - points: optional bullet list (used by the feature tile)
  */
+// "Where I used it" on the back of each tile: project, one-line result, optional link.
+const USED = {
+  'AI Engineering': [
+    { name: 'Navent AI · Breviq', result: 'Recall@10 rose from 61.3% to 84.7% on BGE + Pinecone.' },
+    { name: 'Medicinal Plant Detection', result: '78 plants in about 9 ms, answers cite sources.', study: 'mediplant' },
+    { name: 'BOB Assistant', result: 'Fully offline voice assistant, 11 tools.', href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant' }
+  ],
+  'Backend & Data': [
+    { name: 'Navent AI · Breviq', result: 'FastAPI with SQS batches, S3/STS and PostgreSQL.' },
+    { name: 'Medicinal Plant Detection', result: 'FAISS retrieval over reviewed monographs.', study: 'mediplant' },
+    { name: 'Secure Cloud ML', result: 'JWT-secured API, AES-256 encrypted transfer.', href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml' }
+  ],
+  'Frontend & Delivery': [
+    { name: 'Medicinal Plant Detection', result: 'React app: photo in, plant out, then ask.', study: 'mediplant' },
+    { name: 'Secure Cloud ML', result: 'Flask app packaged with Docker.', href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml' },
+    { name: 'BOB Assistant', result: 'Local LLM through Ollama, no cloud.', href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant' }
+  ]
+};
+
 const TILES = [
   {
     cls: 't-feature',
     title: 'AI Engineering',
-    desc: 'Designing intelligent systems that connect models, retrieval, APIs, and software engineering.',
-    tags: ['Python', 'LLMs', 'RAG', 'LangGraph', 'FastAPI'],
-    points: ['AI application architecture', 'RAG pipelines', 'Agent workflows', 'Model orchestration'],
+    desc: 'LLM, RAG and agent systems that connect models, retrieval and APIs.',
+    tags: ['Python', 'LLMs', 'RAG', 'LangGraph', 'PyTorch'],
     opensModal: true
   },
   {
-    cls: 't-wide',
-    title: 'AI & Machine Learning',
-    desc: 'Building and deploying intelligent models that learn and adapt.',
-    tags: ['Python', 'PyTorch', 'Transformers', 'LLMs']
-  },
-  {
     cls: '',
-    title: 'Backend & Architecture',
-    desc: 'Designing reliable systems and scalable data layers.',
-    tags: ['FastAPI', 'Node.js', 'PostgreSQL', 'Redis']
+    title: 'Backend & Data',
+    desc: 'Reliable APIs, vector search and data pipelines behind the models.',
+    tags: ['FastAPI', 'PostgreSQL', 'Pinecone', 'FAISS', 'AWS']
   },
   {
     cls: 't-dark',
-    title: 'AI Tooling & Data',
-    desc: 'Connecting models to real-world data at scale.',
-    tags: ['Vector DBs', 'RAG Pipelines', 'Embeddings']
-  },
-  {
-    cls: 't-strip',
-    title: 'Frontend Engineering',
-    desc: 'Crafting fast, accessible interfaces with modern frameworks.',
-    tags: ['React', 'Next.js', 'TypeScript', 'Tailwind']
+    title: 'Frontend & Delivery',
+    desc: 'Interfaces and packaging that make the work usable.',
+    tags: ['React', 'Docker', 'Flask', 'Ollama']
   }
 ];
 
 function Tile({ tile, index, onOpenSkill }) {
   const reduce = useReducedMotion();
+  const [flipped, setFlipped] = useState(false);
+  const used = USED[tile.title] || [];
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   // soft spotlight that follows the cursor inside the tile
@@ -64,31 +75,55 @@ function Tile({ tile, index, onOpenSkill }) {
     >
       <motion.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />
 
-      <div className="bento-main">
-        <div className="bento-index mono">{String(index + 1).padStart(2, '0')}</div>
-        <h3 className="bento-title disp">{tile.title}</h3>
-        <p className="bento-desc">{tile.desc}</p>
+      <div className={'tile-face tile-front' + (flipped ? ' is-away' : '')} aria-hidden={flipped}>
+        <div className="bento-main">
+          <div className="bento-index mono">{String(index + 1).padStart(2, '0')}</div>
+          <h3 className="bento-title disp">{tile.title}</h3>
+          <p className="bento-desc">{tile.desc}</p>
 
-        {tile.points && (
-          <ul className="bento-points">
-            {tile.points.map((p) => (
-              <li key={p}>{p}</li>
+          {tile.points && (
+            <ul className="bento-points">
+              {tile.points.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="bento-foot">
+          <div className="bento-tags">
+            {tile.tags.map((t) => (
+              <span key={t}>{t}</span>
             ))}
-          </ul>
-        )}
+          </div>
+          {tile.opensModal && (
+            <button type="button" className="bento-cta" onClick={onOpenSkill}>
+              View skills →
+            </button>
+          )}
+        </div>
+        <button type="button" className="flip-btn" onClick={() => setFlipped(true)} tabIndex={flipped ? -1 : 0}>Where I used it <span aria-hidden="true">↻</span></button>
       </div>
 
-      <div className="bento-foot">
-        <div className="bento-tags">
-          {tile.tags.map((t) => (
-            <span key={t}>{t}</span>
+      <div className={'tile-face tile-back' + (flipped ? '' : ' is-away')} aria-hidden={!flipped}>
+        <div className="back-k mono">{String(index + 1).padStart(2, '0')} · Where I used it</div>
+        <ul className="back-list">
+          {used.map((u) => (
+            <li key={u.name}>
+              <b>{u.name}</b>
+              <span>{u.result}</span>
+              {u.study && (
+                <a href={'#/project/' + u.study} onClick={(e) => { e.preventDefault(); openProject(u.study); }}>Case study →</a>
+              )}
+              {!u.study && u.href && (
+                <a href={u.href} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+              )}
+            </li>
           ))}
-        </div>
-        {tile.opensModal && (
-          <button type="button" className="bento-cta" onClick={onOpenSkill}>
-            View skills →
-          </button>
-        )}
+        </ul>
+        <button type="button" className="flip-btn" onClick={() => setFlipped(false)} tabIndex={flipped ? 0 : -1}>
+          <span aria-hidden="true">↺</span> Back
+        </button>
       </div>
     </Reveal>
   );
@@ -100,11 +135,11 @@ export default function TechStack({ onOpenSkill }) {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Core expertise</Reveal>
-          <Reveal as="h2" className="disp">Tech Stack</Reveal>
+          <SplitHeading>{"Tech Stack"}</SplitHeading>
         </div>
       </div>
 
-      <div className="bento">
+      <div className="bento bento-3">
         {TILES.map((t, i) => (
           <Tile key={t.title} tile={t} index={i} onOpenSkill={onOpenSkill} />
         ))}
