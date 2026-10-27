@@ -7,7 +7,7 @@ import { openProject } from '../route.js';
 const PROJECTS = [
   {
     cls: 'work-1',
-    image: 'projects/ai-stock-trader.png',
+    image: 'projects/ai-stock-trader.webp',
     category: 'Machine Learning · FinTech',
     name: 'AI Stock Trader',
     desc: 'Paper-trading system for 25 US stocks: ML signals, a risk engine that can veto any trade, walk-forward backtests and a live dashboard. Benchmarked honestly against SPY.',
@@ -17,7 +17,7 @@ const PROJECTS = [
   },
   {
     cls: 'work-2',
-    image: 'projects/medicinal-plant.png',
+    image: 'projects/medicinal-plant.webp',
     category: 'Computer Vision + RAG',
     name: 'Medicinal Plant Detection',
     desc: 'Identifies 78 medicinal plants from a photo in about 9 ms, then answers questions with a local RAG assistant that cites its sources.',
@@ -28,7 +28,7 @@ const PROJECTS = [
   },
   {
     cls: 'work-3',
-    image: 'projects/secure-cloud-ml.png',
+    image: 'projects/secure-cloud-ml.webp',
     category: 'Machine Learning · Security',
     name: 'Secure Cloud ML',
     desc: 'Network intrusion detection comparing 5 models side by side (XGBoost 99.99% accuracy), with AES-256 encryption on uploads and a JWT-secured API.',
@@ -38,10 +38,10 @@ const PROJECTS = [
   },
   {
     cls: 'work-4',
-    image: 'projects/bob-assistant.png',
+    image: 'projects/bob-assistant.webp',
     category: 'Local LLM · Automation',
     name: 'BOB Personal AI Assistant',
-    desc: 'A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA’s cloud decides, and 11 tools act, with allow-listed apps and protected system processes.',
+    desc: 'A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA\'s cloud decides, and 11 tools act, with allow-listed apps and protected system processes.',
     meta: 'Python · Ollama · faster-whisper · Piper · 2026',
     href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
     study: 'bob' // opens the case-study page inside this site

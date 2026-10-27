@@ -9,7 +9,7 @@ export const PROJECTS = {
     lead:
       'A paper-trading system for 25 US stocks where a risk engine can veto any trade and every backtest is shown next to SPY. It trails the index, and the repo says so.',
     github: 'https://github.com/praneeth-hari/ai-stock-trader',
-    cover: 'projects/ai-stock-trader.png',
+    cover: 'projects/ai-stock-trader.webp',
     shot: {
       src: 'projects/ai-stock-trader-dashboard.webp',
       alt: 'The AI Stock Trader operator dashboard showing portfolio value, cash, active positions and system status',
@@ -149,7 +149,7 @@ export const PROJECTS = {
     lead:
       'A Flask web app that sorts network traffic into normal or four kinds of attack, running five different models side by side on every upload, with AES-256 encryption on the upload path and a token-protected API.',
     github: 'https://github.com/praneeth-hari/Secure-Cloud-Ml',
-    cover: 'projects/secure-cloud-ml.png',
+    cover: 'projects/secure-cloud-ml.webp',
     shotsTitle: { eyebrow: 'See it work', heading: 'Upload traffic, get five verdicts' },
     shots: [
       {
@@ -287,7 +287,7 @@ export const PROJECTS = {
     lead:
       'A voice assistant for Windows that listens with Whisper, decides with a local Ollama model or NVIDIA’s cloud, and acts through 11 tools. Apps are allow-listed and system processes are protected, so it can open, close and adjust things but cannot delete files or shut the PC down.',
     github: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
-    cover: 'projects/bob-assistant.png',
+    cover: 'projects/bob-assistant.webp',
     stack: [
       'Python', 'faster-whisper', 'Ollama', 'Qwen 2.5 3B', 'NVIDIA NIM', 'Piper TTS', 'ONNX Runtime',
       'sounddevice', 'pywin32', 'pycaw', 'psutil', 'DuckDuckGo search', 'pytest'
@@ -425,7 +425,7 @@ export const PROJECTS = {
       'Take a photo of a leaf and the app names the plant in under 10 ms. Then ask it anything about that plant and a local assistant answers from verified monographs, with a source for every claim.',
     github: 'https://github.com/praneeth-hari/Medicinal-Plant-Detection',
     demo: 'https://ai-medicinal-plant-identification.vercel.app/',
-    cover: 'projects/medicinal-plant.png',
+    cover: 'projects/medicinal-plant.webp',
     video: {
       src: 'projects/medicinal-plant-demo.mp4',
       poster: 'projects/medicinal-plant-demo-poster.jpg',
