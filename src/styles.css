@@ -791,7 +791,7 @@
 
     .work-card:has(.work-img) .card-badge {
       position: absolute;
-      background: rgba(18, 18, 16, .55);
+      background: rgba(18, 18, 16, .68);
     }
 
     .work-card:has(.work-img)::after {
@@ -855,9 +855,7 @@
       top: 20px;
       left: 20px;
       font-size: 11px;
-      background: rgba(255, 255, 255, .18);
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, .24);
       padding: 5px 12px;
       border-radius: 100px;
     }
@@ -1535,14 +1533,15 @@
     .cv-foot:hover { transform: translateY(-2px); background: #fff; }
 
     .status-strip { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; margin-bottom: 36px; border: 1px solid rgba(240,238,230,.2); border-radius: 100px; font-size: 13px; color: #cfccbf; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #3ddc97; box-shadow: 0 0 0 0 rgba(61,220,151,.6); animation: statusPulse 2s infinite; }
+    .status-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #3ddc97; }
+    .status-dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: rgba(61,220,151,.6); animation: statusPulse 2s infinite; pointer-events: none; }
     .role-rot { display: inline-block; position: relative; overflow: hidden; height: 1.35em; line-height: 1.35em; vertical-align: bottom; }
     .role-measure { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
     .role-measure .role-word { width: max-content; }
     .role-word { display: block; color: var(--paper); font-weight: 600; white-space: nowrap; }
     .status-sep { opacity: .5; }
     .status-time { font-family: 'Geist Mono', monospace; font-size: 12px; }
-    @keyframes statusPulse { 70% { box-shadow: 0 0 0 9px rgba(61,220,151,0); } 100% { box-shadow: 0 0 0 0 rgba(61,220,151,0); } }
+    @keyframes statusPulse { 0% { transform: scale(1); opacity: .75; } 70%, 100% { transform: scale(3.25); opacity: 0; } }
     .footer-cols .email-copy { background: none; border: 0; padding: 0; color: inherit; font-family: inherit; cursor: pointer; text-align: left; flex-wrap: wrap; gap: 10px; }
     .email-copy .email-text { border-bottom: 1px solid rgba(240,238,230,.3); transition: border-color .2s; }
     .email-copy:hover .email-text { border-color: var(--paper); }
@@ -1973,11 +1972,17 @@
     .tl { position: relative; margin-top: 30px; max-width: 70ch; padding-left: 38px; }
     .tl-track { position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: var(--line); border-radius: 2px; }
     .tl-fill { position: absolute; inset: 0; background: #2f5cff; transform-origin: top; border-radius: 2px; }
-    .tl-item { position: relative; padding: 0 0 34px; }
+    .tl-item { position: relative; padding: 0 0 34px; opacity: .25; transition: opacity .5s ease; }
+    .tl-item.is-in { opacity: 1; }
     .tl-item:last-child { padding-bottom: 6px; }
     .tl-item p { font-size: 15.5px; line-height: 1.65; color: var(--ink); }
     .tl-item .num { color: #2f5cff; font-weight: 700; }
-    .tl-dot { position: absolute; left: -38px; top: 5px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #2f5cff; box-sizing: border-box; }
+    .tl-dot { position: absolute; left: -38px; top: 5px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #2f5cff; box-sizing: border-box; background: var(--paper); transform: scale(.6); transition: transform .35s ease, background-color .35s ease; }
+    .tl-item.is-in .tl-dot { transform: scale(1); background: #2f5cff; }
+    @media (prefers-reduced-motion: reduce) {
+      .tl-item { opacity: 1; transition: none; }
+      .tl-dot { transform: scale(1); background: #2f5cff; transition: none; }
+    }
     .sw { transition: none; position: relative; display: inline-block; }
     .sw-hl { color: #2f5cff; font-weight: 600; }
     .sw-u { position: absolute; left: 0; right: 0; bottom: .02em; height: 3px; border-radius: 3px; background: #2f5cff; transform-origin: left; opacity: .55; }
@@ -2013,9 +2018,7 @@
       font-weight: 600;
       padding: 6px 12px;
       border-radius: 100px;
-      background: rgba(18, 18, 16, .55);
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
+      background: rgba(18, 18, 16, .68);
       color: #fff;
       transition: background .2s ease;
     }
@@ -2324,7 +2327,7 @@
     /* ---------- polish: magnetic buttons, split headings, scroll progress ---------- */
     [data-magnetic] { will-change: transform; }
     .split-h .split-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
-    .split-h .split-i { display: inline-block; will-change: transform; }
+    .split-h .split-i { display: inline-block; }
     .scroll-progress {
       position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 9000;
       transform-origin: 0 50%;
@@ -2533,8 +2536,8 @@
     .pj-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 48px; }
     .pj-stats-tight { margin-top: 28px; }
     .pj-stat {
-      padding: 24px 22px; border-radius: 22px; background: rgba(255,255,255,.55);
-      border: 1px solid rgba(255,255,255,.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      padding: 24px 22px; border-radius: 22px; background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.85);
     }
     .pj-stat-value { font-size: clamp(34px, 4.2vw, 56px); line-height: 1; letter-spacing: -.03em; }
     .pj-stat-label { margin-top: 10px; font-size: 14px; font-weight: 600; line-height: 1.35; }
@@ -2556,7 +2559,7 @@
     .arch-node {
       flex: 1 1 auto; min-width: 0; text-align: left; cursor: pointer; padding: 16px 16px 15px;
       border-radius: 18px; border: 1px solid rgba(255,255,255,.85); color: var(--ink);
-      background: rgba(255,255,255,.6); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      background: rgba(255,255,255,.72);
       display: flex; flex-direction: column; gap: 4px; height: 100%;
       transition: transform .2s, background .2s, color .2s, box-shadow .2s;
     }
@@ -2632,7 +2635,7 @@
     .hs-meta { display: flex; align-items: center; gap: 18px; max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 24px; font: 600 13px 'Geist Mono', monospace; color: var(--ink-soft); }
     .hs-count b { color: var(--ink); font-size: 22px; font-family: 'Archivo', sans-serif; }
     .hs-line { flex: 1; height: 2px; background: rgba(18,18,16,.12); border-radius: 2px; overflow: hidden; }
-    .hs-line i { display: block; height: 100%; background: var(--ink); }
+    .hs-line i { display: block; width: 100%; height: 100%; background: var(--ink); transform-origin: 0 50%; }
     .hs-hint { letter-spacing: .08em; text-transform: uppercase; font-size: 11px; }
     .hs-track { display: flex; gap: 28px; padding-left: max(24px, calc((100vw - 1240px) / 2 + 24px)); padding-right: 24px; will-change: transform; }
     .hs-card { flex: 0 0 min(64vw, 760px); height: min(58vh, 520px); aspect-ratio: auto; padding: 34px; }
@@ -2685,7 +2688,7 @@
     .back-list span { font-size: 13.5px; line-height: 1.45; opacity: .85; }
     .back-list a { align-self: flex-start; margin-top: 4px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: #2f5cff; color: #fff; }
     .back-list a:hover { background: #1f45d6; }
-    .flip-btn { position: absolute; top: 18px; right: 20px; z-index: 3; font: 600 12px 'Archivo', sans-serif; padding: 6px 12px; border-radius: 99px; border: 1px solid rgba(127,127,127,.45); background: rgba(255,255,255,.14); color: inherit; cursor: pointer; transition: background .2s, transform .2s; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .flip-btn { position: absolute; top: 18px; right: 20px; z-index: 3; font: 600 12px 'Archivo', sans-serif; padding: 6px 12px; border-radius: 99px; border: 1px solid rgba(127,127,127,.45); background: rgba(255,255,255,.22); color: inherit; cursor: pointer; transition: background .2s, transform .2s; }
     .flip-btn:hover { background: rgba(127,127,127,.25); transform: translateY(-1px); }
     .tile-back .flip-btn { top: auto; bottom: 18px; right: 20px; }
     .t-strip .tile-back .flip-btn { position: static; margin-left: auto; align-self: center; }

@@ -3,6 +3,7 @@ import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'fra
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import { openProject } from '../route.js';
+import { getDeviceProfile } from '../device.js';
 
 /*
  * Tech stack as a bento grid. Edit the tiles below to change what shows up.
@@ -53,6 +54,8 @@ const TILES = [
 
 function Tile({ tile, index, onOpenSkill }) {
   const reduce = useReducedMotion();
+  const { tier, isTouchOrSmall } = getDeviceProfile();
+  const canGlow = !reduce && !isTouchOrSmall && tier !== 'low-end';
   const [flipped, setFlipped] = useState(false);
   const used = USED[tile.title] || [];
   const mx = useMotionValue(0);
@@ -70,10 +73,10 @@ function Tile({ tile, index, onOpenSkill }) {
     <Reveal
       className={'bento-tile ' + tile.cls}
       delay={index * 0.07}
-      onMouseMove={reduce ? undefined : onMove}
-      whileHover={reduce ? undefined : { y: -4, transition: { type: 'spring', stiffness: 300, damping: 24 } }}
+      onMouseMove={canGlow ? onMove : undefined}
+      whileHover={canGlow ? { y: -4, transition: { type: 'spring', stiffness: 300, damping: 24 } } : undefined}
     >
-      <motion.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />
+      {canGlow && <motion.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />}
 
       <div className={'tile-face tile-front' + (flipped ? ' is-away' : '')} aria-hidden={flipped}>
         <div className="bento-main">

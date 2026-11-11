@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
+import { getDeviceProfile } from '../device.js';
 
 /*
  * Paint reveal: a base photo with a second image hidden underneath.
@@ -11,7 +12,6 @@ const HOLD = 1500;      // ms a dab stays fully visible
 const FADE = 1900;      // ms it then takes to fade out
 const LIFE = HOLD + FADE;
 const BRUSH = 0.085;    // brush radius as a fraction of the canvas width
-const MAX_DABS = 700;
 
 // A rough, hand-painted looking stamp (irregular edge, soft shadow).
 function makeStamps(size) {
@@ -40,9 +40,10 @@ function makeStamps(size) {
   return stamps;
 }
 
-export default function PaintReveal({ base, reveal, alt = '' }) {
+export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt = '' }) {
   const reduce = useReducedMotion();
   const boxRef = useRef(null);
+  const baseImgRef = useRef(null);
   const canvasRef = useRef(null);
   const baseCvRef = useRef(null);
   const ringRef = useRef(null);
@@ -53,31 +54,35 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
   useEffect(() => {
     if (reduce) return;
     const box = boxRef.current;
+    const baseImg = baseImgRef.current;
     const canvas = canvasRef.current;
     const baseCv = baseCvRef.current;
     const ring = ringRef.current;
-    if (!box || !canvas || !baseCv) return;
+    if (!box || !baseImg || !canvas || !baseCv) return;
+    const { paintDprCap, paintStampSize, paintMaxDabs } = getDeviceProfile();
     const ctx = canvas.getContext('2d');
     const bctx = baseCv.getContext('2d');
     const mask = document.createElement('canvas');
     const mctx = mask.getContext('2d');
-    const stamps = makeStamps(128);
+    const stamps = makeStamps(paintStampSize);
+    let cancelled = false;
+
     const img = new Image();
+    img.decoding = 'async';
     let imgReady = false;
-    img.onload = () => { imgReady = true; };
-    img.src = reveal;
-    // The base photo is drawn on its own canvas so the brush can ERASE it where it paints.
-    // Otherwise the real photo's hair and shoulders stay visible around the revealed helmet.
-    const baseImg = new Image();
-    let baseReady = false;
-    baseImg.onload = () => {
-      baseReady = true;
-      setBaseReady(true);
-      drawBase(false);
+    img.onload = () => {
+      const finalize = () => { if (!cancelled) imgReady = true; };
+      if (img.decode) img.decode().then(finalize, finalize);
+      else finalize();
     };
-    baseImg.src = base;
+    const useSmall = box.clientWidth > 0 && box.clientWidth <= 540 && revealSmall;
+    img.src = useSmall ? revealSmall : reveal;
+
+    // Reuse the visible <img> element directly once decoded asynchronously so we
+    // never duplicate network fetches or stall the main thread with sync decode.
+    let baseLoaded = false;
     const drawBase = (erase) => {
-      if (!baseReady) return;
+      if (!baseLoaded) return;
       bctx.globalCompositeOperation = 'source-over';
       bctx.clearRect(0, 0, W, H);
       bctx.drawImage(baseImg, 0, 0, W, H);
@@ -87,10 +92,27 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
         bctx.globalCompositeOperation = 'source-over';
       }
     };
+    const markBaseReady = () => {
+      const done = () => {
+        if (cancelled) return;
+        baseLoaded = true;
+        setBaseReady(true);
+        drawBase(false);
+      };
+      if (baseImg.decode) baseImg.decode().then(done, done);
+      else done();
+    };
+    if (baseImg.complete && baseImg.naturalWidth > 0) {
+      markBaseReady();
+    } else {
+      baseImg.addEventListener('load', markBaseReady, { once: true });
+    }
 
     let W = 0, H = 0;
     let dabs = [];
     let raf = 0;
+    let dirty = false;
+    let visible = true;
     let last = null;      // last painted point
     let down = false;
     let touchArmed = false;
@@ -100,46 +122,60 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
 
     const size = () => {
       const r = box.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, paintDprCap);
       W = Math.max(1, Math.round(r.width * dpr));
       H = Math.max(1, Math.round(r.height * dpr));
       canvas.width = mask.width = baseCv.width = W;
       canvas.height = mask.height = baseCv.height = H;
+      dirty = true;
       drawBase(false);
     };
     size();
     const ro = new ResizeObserver(size);
     ro.observe(box);
+    const io = 'IntersectionObserver' in window
+      ? new IntersectionObserver(([en]) => {
+          visible = en.isIntersecting;
+          if (visible && dabs.length && !raf) raf = requestAnimationFrame(frame);
+        }, { threshold: 0.01 })
+      : null;
+    if (io) io.observe(box);
 
     const frame = (now) => {
       raf = 0;
+      const prevLen = dabs.length;
       dabs = dabs.filter((d) => now - d.t < LIFE);
-      mctx.clearRect(0, 0, W, H);
-      const R = BRUSH * W;
-      for (const d of dabs) {
-        const age = now - d.t;
-        const a = age < HOLD ? 1 : 1 - (age - HOLD) / FADE;
-        mctx.globalAlpha = a * a * (3 - 2 * a); // smoothstep
-        const s = R * 2 * d.k;
-        mctx.save();
-        mctx.translate(d.x, d.y);
-        mctx.rotate(d.rot);
-        mctx.drawImage(stamps[d.s], -s / 2, -s / 2, s, s);
-        mctx.restore();
-      }
-      mctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.clearRect(0, 0, W, H);
-      if (dabs.length && imgReady) {
-        ctx.drawImage(mask, 0, 0);
-        ctx.globalCompositeOperation = 'source-in';
-        ctx.drawImage(img, 0, 0, W, H);
+      const fading = dabs.some((d) => now - d.t >= HOLD);
+      // Skip full-canvas recompositing when offscreen or static inside HOLD.
+      if (visible && (dirty || fading || dabs.length !== prevLen)) {
+        dirty = false;
+        mctx.clearRect(0, 0, W, H);
+        const R = BRUSH * W;
+        for (const d of dabs) {
+          const age = now - d.t;
+          const a = age < HOLD ? 1 : 1 - (age - HOLD) / FADE;
+          mctx.globalAlpha = a * a * (3 - 2 * a); // smoothstep
+          const s = R * 2 * d.k;
+          mctx.save();
+          mctx.translate(d.x, d.y);
+          mctx.rotate(d.rot);
+          mctx.drawImage(stamps[d.s], -s / 2, -s / 2, s, s);
+          mctx.restore();
+        }
+        mctx.globalAlpha = 1;
         ctx.globalCompositeOperation = 'source-over';
+        ctx.clearRect(0, 0, W, H);
+        if (dabs.length && imgReady) {
+          ctx.drawImage(mask, 0, 0);
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.drawImage(img, 0, 0, W, H);
+          ctx.globalCompositeOperation = 'source-over';
+        }
+        drawBase(dabs.length > 0 && imgReady);
       }
-      drawBase(dabs.length > 0 && imgReady);
-      if (dabs.length) raf = requestAnimationFrame(frame);
+      if (dabs.length && visible) raf = requestAnimationFrame(frame);
     };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const kick = () => { if (!raf && visible) raf = requestAnimationFrame(frame); };
 
     const toLocal = (e) => {
       const r = box.getBoundingClientRect();
@@ -147,13 +183,14 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
     };
 
     const stamp = (x, y, scale) => {
+      dirty = true;
       dabs.push({
         x: x * scale, y: y * scale, t: performance.now(),
         s: (Math.random() * stamps.length) | 0,
         rot: Math.random() * Math.PI * 2,
         k: 0.85 + Math.random() * 0.4
       });
-      if (dabs.length > MAX_DABS) dabs.shift();
+      if (dabs.length > paintMaxDabs) dabs.shift();
       if (!everPainted) { everPainted = true; setPainted(true); }
     };
 
@@ -232,9 +269,12 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
 
     return () => {
+      cancelled = true;
+      baseImg.removeEventListener('load', markBaseReady);
       cancelAnimationFrame(raf);
       clearTimeout(armTimer);
       ro.disconnect();
+      if (io) io.disconnect();
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerup', onUp);
@@ -242,11 +282,24 @@ export default function PaintReveal({ base, reveal, alt = '' }) {
       canvas.removeEventListener('pointerleave', onLeave);
       canvas.removeEventListener('touchmove', onTouchMove);
     };
-  }, [reduce, reveal, base]);
+  }, [reduce, reveal, revealSmall, base]);
 
   return (
     <div className={'paint' + (armed ? ' is-armed' : '') + (painted ? ' is-painted' : '') + (baseReady ? ' base-ready' : '')} ref={boxRef}>
-      <img className="paint-base" src={base} alt={alt} draggable="false" loading="eager" decoding="async" fetchPriority="high" />
+      <img
+        ref={baseImgRef}
+        className="paint-base"
+        src={base}
+        srcSet={baseSrcSet}
+        sizes="(max-width: 899px) 520px, 900px"
+        width={900}
+        height={1600}
+        alt={alt}
+        draggable="false"
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+      />
       {!reduce && (
         <>
           <canvas className="paint-basecv" ref={baseCvRef} aria-hidden="true" />

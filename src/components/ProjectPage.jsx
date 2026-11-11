@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
+import OptimizedImage from './OptimizedImage.jsx';
 import { PROJECTS } from '../data/projects.js';
 import { goHome } from '../route.js';
 
@@ -75,17 +76,22 @@ function Architecture({ rows }) {
 
 function Bar({ label, value, tone, max = 100, unit = '%' }) {
   const reduce = useReducedMotion();
+  const width = Math.max(1.5, (value / max) * 100) + '%';
   return (
     <div className="bar-row">
       <span className="bar-label">{label}</span>
       <div className="bar-track">
-        <motion.div
-          className={'bar-fill ' + tone}
-          initial={reduce ? false : { width: 0 }}
-          whileInView={{ width: Math.max(1.5, (value / max) * 100) + '%' }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
-        />
+        {reduce ? (
+          <div className={'bar-fill ' + tone} style={{ width }} />
+        ) : (
+          <motion.div
+            className={'bar-fill ' + tone}
+            initial={{ width: 0 }}
+            whileInView={{ width }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}
+          />
+        )}
       </div>
       <span className="bar-val">{value}{unit}</span>
     </div>
@@ -98,7 +104,18 @@ function CoverBg({ src }) {
   if (!ok) return null;
   return (
     <div className="pj-bg" aria-hidden="true">
-      <img src={'/' + src} alt="" onError={() => setOk(false)} />
+      <OptimizedImage
+        src={src}
+        alt=""
+        widths={[640, 1024, 1448]}
+        sizes="(max-width: 900px) 100vw, 62vw"
+        width={1448}
+        height={1086}
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        onError={() => setOk(false)}
+      />
     </div>
   );
 }
@@ -195,7 +212,17 @@ export default function ProjectPage({ slug }) {
             {(p.shots || [p.shot]).map((sh) => (
               <Reveal key={sh.src} className="pj-shot-wrap">
                 <figure className="pj-demo">
-                  <img className="pj-demo-video pj-shot" src={import.meta.env.BASE_URL + sh.src} alt={sh.alt} loading="lazy" />
+                  <OptimizedImage
+                    className="pj-demo-video pj-shot"
+                    src={sh.src}
+                    alt={sh.alt}
+                    widths={sh.width ? [720, sh.width] : undefined}
+                    sizes="(max-width: 900px) calc(100vw - 48px), 1116px"
+                    width={sh.width}
+                    height={sh.height}
+                    loading="eager"
+                    decoding="async"
+                  />
                   <figcaption className="pj-demo-cap">{sh.caption}</figcaption>
                 </figure>
               </Reveal>

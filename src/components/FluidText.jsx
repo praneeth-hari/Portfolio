@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getDeviceProfile } from '../device.js';
 
 /*
  * "AI / ENGINEER" hero text with the WebGL fluid distortion effect.
@@ -18,10 +19,12 @@ export default function FluidText() {
     if (!stage || !textEl || !canvas) return;
     let disposed = false;
 
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // static text stays
+        const { reducedMotion, fluidDprCap, fluidSim } = getDeviceProfile();
+        if (reducedMotion) return; // static text stays
 
-        const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false }) ||
-          canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false });
+        const glOpts = { alpha: true, premultipliedAlpha: false, depth: false, stencil: false, antialias: false };
+        const gl = canvas.getContext('webgl', glOpts) ||
+          canvas.getContext('experimental-webgl', glOpts);
         if (!gl) return; // no WebGL -> static text stays (SSR / old browser fallback)
 
         // Canvas 2D images are top-left origin; WebGL textures are bottom-left origin.
@@ -195,7 +198,7 @@ export default function FluidText() {
         }
 
         /* ---------------- sim FBOs (ping-pong, low-res for perf) ---------------- */
-        const SIM_W = 200, SIM_H = 100;
+        const [SIM_W, SIM_H] = fluidSim;
         function makeFbo(w, h) {
           const tex = gl.createTexture();
           gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -230,7 +233,7 @@ export default function FluidText() {
 
         const off = document.createElement('canvas');
         const octx = off.getContext('2d');
-        let stageW = 0, stageH = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let stageW = 0, stageH = 0, dpr = Math.min(window.devicePixelRatio || 1, fluidDprCap);
 
         function drawTextTexture() {
           stageW = stage.clientWidth; stageH = stage.clientHeight;
@@ -393,6 +396,7 @@ export default function FluidText() {
           if (!maybeStop(now)) rafId = requestAnimationFrame(loop);
         }
 
+        let settleTimer;
         function resize() {
           const ok = drawTextTexture();
           if (ok && !stage.classList.contains('fluid-ready')) {
@@ -401,7 +405,8 @@ export default function FluidText() {
           if (running) { /* keep looping, next frame reads new sizes */ }
           else { // paint a static frame so the resized canvas isn't blank
             ensureRunning();
-            setTimeout(() => { if (performance.now() - lastMoveT > IDLE_MS && clickTime > 1.5) { running = false; if (rafId) cancelAnimationFrame(rafId); } }, 50);
+            clearTimeout(settleTimer);
+            settleTimer = setTimeout(() => { if (!disposed && performance.now() - lastMoveT > IDLE_MS && clickTime > 1.5) { running = false; if (rafId) cancelAnimationFrame(rafId); } }, 50);
           }
         }
 
@@ -421,6 +426,7 @@ export default function FluidText() {
           if (rafId) cancelAnimationFrame(rafId);
           if (io) io.disconnect();
           clearTimeout(resizeTimer);
+          clearTimeout(settleTimer);
           window.removeEventListener('resize', onWinResize);
           canvas.removeEventListener('pointermove', onMove);
           canvas.removeEventListener('pointerenter', onMove);

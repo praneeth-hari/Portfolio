@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 /* Skill detail dialog for the "AI Engineering" card. */
 export default function SkillModal({ open, onClose }) {
+  const reduce = useReducedMotion();
   const modalRef = useRef(null);
   const closeRef = useRef(null);
   const opener = useRef(null);
@@ -51,7 +52,7 @@ export default function SkillModal({ open, onClose }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: reduce ? 0 : 0.25 }}
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -63,10 +64,10 @@ export default function SkillModal({ open, onClose }) {
             aria-labelledby="skillModalTitle"
             tabIndex={-1}
             ref={modalRef}
-            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 14, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.98 }}
+            transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 28 }}
           >
             <button className="skill-modal-close" ref={closeRef} aria-label="Close" onClick={onClose}>✕</button>
             <h3 className="disp skill-modal-title" id="skillModalTitle">AI Engineering</h3>

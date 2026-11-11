@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 
@@ -26,32 +26,44 @@ const hi = (text) =>
   text.split(/((?<![A-Za-z])\d+(?:\.\d+)?%?)/g).map((part, i) => (i % 2 ? <b key={i} className="num">{part}</b> : part));
 
 function Timeline({ points }) {
+  const reduce = useReducedMotion();
   const ref = useRef(null);
+  const itemRefs = useRef([]);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 65%', 'end 55%'] });
   const fill = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4 });
+
+  useEffect(() => {
+    const items = itemRefs.current.filter(Boolean);
+    if (reduce || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-in'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          en.target.classList.toggle('is-in', en.isIntersecting);
+        }
+      },
+      { rootMargin: '0px 0px -38% 0px', threshold: 0 }
+    );
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [reduce, points.length]);
+
   return (
     <div className="tl" ref={ref}>
       <div className="tl-track" aria-hidden="true">
-        <motion.div className="tl-fill" style={{ scaleY: fill }} />
+        <motion.div className="tl-fill" style={reduce ? { scaleY: 1 } : { scaleY: fill }} />
       </div>
-      {points.map((p) => (
-        <motion.div
+      {points.map((p, i) => (
+        <div
           key={p}
-          className="tl-item"
-          initial={{ opacity: 0.25 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ margin: '0px 0px -38% 0px' }}
-          transition={{ duration: 0.5 }}
+          ref={(el) => { itemRefs.current[i] = el; }}
+          className={'tl-item' + (reduce ? ' is-in' : '')}
         >
-          <motion.span
-            className="tl-dot"
-            initial={{ scale: 0.6, backgroundColor: 'var(--paper)' }}
-            whileInView={{ scale: 1, backgroundColor: '#2f5cff' }}
-            viewport={{ margin: '0px 0px -38% 0px' }}
-            transition={{ duration: 0.35 }}
-          />
+          <span className="tl-dot" aria-hidden="true" />
           <p>{hi(p)}</p>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

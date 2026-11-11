@@ -1,5 +1,6 @@
 node_modules
 dist
+assets-raw/
 .env
 .env.local
 .env*.local

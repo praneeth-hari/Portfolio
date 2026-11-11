@@ -33,30 +33,46 @@ export default function Nav() {
 
   /* scroll-spy */
   useEffect(() => {
-    let ticking = false;
-    const update = () => {
-      const line = window.innerHeight * 0.35;
-      let current = SECTIONS[0].id;
-      for (const s of SECTIONS) {
-        const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top <= line) current = s.id;
-      }
-      setActive(current);
-      setScrolled(window.scrollY > 40);
-    };
+    let lastScrolled = window.scrollY > 40;
+    setScrolled(lastScrolled);
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => { update(); ticking = false; });
+      const next = window.scrollY > 40;
+      if (next !== lastScrolled) {
+        lastScrolled = next;
+        setScrolled(next);
+      }
     };
-    update();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+
+    let io = null;
+    if (!inProject && 'IntersectionObserver' in window) {
+      const vis = new Array(SECTIONS.length).fill(false);
+      const indexById = new Map(SECTIONS.map((s, k) => [s.id, k]));
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const en of entries) {
+            const k = indexById.get(en.target.id);
+            if (k !== undefined) vis[k] = en.isIntersecting;
+          }
+          let n = -1;
+          for (let k = vis.length - 1; k >= 0; k--) {
+            if (vis[k]) { n = k; break; }
+          }
+          if (n >= 0) setActive(SECTIONS[n].id);
+        },
+        { rootMargin: '0px 0px -65% 0px', threshold: 0 }
+      );
+      SECTIONS.forEach((s) => {
+        const el = document.getElementById(s.id);
+        if (el) io.observe(el);
+      });
+    }
+
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      if (io) io.disconnect();
     };
-  }, []);
+  }, [inProject]);
 
   /* Esc closes; page scroll is paused while the menu is open */
   useEffect(() => {

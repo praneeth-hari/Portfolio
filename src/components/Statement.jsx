@@ -1,35 +1,74 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { Fragment, useEffect, useRef } from 'react';
+import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 
 // words wrapped in * get the accent colour and a drawn underline
 const TEXT = 'I build *AI* *systems* that hold up in *production:* retrieval, agents and validation, shipped for *healthcare.*';
-
-function Word({ raw, i, n, p }) {
+const TOKENS = TEXT.split(' ').map((raw) => {
   const hl = raw.startsWith('*') && raw.endsWith('*');
-  const w = hl ? raw.slice(1, -1) : raw;
-  const start = (i / n) * 0.8;
-  const end = start + 0.2;
-  const opacity = useTransform(p, [start, end], [0.14, 1]);
-  const line = useTransform(p, [start + 0.05, end + 0.08], [0, 1]);
-  return (
-    <>
-      <motion.span style={{ opacity }} className={'sw' + (hl ? ' sw-hl' : '')}>
-        {w}
-        {hl && <motion.i className="sw-u" style={{ scaleX: line }} aria-hidden="true" />}
-      </motion.span>{' '}
-    </>
-  );
-}
+  return { hl, word: hl ? raw.slice(1, -1) : raw };
+});
+const N = TOKENS.length;
 
 export default function Statement() {
+  const reduce = useReducedMotion();
   const ref = useRef(null);
+  const wordRefs = useRef([]);
+  const lineRefs = useRef([]);
+  const lastOps = useRef(new Array(N).fill(''));
+  const lastScales = useRef(new Array(N).fill(''));
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 50%'] });
-  const words = TEXT.split(' ');
+
+  const applyProgress = (v) => {
+    if (reduce) return;
+    for (let i = 0; i < N; i++) {
+      const wEl = wordRefs.current[i];
+      const start = (i / N) * 0.8;
+      if (wEl) {
+        const raw = (v - start) / 0.2;
+        const t = raw <= 0 ? 0 : raw >= 1 ? 1 : raw;
+        const op = (0.14 + t * 0.86).toFixed(3);
+        if (lastOps.current[i] !== op) {
+          lastOps.current[i] = op;
+          wEl.style.opacity = op;
+        }
+      }
+      const lEl = lineRefs.current[i];
+      if (lEl) {
+        const rawL = (v - (start + 0.05)) / 0.23;
+        const tL = rawL <= 0 ? 0 : rawL >= 1 ? 1 : rawL;
+        const sc = tL.toFixed(3);
+        if (lastScales.current[i] !== sc) {
+          lastScales.current[i] = sc;
+          lEl.style.transform = `scaleX(${sc})`;
+        }
+      }
+    }
+  };
+
+  useMotionValueEvent(scrollYProgress, 'change', applyProgress);
+  useEffect(() => { applyProgress(scrollYProgress.get()); }, [reduce]);
+
   return (
     <section className="statement wrap" ref={ref}>
       <p aria-label={TEXT.replaceAll('*', '')}>
-        {words.map((w, i) => (
-          <Word key={i} raw={w} i={i} n={words.length} p={scrollYProgress} />
+        {TOKENS.map(({ hl, word }, i) => (
+          <Fragment key={i}>
+            <span
+              ref={(el) => { wordRefs.current[i] = el; }}
+              style={{ opacity: reduce ? 1 : 0.14 }}
+              className={'sw' + (hl ? ' sw-hl' : '')}
+            >
+              {word}
+              {hl && (
+                <i
+                  ref={(el) => { lineRefs.current[i] = el; }}
+                  className="sw-u"
+                  style={{ transform: reduce ? 'scaleX(1)' : 'scaleX(0)' }}
+                  aria-hidden="true"
+                />
+              )}
+            </span>{' '}
+          </Fragment>
         ))}
       </p>
     </section>

@@ -12,6 +12,8 @@ export const PROJECTS = {
     cover: 'projects/ai-stock-trader.webp',
     shot: {
       src: 'projects/ai-stock-trader-dashboard.webp',
+      width: 1390,
+      height: 690,
       alt: 'The AI Stock Trader operator dashboard showing portfolio value, cash, active positions and system status',
       caption: 'The Streamlit operator dashboard on simulated money: portfolio value, cash, open positions and system status, with eleven tabs behind it (trades, model and regime, backtest vs SPY, risk and audit logs). Snapshot from 15 October 2026.',
     },
@@ -154,11 +156,15 @@ export const PROJECTS = {
     shots: [
       {
         src: 'projects/secure-cloud-predict.webp',
+        width: 1100,
+        height: 665,
         alt: 'Prediction results table where five models classify 11 network traffic samples as normal, dos, r2l or u2r',
         caption: 'The prediction page after uploading the 11-row sample. Every model labels every row, so you can see where they agree and where they split: on 4 of the 11 rows at least one model disagrees.',
       },
       {
         src: 'projects/secure-cloud-dashboard.webp',
+        width: 1100,
+        height: 615,
         alt: 'Model performance dashboard with accuracy, F1, precision and recall cards and bar and radar charts for five models',
         caption: 'The model dashboard: the best scores up top, then bar and radar charts that put all five models on the same axes.',
       },
@@ -428,7 +434,7 @@ export const PROJECTS = {
     cover: 'projects/medicinal-plant.webp',
     video: {
       src: 'projects/medicinal-plant-demo.mp4',
-      poster: 'projects/medicinal-plant-demo-poster.jpg',
+      poster: 'projects/medicinal-plant-demo-poster.webp',
       caption: 'One minute, start to finish: upload a leaf photo, get the species with a confidence score, then ask the cited RAG assistant about its uses.',
     },
     stack: [

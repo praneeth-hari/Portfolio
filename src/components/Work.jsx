@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
+import OptimizedImage from './OptimizedImage.jsx';
+import { PROJECTS as PROJECT_DETAILS } from '../data/projects.js';
 import { openProject } from '../route.js';
 
 const PROJECTS = [
@@ -49,18 +51,40 @@ const PROJECTS = [
 ];
 
 // Cover image for a card. If the file is missing, the card keeps its gradient.
+// Cards sit inside a horizontal transform track, so eager + low fetchPriority + async decode
+// prevents off-screen horizontal cards from popping in late when scrolled into view.
 function CardImage({ src, alt }) {
   const [ok, setOk] = useState(true);
   if (!ok) return null;
   return (
-    <img
+    <OptimizedImage
       className="work-img"
-      src={import.meta.env.BASE_URL + src}
+      src={src}
       alt={alt}
-      loading="lazy"
+      widths={[640, 1024, 1448]}
+      sizes="(max-width: 900px) calc(100vw - 64px), min(64vw, 760px)"
+      width={1448}
+      height={1086}
+      loading="eager"
+      fetchPriority="low"
+      decoding="async"
       onError={() => setOk(false)}
     />
   );
+}
+
+const prefetched = new Set();
+function prefetchStudy(slug) {
+  if (!slug || prefetched.has(slug)) return;
+  prefetched.add(slug);
+  const study = PROJECT_DETAILS[slug];
+  if (!study) return;
+  const list = [...(study.shots || []), ...(study.shot ? [study.shot] : [])];
+  for (const item of list) {
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = import.meta.env.BASE_URL + item.src;
+  }
 }
 
 // Pinned horizontal scroll: the section sticks to the screen and the cards slide sideways
@@ -93,7 +117,7 @@ function HScroll({ children, count }) {
   const { scrollYProgress } = useScroll({ target: outer, offset: ['start start', 'end end'] });
   const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
   const x = useTransform(p, (v) => -v * distRef.current);
-  const bar = useTransform(p, [0, 1], ['0%', '100%']);
+  const bar = useTransform(p, [0, 1], [0, 1]);
   const [idx, setIdx] = useState(0);
   useEffect(() => p.on('change', (v) => setIdx(Math.min(count - 1, Math.round(v * (count - 1))))), [p, count]);
 
@@ -103,7 +127,7 @@ function HScroll({ children, count }) {
         <div className="hs-stick">
           <div className="hs-meta">
             <span className="hs-count"><b>{String(idx + 1).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}</span>
-            <span className="hs-line"><motion.i style={{ width: bar }} /></span>
+            <span className="hs-line"><motion.i style={{ scaleX: bar }} /></span>
             <span className="hs-hint">Keep scrolling</span>
           </div>
           <motion.div ref={track} className="hs-track" style={{ x }}>{children}</motion.div>
@@ -126,7 +150,12 @@ export default function Work() {
 
       <HScroll count={PROJECTS.length}>
         {PROJECTS.map((p, i) => (
-          <div key={i} className={'work-card hs-card ' + p.cls}>
+          <div
+            key={i}
+            className={'work-card hs-card ' + p.cls}
+            onMouseEnter={p.study ? () => prefetchStudy(p.study) : undefined}
+            onFocus={p.study ? () => prefetchStudy(p.study) : undefined}
+          >
               <span className="hs-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <CardImage src={p.image} alt={p.name + ' preview'} />
               <span className="card-badge">{p.category}</span>

@@ -21,6 +21,8 @@ const ROLES = ['AI Engineer', 'Software Engineer', 'Generative AI Engineer'];
 function RoleRotator() {
   const reduce = useReducedMotion();
   const [i, setI] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const rotRef = useRef(null);
   // measure every role once so the chip can shrink and grow to fit the word that is showing
   const measure = useRef([]);
   const [widths, setWidths] = useState(null);
@@ -32,25 +34,36 @@ function RoleRotator() {
     return () => window.removeEventListener('resize', read);
   }, []);
   useEffect(() => {
-    if (reduce) return;
+    const el = rotRef.current;
+    if (!el || !('IntersectionObserver' in window)) { setVisible(true); return; }
+    const io = new IntersectionObserver(
+      ([en]) => setVisible(en.isIntersecting),
+      { rootMargin: '200px 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (reduce || !visible) return;
     const id = setInterval(() => setI((n) => (n + 1) % ROLES.length), 2400);
     return () => clearInterval(id);
-  }, [reduce]);
+  }, [reduce, visible]);
   return (
     <motion.span
+      ref={rotRef}
       className="role-rot"
       aria-live="off"
       animate={widths ? { width: widths[i] } : undefined}
-      transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+      transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
     >
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
           key={ROLES[i]}
           className="role-word"
-          initial={{ y: '100%', opacity: 0 }}
+          initial={reduce ? false : { y: '100%', opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: '-100%', opacity: 0 }}
-          transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
+          exit={reduce ? { opacity: 0 } : { y: '-100%', opacity: 0 }}
+          transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
         >
           {ROLES[i]}
         </motion.span>
@@ -85,10 +98,9 @@ export default function Footer() {
   const time = useISTClock();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end end'] });
   const y = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : -110, 0]);
-  const radius = useTransform(scrollYProgress, [0, 1], [reduce ? 40 : 110, 40]);
 
   return (
-    <motion.div ref={ref} className="footer-band footer-curtain" style={{ borderTopLeftRadius: radius, borderTopRightRadius: radius }}>
+    <div ref={ref} className="footer-band footer-curtain">
       <motion.div className="wrap" style={{ y }}>
         <div className="footer-top">
           <div className="status-strip">
@@ -133,6 +145,6 @@ export default function Footer() {
           <a href="#top">Back to top ↑</a>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

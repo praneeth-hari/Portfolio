@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getDeviceProfile } from '../device.js';
 
 /*
  * Site-wide animated "noise gradient" background.
@@ -74,10 +75,16 @@ export default function GradientBackground({ palette = 'aurora' }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
+    const gl = canvas.getContext('webgl', {
+      antialias: false,
+      alpha: false,
+      depth: false,
+      stencil: false,
+      powerPreference: 'low-power'
+    });
     if (!gl) return; // CSS fallback colour stays
     const pal = PALETTES[palette] || PALETTES.soft;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const { bgScale, bgInterval, bgLerp, reducedMotion: reduce } = getDeviceProfile();
 
     const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
     const prog = gl.createProgram();
@@ -101,49 +108,103 @@ export default function GradientBackground({ palette = 'aurora' }) {
       gl.uniform3fv(U('uGlow'), cur.glow); gl.uniform1f(U('uStr'), pal.strength);
     };
     push();
-    const pick = () => {
-      let id = 'top';
+    const setTarget = (id) => {
+      target = PALETTES[SECTION_PAL[id]] || pal;
+      if (reduce) {
+        ['a', 'b', 'c', 'glow'].forEach((k) => { cur[k] = [...target[k]]; });
+        push();
+        gl.uniform1f(U('uT'), 8);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+    };
+    let io = null;
+    let routeRaf = 0;
+    const observeSections = () => {
+      if (io) io.disconnect();
+      if (!('IntersectionObserver' in window)) return;
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const en of entries) {
+            if (en.isIntersecting) setTarget(en.target.id);
+          }
+        },
+        { rootMargin: '-49% 0px -50% 0px', threshold: 0 }
+      );
+      let found = false;
       for (const k of SECTION_IDS) {
         const el = document.getElementById(k);
-        if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.5) id = k;
+        if (el) { io.observe(el); found = true; }
       }
-      target = PALETTES[SECTION_PAL[id]] || pal;
-      if (reduce) { ['a', 'b', 'c', 'glow'].forEach((k) => { cur[k] = [...target[k]]; }); push(); }
+      if (!found) setTarget('top');
     };
-    window.addEventListener('scroll', pick, { passive: true });
-    pick();
+    observeSections();
+    const onRoute = () => {
+      cancelAnimationFrame(routeRaf);
+      routeRaf = requestAnimationFrame(observeSections);
+    };
+    window.addEventListener('hashchange', onRoute);
+    window.addEventListener('popstate', onRoute);
+    window.addEventListener('app:route', onRoute);
 
     const size = () => {
-      const scale = 0.6; // soft by design, so a lower resolution is plenty
-      canvas.width = Math.max(2, Math.round(window.innerWidth * scale));
-      canvas.height = Math.max(2, Math.round(window.innerHeight * scale));
+      canvas.width = Math.max(2, Math.round(window.innerWidth * bgScale));
+      canvas.height = Math.max(2, Math.round(window.innerHeight * bgScale));
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(U('uRes'), canvas.width, canvas.height);
+      if (reduce) gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
     size();
     window.addEventListener('resize', size);
 
-    let raf = 0, t0 = performance.now(), running = true;
+    let raf = 0, timer = 0, t0 = performance.now(), running = true, drawnInitial = false;
+    const schedule = (covered) => {
+      if (!running || reduce || timer || raf) return;
+      const delay = covered ? 250 : Math.max(16, bgInterval - 6);
+      timer = setTimeout(() => {
+        timer = 0;
+        if (running) raf = requestAnimationFrame(draw);
+      }, delay);
+    };
     const draw = (now) => {
+      raf = 0;
+      if (!running) return;
+      const covered = document.documentElement.classList.contains('pl-active');
+      if (!reduce && drawnInitial && covered) {
+        schedule(true);
+        return;
+      }
+      drawnInitial = true;
       if (!reduce) {
-        ['a', 'b', 'c', 'glow'].forEach((k) => { for (let i = 0; i < 3; i++) cur[k][i] += (target[k][i] - cur[k][i]) * 0.035; });
+        ['a', 'b', 'c', 'glow'].forEach((k) => { for (let i = 0; i < 3; i++) cur[k][i] += (target[k][i] - cur[k][i]) * bgLerp; });
         push();
       }
       gl.uniform1f(U('uT'), reduce ? 8 : (now - t0) / 1000 + 8);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      if (!reduce && running) raf = requestAnimationFrame(draw);
+      if (!reduce) schedule(false);
     };
     raf = requestAnimationFrame(draw);
     const onVis = () => {
       running = !document.hidden;
-      if (running && !reduce) { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+      if (!running) {
+        clearTimeout(timer); timer = 0;
+        cancelAnimationFrame(raf); raf = 0;
+      } else if (!reduce) {
+        clearTimeout(timer); timer = 0;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(draw);
+      }
     };
     document.addEventListener('visibilitychange', onVis);
     return () => {
       running = false;
+      clearTimeout(timer);
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(routeRaf);
+      if (io) io.disconnect();
       window.removeEventListener('resize', size);
-      window.removeEventListener('scroll', pick);
+      window.removeEventListener('hashchange', onRoute);
+      window.removeEventListener('popstate', onRoute);
+      window.removeEventListener('app:route', onRoute);
       document.removeEventListener('visibilitychange', onVis);
     };
   }, [palette]);

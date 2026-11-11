@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { Fragment, useEffect, useRef } from 'react';
+import { useMotionValueEvent, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 
 const TEXT =
   "Hi, I\u2019m Hari Praneeth, a Generative AI Engineer building LLM and RAG applications in Python. " +
@@ -10,23 +10,13 @@ const TEXT =
 const WORDS = TEXT.split(' ');
 const N = WORDS.length;
 const SOFT = 7; // how many words are mid-fade at once (bigger = softer wave)
-
-// each word fades from 15% to 100% as the paragraph scrolls into view
-function Word({ children, index, progress, still }) {
-  const start = (index / N) * (1 - SOFT / N);
-  const opacity = useTransform(progress, [start, start + SOFT / N], [0.15, 1]);
-  return (
-    <>
-      <motion.span className="rw" style={{ opacity: still ? 1 : opacity }}>
-        {children}
-      </motion.span>{' '}
-    </>
-  );
-}
+const SOFT_FRAC = SOFT / N;
 
 export default function About() {
   const reduce = useReducedMotion();
   const ref = useRef(null);
+  const wordRefs = useRef([]);
+  const lastOps = useRef(new Array(N).fill(''));
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start 0.92', 'end 0.3']
@@ -34,14 +24,39 @@ export default function About() {
   // spring smoothing so fast scrolling still reveals gently
   const smooth = useSpring(scrollYProgress, { stiffness: 70, damping: 22, mass: 0.6 });
 
+  const applyProgress = (v) => {
+    if (reduce) return;
+    for (let i = 0; i < N; i++) {
+      const el = wordRefs.current[i];
+      if (!el) continue;
+      const start = (i / N) * (1 - SOFT_FRAC);
+      const raw = (v - start) / SOFT_FRAC;
+      const t = raw <= 0 ? 0 : raw >= 1 ? 1 : raw;
+      const op = (0.15 + t * 0.85).toFixed(3);
+      if (lastOps.current[i] !== op) {
+        lastOps.current[i] = op;
+        el.style.opacity = op;
+      }
+    }
+  };
+
+  useMotionValueEvent(smooth, 'change', applyProgress);
+  useEffect(() => { applyProgress(smooth.get()); }, [reduce]);
+
   return (
     <section className="wrap about-section" id="about">
       <div className="eyebrow">About me</div>
       <p className="about-text" ref={ref}>
         {WORDS.map((w, i) => (
-          <Word key={i} index={i} progress={smooth} still={!!reduce}>
-            {w}
-          </Word>
+          <Fragment key={i}>
+            <span
+              className="rw"
+              ref={(el) => { wordRefs.current[i] = el; }}
+              style={reduce ? { opacity: 1 } : undefined}
+            >
+              {w}
+            </span>{' '}
+          </Fragment>
         ))}
       </p>
 
