@@ -1,0 +1,73 @@
+/* ---------- interactions: shared press / hover feel and the cursor label ---------- */
+
+/* One timing and curve for every button-like control, plus press-down feedback. `scale` is its own
+   property, so it composes with the `transform` the magnetic pull sets. */
+:is(
+  .mn-hire,
+  .mn-btn,
+  .mn-theme,
+  .cv-btn,
+  .pj-btn,
+  .pj-back,
+  .view-all,
+  .bento-cta,
+  .flip-btn,
+  .hero-meta .cta
+) {
+  transition-property: transform, scale, background, color, border-color, box-shadow, gap, opacity;
+  transition-duration: var(--dur-base);
+  transition-timing-function: var(--ease-out);
+}
+
+:is(
+  .mn-hire,
+  .mn-btn,
+  .mn-theme,
+  .cv-btn,
+  .pj-btn,
+  .pj-back,
+  .view-all,
+  .bento-cta,
+  .flip-btn,
+  .hero-meta .cta
+):active {
+  scale: 0.96;
+  transition-duration: var(--dur-press);
+}
+
+/* the cursor label (CursorLabel.jsx) */
+.cursor-label {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000; /* above the page and the nav, below the loading screen */
+  pointer-events: none;
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  /* the accent stands out on the dark project images and on the pale page, in either theme */
+  background: var(--accent);
+  color: #fff;
+  font:
+    600 12px 'Geist Mono',
+    monospace;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 8px 24px rgba(var(--shadow-rgb), 0.3);
+  opacity: 0;
+  scale: 0.8;
+  transition:
+    opacity 0.16s ease,
+    scale 0.22s var(--ease-spring);
+}
+.cursor-label.is-on {
+  opacity: 1;
+  scale: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-label {
+    display: none;
+  }
+}
