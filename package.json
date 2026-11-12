@@ -12,9 +12,10 @@
     "format:check": "prettier --check .",
     "test:styles": "vite build && node tests/style-snapshot.mjs",
     "test:a11y": "vite build && node tests/a11y.mjs",
-    "test": "vite build && node tests/a11y.mjs && node tests/style-snapshot.mjs && node tests/transitions.mjs && node tests/theme.mjs",
+    "test": "vite build && node tests/a11y.mjs && node tests/style-snapshot.mjs && node tests/transitions.mjs && node tests/theme.mjs && node tests/interactions.mjs",
     "test:transitions": "vite build && node tests/transitions.mjs",
-    "test:theme": "vite build && node tests/theme.mjs"
+    "test:theme": "vite build && node tests/theme.mjs",
+    "test:interactions": "vite build && node tests/interactions.mjs"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

@@ -168,6 +168,7 @@ export default function Nav() {
           <button
             type="button"
             className="mn-theme"
+            data-magnetic
             onClick={toggleTheme}
             aria-pressed={theme === 'dark'}
             aria-label="Dark theme"
@@ -192,7 +193,7 @@ export default function Nav() {
               />
             </svg>
           </button>
-          <a href="#contact" className="mn-hire" onClick={(e) => goTo(e, 'contact')}>
+          <a href="#contact" className="mn-hire" data-magnetic onClick={(e) => goTo(e, 'contact')}>
             Hire me
           </a>
           <button

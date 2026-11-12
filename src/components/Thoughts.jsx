@@ -71,6 +71,7 @@ export default function Thoughts() {
             {p.href && (
               <a
                 className="card-hit"
+                data-cursor="View post ↗"
                 href={p.href}
                 target="_blank"
                 rel="noopener noreferrer"

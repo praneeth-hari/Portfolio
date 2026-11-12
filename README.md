@@ -72,6 +72,13 @@ How it is built, and what to know when you add UI:
 - The WebGL background has darkened versions of every palette (`GradientBackground.jsx`) and the hero text reads `--ink`; both react to the `app:theme` event.
 - `tests/theme.mjs` covers the behaviour; the accessibility and style-snapshot tests run in both themes.
 
+## Cursor label and press feel
+
+- **Cursor label** (`CursorLabel.jsx`): a small accent pill that follows the pointer and names what a click will do. Any element opts in with `data-cursor="View case study"`; it is used on the project cards ("View case study", "Live demo ↗", "GitHub ↗") and the highlight cards. It is decorative (`aria-hidden`), never replaces the real cursor, and is off for touch devices and reduced motion. The card's own small links (Live demo / GitHub) are not opted in, so the label steps aside over them.
+- **Press and hover feel** (`34-interactions.css`): every button-like control shares one timing (`--dur-base`, `--ease-out`) and gets a press-down (`scale: .96` on `:active`). To bring a new control into the system, add its class to the two `:is(...)` lists in that file.
+- **Magnetic pull** (`useMagnetic.js`): add `data-magnetic` to any element. Used on the About buttons, "Hire me", the theme toggle and the primary case-study button.
+- `tests/interactions.mjs` covers all of it.
+
 ## Page transitions
 
 Opening a case study from the Work section (and coming back) runs inside the browser's View Transitions API: the clicked card's image morphs into the case-study cover, the nav stays put and the rest of the page fades. It is wired up in `src/App.jsx` (`navigate`), `src/viewTransition.js` and `src/styles/31-view-transitions.css`. Browsers without the API, and visitors who prefer reduced motion, just get the plain page swap.
