@@ -207,6 +207,7 @@ export default function Work() {
             {p.study ? (
               <a
                 className="card-hit"
+                data-cursor="View case study"
                 href={'#/project/' + p.study}
                 aria-label={p.name + ' case study'}
                 onClick={(e) => {
@@ -217,6 +218,7 @@ export default function Work() {
             ) : (
               <a
                 className="card-hit"
+                data-cursor={p.demo ? 'Live demo ↗' : 'GitHub ↗'}
                 href={p.demo || p.href}
                 target="_blank"
                 rel="noopener noreferrer"
