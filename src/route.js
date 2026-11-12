@@ -4,7 +4,9 @@ try {
   if (nav && nav.type === 'reload' && /^#\/project\//.test(window.location.hash)) {
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
-} catch { /* ignore */ }
+} catch {
+  /* ignore */
+}
 
 /*
  * Tiny hash router: "#/project/<slug>" shows a case-study page, anything else shows the home page.

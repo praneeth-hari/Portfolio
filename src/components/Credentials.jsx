@@ -3,12 +3,26 @@ import SplitHeading from './SplitHeading.jsx';
 
 const EDUCATION = [
   { years: '2022–2026', title: 'B.Tech, Information Technology', sub: "St. Peter's Engineering College" },
-  { years: '2020–2022', title: 'Intermediate Education', sub: "Bhavan's Sri Aurobindo Junior College · Science, Mathematics" }
+  {
+    years: '2020–2022',
+    title: 'Intermediate Education',
+    sub: "Bhavan's Sri Aurobindo Junior College · Science, Mathematics"
+  }
 ];
 
 const CERTS = [
-  { mark: 'AI', title: 'AI Engineer Associate Certificate Course', sub: 'Udemy · Sep 2026', url: 'https://www.udemy.com/certificate/UC-0d473352-ad8a-4e7a-a42f-340ef7b065b7/' },
-  { mark: 'ML', title: 'Machine Learning & AI Foundations Course', sub: 'Data Science Academy · Udemy · Sep 2026', url: 'https://www.udemy.com/certificate/UC-421f46bc-f392-4f4e-b9c3-9c3966ce9469/' }
+  {
+    mark: 'AI',
+    title: 'AI Engineer Associate Certificate Course',
+    sub: 'Udemy · Sep 2026',
+    url: 'https://www.udemy.com/certificate/UC-0d473352-ad8a-4e7a-a42f-340ef7b065b7/'
+  },
+  {
+    mark: 'ML',
+    title: 'Machine Learning & AI Foundations Course',
+    sub: 'Data Science Academy · Udemy · Sep 2026',
+    url: 'https://www.udemy.com/certificate/UC-421f46bc-f392-4f4e-b9c3-9c3966ce9469/'
+  }
 ];
 
 export default function Credentials() {
@@ -17,7 +31,7 @@ export default function Credentials() {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Credentials</Reveal>
-          <SplitHeading>{"Certifications & Education"}</SplitHeading>
+          <SplitHeading>{'Certifications & Education'}</SplitHeading>
         </div>
       </div>
 
@@ -48,14 +62,28 @@ export default function Credentials() {
                     <h3>{c.title}</h3>
                     <div className="cert-sub">{c.sub}</div>
                   </div>
-                  {c.url && <span className="cert-go mono" aria-hidden="true">View certificate ↗</span>}
+                  {c.url && (
+                    <span className="cert-go mono" aria-hidden="true">
+                      View certificate ↗
+                    </span>
+                  )}
                 </>
               );
               return c.url ? (
-                <a className="cert-card is-link" key={c.title} href={c.url} target="_blank" rel="noopener noreferrer"
-                   aria-label={c.title + ' — view certificate (opens in a new tab)'}>{inner}</a>
+                <a
+                  className="cert-card is-link"
+                  key={c.title}
+                  href={c.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={c.title + ' — view certificate (opens in a new tab)'}
+                >
+                  {inner}
+                </a>
               ) : (
-                <div className="cert-card" key={c.title}>{inner}</div>
+                <div className="cert-card" key={c.title}>
+                  {inner}
+                </div>
               );
             })}
           </div>

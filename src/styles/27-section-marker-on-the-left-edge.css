@@ -1,0 +1,58 @@
+/* ---------- section marker on the left edge ---------- */
+.rail {
+  position: fixed;
+  left: 14px;
+  bottom: 26px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  font:
+    600 11px 'Geist Mono',
+    monospace;
+  color: var(--ink-soft);
+}
+.rail-num {
+  font:
+    900 26px 'Archivo',
+    sans-serif;
+  color: var(--ink);
+  animation: railIn 0.5s var(--ease-out);
+}
+.rail-name {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.rail-total {
+  opacity: 1;
+}
+@keyframes railIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 1100px) {
+  .rail {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .hs-num {
+    display: none;
+  }
+}
+/* the fluid text must receive the pointer again (wrapper layers are pointer-events:none) */
+.hl-title .hero-title,
+.hl-title .fluid-stage,
+.hl-title .fluid-canvas {
+  pointer-events: auto;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { BotAvatar } from 'bot-avatars';
 
 /*
@@ -17,7 +17,8 @@ const SUGGESTIONS = [
 const HELLO = {
   id: 0,
   role: 'assistant',
-  content: "Hi! I'm a bot that answers questions about Hari's work, projects and skills. What would you like to know?"
+  content:
+    "Hi! I'm a bot that answers questions about Hari's work, projects and skills. What would you like to know?"
 };
 
 let nextId = 1;
@@ -39,7 +40,12 @@ export default function ChatBot() {
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 250);
-    const onKey = (e) => { if (e.key === 'Escape' && open) { setOpen(false); btnRef.current?.focus(); } };
+    const onKey = (e) => {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+        btnRef.current?.focus();
+      }
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
@@ -53,7 +59,10 @@ export default function ChatBot() {
     const botId = nextId++;
     const history = [...messages, userMsg];
     // the greeting is UI only and failed answers are not worth sending back
-    const payload = history.slice(1).filter((m) => !m.error).map(({ role, content }) => ({ role, content }));
+    const payload = history
+      .slice(1)
+      .filter((m) => !m.error)
+      .map(({ role, content }) => ({ role, content }));
     setMessages([...history, { id: botId, role: 'assistant', content: '', streaming: true }]);
     setInput('');
     setBusy(true);
@@ -71,7 +80,8 @@ export default function ChatBot() {
       if (!res.ok || !ctype.includes('ndjson') || !res.body) {
         // plain JSON: an error, or a server that does not stream
         const data = await res.json().catch(() => ({}));
-        if (res.ok && data.answer) patch(botId, () => ({ content: data.answer, sources: data.sources, streaming: false }));
+        if (res.ok && data.answer)
+          patch(botId, () => ({ content: data.answer, sources: data.sources, streaming: false }));
         else fail(data.error || 'The bot could not answer right now.');
         return;
       }
@@ -88,7 +98,9 @@ export default function ChatBot() {
           patch(botId, () => ({ streaming: false, sources: evt.sources }));
         } else if (evt.type === 'error') {
           sawDone = true;
-          patch(botId, (m) => (m.content ? { streaming: false } : { content: evt.message, error: true, streaming: false }));
+          patch(botId, (m) =>
+            m.content ? { streaming: false } : { content: evt.message, error: true, streaming: false }
+          );
         }
       };
       for (;;) {
@@ -100,20 +112,38 @@ export default function ChatBot() {
           const line = buf.slice(0, nl).trim();
           buf = buf.slice(nl + 1);
           if (!line) continue;
-          try { handle(JSON.parse(line)); } catch { /* ignore a broken line */ }
+          try {
+            handle(JSON.parse(line));
+          } catch {
+            /* ignore a broken line */
+          }
         }
       }
-      if (!sawDone) patch(botId, (m) => (m.content ? { streaming: false } : { content: 'The bot could not answer right now.', error: true, streaming: false }));
+      if (!sawDone)
+        patch(botId, (m) =>
+          m.content
+            ? { streaming: false }
+            : { content: 'The bot could not answer right now.', error: true, streaming: false }
+        );
     } catch {
-      patch(botId, (m) => (m.content
-        ? { streaming: false }
-        : { content: 'Could not reach the bot. Check your connection and try again.', error: true, streaming: false }));
+      patch(botId, (m) =>
+        m.content
+          ? { streaming: false }
+          : {
+              content: 'Could not reach the bot. Check your connection and try again.',
+              error: true,
+              streaming: false
+            }
+      );
     } finally {
       setBusy(false);
     }
   };
 
-  const onSubmit = (e) => { e.preventDefault(); ask(input); };
+  const onSubmit = (e) => {
+    e.preventDefault();
+    ask(input);
+  };
   const showSuggestions = messages.length === 1 && !busy;
   const lastDone = [...messages].reverse().find((m) => m.role === 'assistant' && !m.streaming && m.id !== 0);
 
@@ -127,13 +157,15 @@ export default function ChatBot() {
         aria-controls="chat-panel"
         aria-label={open ? 'Close chat' : 'Ask about Hari'}
       >
-        <span className="chat-fab-ghost" aria-hidden="true"><BotAvatar type="ghost" shading="plastic" size={26} state={busy ? 'working' : 'default'} /></span>
+        <span className="chat-fab-ghost" aria-hidden="true">
+          <BotAvatar type="ghost" shading="plastic" size={26} state={busy ? 'working' : 'default'} />
+        </span>
         <span className="chat-fab-label">{open ? 'Close' : 'Ask about Hari'}</span>
       </button>
 
       <AnimatePresence>
         {open && (
-          <motion.section
+          <m.section
             id="chat-panel"
             className="chat-panel"
             role="dialog"
@@ -144,12 +176,16 @@ export default function ChatBot() {
             transition={{ duration: 0.28, ease: [0.2, 0.7, 0.2, 1] }}
           >
             <header className="chat-head">
-              <span className="chat-head-ghost" aria-hidden="true"><BotAvatar type="ghost" shading="plastic" size={44} state={busy ? 'working' : 'default'} /></span>
+              <span className="chat-head-ghost" aria-hidden="true">
+                <BotAvatar type="ghost" shading="plastic" size={44} state={busy ? 'working' : 'default'} />
+              </span>
               <div className="chat-head-text">
                 <div className="chat-title">Ask about Hari</div>
                 <div className="chat-sub mono">RAG · answers from his resume &amp; projects</div>
               </div>
-              <button className="chat-x" onClick={() => setOpen(false)} aria-label="Close chat">×</button>
+              <button className="chat-x" onClick={() => setOpen(false)} aria-label="Close chat">
+                ×
+              </button>
             </header>
 
             {/* the list is not a live region (it would read out every streamed word); the finished answer is announced below */}
@@ -157,7 +193,11 @@ export default function ChatBot() {
               {messages.map((m) => (
                 <div key={m.id} className={'chat-msg ' + m.role + (m.error ? ' error' : '')}>
                   {m.streaming && !m.content ? (
-                    <div className="chat-bubble chat-typing" aria-label="Thinking"><i /><i /><i /></div>
+                    <div className="chat-bubble chat-typing" aria-label="Thinking">
+                      <i />
+                      <i />
+                      <i />
+                    </div>
                   ) : (
                     <div className="chat-bubble">
                       {m.content}
@@ -166,7 +206,9 @@ export default function ChatBot() {
                   )}
                   {m.sources?.length > 0 && (
                     <div className="chat-sources">
-                      {m.sources.map((src) => <span key={src}>{src}</span>)}
+                      {m.sources.map((src) => (
+                        <span key={src}>{src}</span>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -174,12 +216,16 @@ export default function ChatBot() {
               {showSuggestions && (
                 <div className="chat-suggest">
                   {SUGGESTIONS.map((s) => (
-                    <button key={s} onClick={() => ask(s)}>{s}</button>
+                    <button key={s} onClick={() => ask(s)}>
+                      {s}
+                    </button>
                   ))}
                 </div>
               )}
             </div>
-            <div className="chat-sr" role="status" aria-live="polite">{lastDone ? lastDone.content : ''}</div>
+            <div className="chat-sr" role="status" aria-live="polite">
+              {lastDone ? lastDone.content : ''}
+            </div>
 
             <form className="chat-form" onSubmit={onSubmit}>
               <input
@@ -190,10 +236,12 @@ export default function ChatBot() {
                 maxLength={500}
                 aria-label="Your question"
               />
-              <button type="submit" disabled={!input.trim() || busy} aria-label="Send">→</button>
+              <button type="submit" disabled={!input.trim() || busy} aria-label="Send">
+                →
+              </button>
             </form>
             <div className="chat-note">AI answers can be wrong. For anything important, email Hari.</div>
-          </motion.section>
+          </m.section>
         )}
       </AnimatePresence>
     </>
