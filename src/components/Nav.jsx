@@ -142,7 +142,7 @@ export default function Nav() {
           href="#top"
           className="mn-logo"
           onClick={(e) => goTo(e, 'top')}
-          aria-label="Hari Praneeth, back to top"
+          aria-label="HP Hari Praneeth, back to top"
         >
           <span className="mn-mark">HP</span>
           <span className="mn-name">Hari Praneeth</span>
