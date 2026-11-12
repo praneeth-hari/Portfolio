@@ -1,0 +1,37 @@
+/* ---------- typography ---------- */
+
+/* Headings break into even lines instead of leaving a short last line. */
+:is(h1, h2, h3, h4, .disp, .pj-title, .pj-h2, .pj-body-lg, .statement p) {
+  text-wrap: balance;
+}
+
+/* Running text avoids ending on a single stranded word. */
+:is(p, li, figcaption, blockquote, dd) {
+  text-wrap: pretty;
+}
+
+/* Short blurbs (card descriptions, the contact line) read best with evenly balanced lines. */
+:is(.work-desc, .bento-desc, .thought-excerpt, .contact-left p) {
+  text-wrap: balance;
+}
+
+/* Comfortable line length for long reading: about 65-75 characters per line. (`ch` is the width of a "0",
+   wider than an average letter, so these caps are in the mid-50s.) */
+.pj-body {
+  max-width: 56ch;
+}
+.arch-panel-text {
+  max-width: 58ch;
+}
+.pj-limits {
+  max-width: 62ch;
+}
+.tl {
+  max-width: 62ch;
+}
+
+/* Numbers in the body face (Geist Sans has proportional digits by default) line up in dates, data labels
+   and counters. Archivo and Geist Mono are already tabular. */
+:is(.date, .cert-sub, .bar-val, .pj-stat-note, .exp-meta, .hs-count, .rail, .status-time, .arch-files) {
+  font-variant-numeric: tabular-nums;
+}

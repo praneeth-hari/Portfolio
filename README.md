@@ -72,6 +72,12 @@ How it is built, and what to know when you add UI:
 - The WebGL background has darkened versions of every palette (`GradientBackground.jsx`) and the hero text reads `--ink`; both react to the `app:theme` event.
 - `tests/theme.mjs` covers the behaviour; the accessibility and style-snapshot tests run in both themes.
 
+## Typography
+
+`src/styles/35-typography.css` holds the text rules: headings use `text-wrap: balance`, running text uses `text-wrap: pretty`, short blurbs (card descriptions, the contact line) use `balance`, long-reading columns are capped at about 55-60ch (65-75 characters per line), and numbers set in Geist Sans use tabular figures (Archivo and Geist Mono already do). Sizes, letter-spacing and line-height live with each component.
+
+`tests/typography.mjs` measures the real wrapping at 1440 and 1920 wide: stranded last words, unevenly wrapped headings, over-wide prose and text under 12px. It allows a tiny budget so copy edits do not break it; if it fails after you edit text, look at the element it prints.
+
 ## Cursor label and press feel
 
 - **Cursor label** (`CursorLabel.jsx`): a small accent pill that follows the pointer and names what a click will do. Any element opts in with `data-cursor="View case study"`; it is used on the project cards ("View case study", "Live demo ↗", "GitHub ↗") and the highlight cards. It is decorative (`aria-hidden`), never replaces the real cursor, and is off for touch devices and reduced motion. The card's own small links (Live demo / GitHub) are not opted in, so the label steps aside over them.
