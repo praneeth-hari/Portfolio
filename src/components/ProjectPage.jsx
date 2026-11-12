@@ -159,7 +159,7 @@ export default function ProjectPage({ slug }) {
 
   if (!p) {
     return (
-      <main className="wrap pj">
+      <main className="wrap pj" id="main-content" tabIndex={-1}>
         <button type="button" className="pj-back" onClick={() => goHome('work')}>← All projects</button>
         <h1 className="pj-title disp">Project not found</h1>
       </main>
@@ -167,7 +167,7 @@ export default function ProjectPage({ slug }) {
   }
 
   return (
-    <main className="pj" id="project">
+    <main className="pj" id="main-content" tabIndex={-1}>
       <CoverBg src={p.cover} />
       <div className="wrap">
         <button type="button" className="pj-back" onClick={() => goHome('work')}>← All projects</button>

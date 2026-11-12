@@ -55,6 +55,27 @@
       outline-offset: 3px;
     }
 
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 1000;
+      padding: 10px 18px;
+      border-radius: 100px;
+      background: var(--ink);
+      color: var(--paper);
+      font: 600 14px 'Geist Sans', sans-serif;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: none;
+    }
+
+    main:focus {
+      outline: none;
+    }
+
     .wrap {
       width: 100%;
       max-width: 1180px;
@@ -2541,7 +2562,7 @@
     }
     .pj-stat-value { font-size: clamp(34px, 4.2vw, 56px); line-height: 1; letter-spacing: -.03em; }
     .pj-stat-label { margin-top: 10px; font-size: 14px; font-weight: 600; line-height: 1.35; }
-    .pj-stat-note { margin-top: 8px; font-size: 11px; opacity: .55; }
+    .pj-stat-note { margin-top: 8px; font-size: 11px; opacity: .72; }
 
     .pj section { padding-top: 0; }   /* don't inherit the home page's 120px section padding */
     .pj-sec { margin-top: clamp(56px, 7vw, 100px); }
@@ -2662,7 +2683,7 @@
     .rail { position: fixed; left: 14px; bottom: 26px; z-index: 40; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; font: 600 11px 'Geist Mono', monospace; color: var(--ink-soft); }
     .rail-num { font: 900 26px 'Archivo', sans-serif; color: var(--ink); animation: railIn .5s cubic-bezier(.2,.8,.2,1); }
     .rail-name { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .14em; text-transform: uppercase; }
-    .rail-total { opacity: .6; }
+    .rail-total { opacity: 1; }
     @keyframes railIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     @media (max-width: 1100px) { .rail { display: none; } }
     @media (max-width: 900px) { .hs-num { display: none; } }
