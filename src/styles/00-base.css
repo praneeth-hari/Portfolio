@@ -68,7 +68,7 @@ main:focus {
 
 .wrap {
   width: 100%;
-  max-width: 1180px;
+  max-width: var(--wrap-max);
   margin: 0 auto;
   padding-left: 32px;
   padding-right: 32px;
