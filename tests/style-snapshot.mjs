@@ -12,7 +12,7 @@
  */
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { start, BASE, PAGES } from './helpers.mjs';
+import { start, BASE, PAGES, THEMES, newPage } from './helpers.mjs';
 
 const BASELINE = new URL('./style-baseline.json', import.meta.url);
 const UPDATE = process.argv.includes('--update');
@@ -57,29 +57,31 @@ const app = await start();
 const current = {};
 const detail = {};
 try {
-  for (const [name, route, width, height] of PAGES) {
-    // reduced motion makes the page static, so the result is deterministic
-    const ctx = await app.browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
-    const page = await ctx.newPage();
-    await page.goto(BASE + '/' + route);
-    await page.waitForSelector('main', { timeout: 15000 });
-    await page.waitForTimeout(2500);
-    const rows = await page.evaluate((props) => {
-      const out = [];
-      document.querySelectorAll('body *').forEach((el, i) => {
-        if (['CANVAS', 'SCRIPT', 'STYLE'].includes(el.tagName)) return;
-        const cs = getComputedStyle(el);
-        const cls = typeof el.className === 'string' ? el.className : '';
-        out.push([
-          `${i}:${el.tagName.toLowerCase()}.${cls}`,
-          props.map((p) => `${p}: ${cs.getPropertyValue(p)}`).join('; ')
-        ]);
-      });
-      return out;
-    }, PROPS);
-    current[name] = Object.fromEntries(rows.map(([k, v]) => [k, hash(v)]));
-    detail[name] = Object.fromEntries(rows);
-    await ctx.close();
+  for (const theme of THEMES) {
+    for (const [pageName, route, width, height] of PAGES) {
+      const name = `${pageName}-${theme}`;
+      // reduced motion makes the page static, so the result is deterministic
+      const { ctx, page } = await newPage(app.browser, { width, height, theme });
+      await page.goto(BASE + '/' + route);
+      await page.waitForSelector('main', { timeout: 15000 });
+      await page.waitForTimeout(2500);
+      const rows = await page.evaluate((props) => {
+        const out = [];
+        document.querySelectorAll('body *').forEach((el, i) => {
+          if (['CANVAS', 'SCRIPT', 'STYLE'].includes(el.tagName)) return;
+          const cs = getComputedStyle(el);
+          const cls = typeof el.className === 'string' ? el.className : '';
+          out.push([
+            `${i}:${el.tagName.toLowerCase()}.${cls}`,
+            props.map((p) => `${p}: ${cs.getPropertyValue(p)}`).join('; ')
+          ]);
+        });
+        return out;
+      }, PROPS);
+      current[name] = Object.fromEntries(rows.map(([k, v]) => [k, hash(v)]));
+      detail[name] = Object.fromEntries(rows);
+      await ctx.close();
+    }
   }
 } finally {
   await app.stop();

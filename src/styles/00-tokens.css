@@ -9,20 +9,33 @@
  *   --bp-narrow: 520px
  */
 :root {
+  color-scheme: light;
+
   /* colour */
   --paper: #f0eee6;
   --paper-2: #e7e4d9;
   --paper-soft: #f4f2ea;
+  --paper-3: #ded9c8; /* second cream tone (tech tiles) */
   --paper-rgb: 240, 238, 230;
   --ink: #121210;
   --ink-rgb: 18, 18, 16;
   --ink-soft: #6b685f;
+  --ink-body: #3a3833; /* long-form text on case-study pages */
+  --ink-lead: #3d3a33;
+  /* frosted "glass" surfaces: white at the alpha written in each rule, scaled by --glass-k (lower in dark) */
+  --glass-rgb: 255, 255, 255;
+  --glass-k: 1;
+  --shadow-rgb: 18, 18, 16; /* shadows stay dark in every theme */
+  --on-white: #121210; /* text on always-white buttons */
+  --panel: rgba(250, 249, 245, 0.92); /* chat panel */
+  --bubble: #fff; /* chat bubbles and input */
   --card: #151412;
   --card-2: #1b1a17;
   --line: rgba(var(--ink-rgb), 0.12);
   --accent: #2f5cff;
   /* slightly deeper blue for small text on the paper background (4.41:1 -> 5:1 contrast) */
   --accent-text: #2a54ee;
+  --link: #2f5cff; /* accent used as text colour (lighter in the dark theme) */
   --accent-light: #5b8cff;
   --accent-deep: #1f45d6;
   --mint: #6fd6b0;

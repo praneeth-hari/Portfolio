@@ -1,0 +1,40 @@
+/* ---------- theme toggle (sun / moon) ---------- */
+.mn-theme {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink);
+  background: rgba(var(--glass-rgb), calc(0.65 * var(--glass-k)));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(var(--glass-rgb), calc(0.8 * var(--glass-k)));
+}
+.mn-theme svg {
+  grid-area: 1 / 1;
+  transition:
+    transform 0.5s var(--ease-out),
+    opacity 0.3s ease;
+}
+/* light theme shows the moon ("switch to dark"), dark theme shows the sun */
+.mn-theme .mn-theme-sun {
+  opacity: 0;
+  transform: rotate(-70deg) scale(0.5);
+}
+.mn-theme[aria-pressed='true'] .mn-theme-sun {
+  opacity: 1;
+  transform: none;
+}
+.mn-theme[aria-pressed='true'] .mn-theme-moon {
+  opacity: 0;
+  transform: rotate(70deg) scale(0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mn-theme svg {
+    transition: none;
+  }
+}
