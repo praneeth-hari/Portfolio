@@ -81,10 +81,10 @@ html.menu-open .mn-bar::before {
   height: 42px;
   padding: 0 16px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(var(--glass-rgb), calc(0.5 * var(--glass-k)));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(var(--glass-rgb), calc(0.7 * var(--glass-k)));
   font-weight: 600;
   font-size: var(--fs-base);
   color: var(--ink);
@@ -120,10 +120,10 @@ html.menu-open .mn-bar::before {
   gap: var(--space-3);
   border-radius: 99px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(var(--glass-rgb), calc(0.65 * var(--glass-k)));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(var(--glass-rgb), calc(0.8 * var(--glass-k)));
   color: var(--ink);
   font:
     700 14px 'Archivo',
@@ -216,7 +216,7 @@ html.menu-open .mn-bar::before {
 .mn-arrow {
   font-size: clamp(24px, min(5vw, 6vh), 60px);
   line-height: 1;
-  color: var(--accent);
+  color: var(--link);
   opacity: 0;
   transform: translateX(-24px);
   transition:

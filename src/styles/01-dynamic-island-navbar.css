@@ -160,7 +160,7 @@
 }
 
 .dyn-nav-links-inner a.is-active {
-  color: var(--accent);
+  color: var(--link);
 }
 
 @media (max-width: 900px) {

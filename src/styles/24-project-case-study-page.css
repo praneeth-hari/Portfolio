@@ -29,8 +29,8 @@
   gap: var(--space-2);
   margin-bottom: 36px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(var(--glass-rgb), calc(0.55 * var(--glass-k)));
+  border: 1px solid rgba(var(--glass-rgb), calc(0.8 * var(--glass-k)));
   color: var(--ink);
   padding: 10px 18px;
   border-radius: 99px;
@@ -57,7 +57,7 @@
 .pj-lead {
   font-size: clamp(17px, 1.5vw, 20px);
   line-height: 1.5;
-  color: #3d3a33;
+  color: var(--ink-lead);
   max-width: 600px;
 }
 .pj-actions,
@@ -79,7 +79,7 @@
     sans-serif;
   color: var(--ink);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(var(--glass-rgb), calc(0.6 * var(--glass-k)));
   border: 1px solid rgba(var(--ink-rgb), 0.14);
   transition: transform 0.2s;
 }
@@ -148,8 +148,8 @@
 .pj-stat {
   padding: 24px 22px;
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(var(--glass-rgb), calc(0.72 * var(--glass-k)));
+  border: 1px solid rgba(var(--glass-rgb), calc(0.85 * var(--glass-k)));
 }
 .pj-stat-value {
   font-size: clamp(34px, 4.2vw, 56px);
@@ -184,7 +184,7 @@
   font-size: 17px;
   line-height: 1.65;
   max-width: 760px;
-  color: #3a3833;
+  color: var(--ink-body);
 }
 .pj-body-lg {
   font-size: clamp(20px, 2.2vw, 28px);
@@ -227,9 +227,9 @@
   cursor: pointer;
   padding: 16px 16px 15px;
   border-radius: var(--r-md);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(var(--glass-rgb), calc(0.85 * var(--glass-k)));
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(var(--glass-rgb), calc(0.72 * var(--glass-k)));
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -248,7 +248,7 @@
   background: var(--ink);
   color: var(--paper-soft);
   border-color: var(--ink);
-  box-shadow: 0 16px 40px rgba(var(--ink-rgb), 0.28);
+  box-shadow: 0 16px 40px rgba(var(--shadow-rgb), 0.28);
 }
 .arch-node:focus-visible {
   outline: 2px solid var(--accent);
@@ -308,8 +308,8 @@
   padding: clamp(22px, 3vw, 34px);
   border-radius: 26px;
   min-height: 250px;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(var(--glass-rgb), calc(0.62 * var(--glass-k)));
+  border: 1px solid rgba(var(--glass-rgb), calc(0.85 * var(--glass-k)));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -335,7 +335,7 @@
   font-size: var(--fs-2xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--link);
   font-weight: 600;
 }
 .arch-why p {
@@ -378,8 +378,8 @@
 .bars-group {
   padding: 22px;
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(var(--glass-rgb), calc(0.58 * var(--glass-k)));
+  border: 1px solid rgba(var(--glass-rgb), calc(0.85 * var(--glass-k)));
 }
 .bars-name {
   font:
@@ -429,12 +429,12 @@
 .pj-decision {
   padding: 26px;
   border-radius: var(--r-xl);
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(var(--glass-rgb), calc(0.58 * var(--glass-k)));
+  border: 1px solid rgba(var(--glass-rgb), calc(0.85 * var(--glass-k)));
 }
 .pj-decision-n {
   font-size: var(--fs-xs);
-  color: var(--accent);
+  color: var(--link);
 }
 .pj-decision h3 {
   font:
@@ -446,7 +446,7 @@
 .pj-decision p {
   font-size: 15.5px;
   line-height: 1.6;
-  color: #3a3833;
+  color: var(--ink-body);
 }
 .pj-limits {
   list-style: none;
@@ -484,7 +484,7 @@
   border-radius: 99px;
   font-size: var(--fs-base);
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(var(--glass-rgb), calc(0.65 * var(--glass-k)));
   border: 1px solid rgba(var(--ink-rgb), 0.1);
 }
 .pj-end {

@@ -36,7 +36,7 @@ html.modal-lock body {
   border-radius: var(--radius);
   padding: 40px 36px;
   position: relative;
-  box-shadow: 0 30px 70px rgba(var(--ink-rgb), 0.35);
+  box-shadow: 0 30px 70px rgba(var(--shadow-rgb), 0.35);
   transform: translateY(14px) scale(0.98);
   transition: transform 0.3s var(--ease-out);
 }
@@ -121,7 +121,7 @@ html.modal-lock body {
 
 .skill-modal-list.has-bullets li::before {
   content: '•';
-  color: var(--accent);
+  color: var(--link);
   position: absolute;
   left: 0;
 }
