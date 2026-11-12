@@ -4,7 +4,7 @@ import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
 import { openProject } from '../route.js';
-import { BP, WORK_TRACK, maxTablet } from '../breakpoints.js';
+import { BP, maxTablet } from '../breakpoints.js';
 
 const PROJECTS = [
   {
@@ -105,7 +105,8 @@ function HScroll({ children, count }) {
       const wide = window.innerWidth > BP.tablet && !reduce;
       setOn(wide);
       if (wide && track.current) {
-        const pad = Math.max(24, (window.innerWidth - WORK_TRACK) / 2 + 24);
+        // the left padding of the track is set in CSS (25-projects.css); read it so the two cannot drift apart
+        const pad = parseFloat(getComputedStyle(track.current).paddingLeft) || 24;
         const d = Math.max(0, track.current.scrollWidth - window.innerWidth + pad);
         distRef.current = d;
         setDist(d);

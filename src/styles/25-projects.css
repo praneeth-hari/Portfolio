@@ -5,7 +5,7 @@
   padding-right: 0;
 }
 #work .section-head {
-  max-width: 1240px;
+  max-width: var(--work-max);
   margin-left: auto;
   margin-right: auto;
   padding: 0 24px;
@@ -32,7 +32,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  max-width: 1240px;
+  max-width: var(--work-max);
   width: 100%;
   margin: 0 auto;
   padding: 0 24px;
@@ -68,21 +68,21 @@
 .hs-track {
   display: flex;
   gap: 28px;
-  padding-left: max(24px, calc((100vw - 1240px) / 2 + 24px));
+  padding-left: max(24px, calc((100vw - var(--work-max)) / 2 + 24px));
   padding-right: 24px;
   will-change: transform;
 }
 .hs-card {
-  flex: 0 0 min(64vw, 760px);
-  height: min(58vh, 520px);
+  flex: 0 0 min(64vw, max(760px, 40vw));
+  height: min(58vh, max(520px, 27.4vw));
   aspect-ratio: auto;
-  padding: 34px;
+  padding: max(34px, 1.77vw);
 }
 .hs-card h3 {
-  font-size: clamp(26px, 3vw, 40px);
+  font-size: clamp(26px, 3vw, max(40px, 2.1vw));
 }
 .hs-card .work-desc {
-  font-size: var(--fs-md);
+  font-size: max(var(--fs-md), 0.78vw);
   max-width: 52ch;
   min-height: 0;
 }
@@ -93,7 +93,7 @@
   z-index: 2;
   pointer-events: none;
   font:
-    900 clamp(90px, 12vw, 170px)/1 'Archivo',
+    900 clamp(90px, 12vw, max(170px, 8vw))/1 'Archivo',
     sans-serif;
   letter-spacing: -0.04em;
   color: transparent;
@@ -102,4 +102,11 @@
 .work-1 .hs-num,
 .work-3 .hs-num {
   -webkit-text-stroke-color: rgba(var(--ink-rgb), 0.4);
+}
+
+/* big monitors: the pinned stage was top-aligned, which left the lower half of the screen empty */
+@media (min-width: 1800px) {
+  .hs-stick {
+    justify-content: center;
+  }
 }
