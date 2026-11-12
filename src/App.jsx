@@ -26,8 +26,26 @@ import { getProjectSlug, onRouteChange } from './route.js';
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// The loading screen plays once per browser session: reloads and return visits in the same tab skip it.
+// sessionStorage can throw (private windows, blocked site data), so every access is guarded.
+const PRELOADER_KEY = 'hp-preloader-seen';
+const preloaderSeen = () => {
+  try {
+    return window.sessionStorage.getItem(PRELOADER_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+const markPreloaderSeen = () => {
+  try {
+    window.sessionStorage.setItem(PRELOADER_KEY, '1');
+  } catch {
+    /* storage unavailable: the loading screen simply plays again next time */
+  }
+};
+
 export default function App() {
-  const [loading, setLoading] = useState(() => !prefersReducedMotion());
+  const [loading, setLoading] = useState(() => !prefersReducedMotion() && !preloaderSeen());
   const [skillOpen, setSkillOpen] = useState(false);
   const [slug, setSlug] = useState(getProjectSlug);
   const toTop = () => {
@@ -36,6 +54,7 @@ export default function App() {
   };
   const done = useCallback(() => {
     toTop(); // always land exactly on the top of the hero
+    markPreloaderSeen();
     setLoading(false);
   }, []);
 

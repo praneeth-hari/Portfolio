@@ -56,6 +56,10 @@ Each section is its own component in `src/components/`. Placeholders look like `
 
 `npm run build`, then upload `dist/` to Vercel, Netlify or GitHub Pages (the build uses relative paths).
 
+## Loading screen
+
+The preloader plays once per browser session (`sessionStorage` key `hp-preloader-seen`, see `src/App.jsx`). Reloads, return visits in the same tab and users with reduced motion go straight to the hero. To see it again, open the site in a new tab or private window, or clear that key in DevTools.
+
 ## Tests and CI
 
 `npm test` builds the site and runs two browser checks (headless Chromium, `tests/`):
