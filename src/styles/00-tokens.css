@@ -1,0 +1,54 @@
+/*
+ * Design tokens. Every colour, size, radius and easing curve used across the
+ * site lives here; the section files only reference these variables.
+ *
+ * Breakpoints (media queries cannot read variables, so they are listed here and
+ * mirrored in src/breakpoints.js for scripts):
+ *   --bp-tablet: 900px   (layouts collapse, horizontal scroll turns vertical)
+ *   --bp-phone:  640px
+ *   --bp-narrow: 520px
+ */
+:root {
+  /* colour */
+  --paper: #f0eee6;
+  --paper-2: #e7e4d9;
+  --paper-soft: #f4f2ea;
+  --paper-rgb: 240, 238, 230;
+  --ink: #121210;
+  --ink-rgb: 18, 18, 16;
+  --ink-soft: #6b685f;
+  --card: #151412;
+  --card-2: #1b1a17;
+  --line: rgba(var(--ink-rgb), 0.12);
+  --accent: #2f5cff;
+  /* slightly deeper blue for small text on the paper background (4.41:1 -> 5:1 contrast) */
+  --accent-text: #2a54ee;
+  --accent-light: #5b8cff;
+  --accent-deep: #1f45d6;
+  --mint: #6fd6b0;
+  --lilac: #b79cff;
+
+  /* shape */
+  --radius: 22px;
+  --r-md: 18px;
+  --r-xl: 24px;
+  --r-pill: 100px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* type scale */
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 16px;
+
+  /* spacing scale */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+}

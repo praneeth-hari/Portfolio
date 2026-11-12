@@ -1,0 +1,211 @@
+/* ---------- loading screen: sliding role words + counter pill ---------- */
+.preloader {
+  padding: 0;
+}
+.pl2-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 32px;
+}
+.pl2-name {
+  font:
+    900 15px/1 'Archivo',
+    sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.pl2-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 22px;
+}
+.pl2-bars i {
+  display: block;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  animation: pl2Bar 1.1s ease-in-out infinite;
+}
+.pl2-bars i:nth-child(1) {
+  height: 8px;
+  animation-delay: -0.2s;
+}
+.pl2-bars i:nth-child(2) {
+  height: 18px;
+  animation-delay: -0.5s;
+}
+.pl2-bars i:nth-child(3) {
+  height: 12px;
+  animation-delay: -0.8s;
+}
+.pl2-bars i:nth-child(4) {
+  height: 20px;
+  animation-delay: -0.35s;
+}
+.pl2-bars i:nth-child(5) {
+  height: 10px;
+  animation-delay: -0.65s;
+}
+@keyframes pl2Bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.pl2-bars i {
+  transform-origin: bottom;
+}
+
+.pl2-marquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  overflow: hidden;
+  z-index: 1;
+}
+.pl2-track {
+  display: flex;
+  width: max-content;
+  animation: pl2Scroll 11s linear infinite;
+  will-change: transform;
+}
+.pl2-set {
+  display: flex;
+  flex: none;
+}
+.pl2-set span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding-right: 0.55em;
+  font:
+    900 clamp(54px, 10.5vw, 160px)/1 'Archivo',
+    sans-serif;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pl2-set span i {
+  width: 0.16em;
+  height: 0.16em;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mint), var(--accent-light), var(--lilac));
+  flex: none;
+}
+@keyframes pl2Scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.pl2-pill {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  color: var(--paper-soft);
+  background: var(--ink);
+  box-shadow:
+    0 18px 50px rgba(var(--ink-rgb), 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+.pl2-glow {
+  /* soft mint/blue glow on the small pill; fades out as it swells to black */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 160% at 0% 0%,
+    rgba(111, 214, 176, 0.55),
+    rgba(91, 140, 255, 0.38) 38%,
+    transparent 62%
+  );
+}
+.pl2-fill {
+  /* the swell becomes the same Aurora colours as the page, so the hand-off is seamless */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 18% 30%, rgba(184, 240, 219, 0.85), transparent 70%),
+    radial-gradient(55% 65% at 85% 25%, rgba(219, 204, 255, 0.9), transparent 70%),
+    radial-gradient(70% 60% at 55% 110%, rgba(184, 205, 255, 0.95), transparent 70%), var(--paper);
+}
+.pl2-count,
+.pl2-welcome {
+  position: relative;
+  z-index: 1;
+}
+.pl2-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font:
+    600 12px/1 'Geist Sans',
+    sans-serif;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.pl2-label {
+  opacity: 0.95;
+}
+.pl2-num {
+  display: inline-block;
+  min-width: 4ch;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+.pl2-block {
+  width: 6px;
+  height: 15px;
+  margin-left: -8px;
+  background: var(--paper-soft);
+  animation: pl2Blink 0.8s steps(2) infinite;
+}
+@keyframes pl2Blink {
+  50% {
+    opacity: 0;
+  }
+}
+.pl2-welcome {
+  font:
+    600 13px/1 'Geist Sans',
+    sans-serif;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+  opacity: 0.9;
+}
+@media (max-width: 640px) {
+  .pl2-top {
+    padding: 20px 20px;
+  }
+  .pl2-set span {
+    font-size: clamp(44px, 15vw, 90px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pl2-track,
+  .pl2-bars i,
+  .pl2-block {
+    animation: none;
+  }
+}

@@ -1,0 +1,26 @@
+/* ---------- polish: magnetic buttons, split headings, scroll progress ---------- */
+[data-magnetic] {
+  will-change: transform;
+}
+.split-h .split-w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.split-h .split-i {
+  display: inline-block;
+}
+.scroll-progress {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  z-index: 9000;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--mint), var(--accent-light) 55%, var(--lilac));
+  box-shadow: 0 0 12px rgba(91, 140, 255, 0.5);
+  pointer-events: none;
+}

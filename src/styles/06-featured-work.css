@@ -1,0 +1,111 @@
+/* ---------- featured work ---------- */
+.work-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.work-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 4/3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 26px;
+  color: #fff;
+  transform-style: preserve-3d;
+  transition: transform 0.35s ease;
+}
+
+/* project cover image (public/projects/*.png) */
+.work-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.work-img + .card-badge,
+.work-card:has(.work-img) .card-badge,
+.work-card:has(.work-img) h3,
+.work-card:has(.work-img) .work-desc,
+.work-card:has(.work-img) .sub {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+
+.work-card:has(.work-img) .card-badge {
+  position: absolute;
+  background: rgba(var(--ink-rgb), 0.68);
+}
+
+.work-card:has(.work-img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(10, 10, 9, 0.82) 0%, rgba(10, 10, 9, 0.35) 45%, transparent 70%);
+}
+
+.work-card h3 {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.work-card .work-desc {
+  font-size: var(--fs-base);
+  line-height: 1.45;
+  opacity: 0.8;
+  margin: 6px 0 10px;
+  max-width: 46ch;
+  min-height: 5.8em;
+}
+
+.work-card .sub {
+  font-size: var(--fs-sm);
+  opacity: 0.75;
+}
+
+.work-1 {
+  background: linear-gradient(150deg, #eef0f1, #c9cdd1);
+  color: #111;
+}
+
+.work-1 h3,
+.work-1 .sub {
+  color: #111;
+}
+
+.work-2 {
+  background: linear-gradient(150deg, #1b1a17, #2b2a25 70%);
+}
+
+.work-3 {
+  background: linear-gradient(150deg, #e7e4d9, #c9c6ba 70%);
+  color: var(--ink);
+}
+
+.work-3 h3,
+.work-3 .sub {
+  color: var(--ink);
+}
+
+.work-4 {
+  background: linear-gradient(150deg, #0e2a4d, var(--accent) 70%);
+}
+
+.card-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: var(--fs-2xs);
+  background: rgba(255, 255, 255, 0.24);
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+}

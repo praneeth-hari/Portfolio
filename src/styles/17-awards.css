@@ -1,0 +1,92 @@
+/* ---------- awards ---------- */
+.award-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+.award-card {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.award-medal {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.award-card h3 {
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.1;
+}
+
+.award-org {
+  margin-top: 8px;
+  font-size: var(--fs-base);
+  color: #b8b5a8;
+}
+
+.award-card p {
+  margin-top: 18px;
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  color: #d8d5c9;
+  max-width: 46ch;
+}
+
+.award-card .go {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+}
+
+.award-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.award-photo {
+  margin: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--paper-2);
+}
+
+.award-photo:first-child {
+  grid-column: span 2;
+  aspect-ratio: 16 / 10;
+}
+
+.award-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .award-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* thought-card photos: keep faces in view, text sits lower */
+.thought .work-img {
+  object-position: center 25%;
+}

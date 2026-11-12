@@ -1,0 +1,222 @@
+/* ---------- hero: full-screen portrait + paint reveal ---------- */
+.hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero .fluid-text {
+  font-size: 14.2vw;
+  line-height: 0.92;
+  white-space: nowrap;
+}
+.hero-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  z-index: 1;
+}
+.hero-portrait {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.paint {
+  position: relative;
+  flex: none;
+  height: 180.5%;
+  margin-top: calc(-45.8svh);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  aspect-ratio: 9 / 16;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.paint-base,
+.paint-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.paint-base {
+  object-fit: cover;
+  pointer-events: none;
+}
+.paint-basecv {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.paint.base-ready .paint-base {
+  opacity: 0;
+}
+.paint-canvas {
+  cursor: none;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+.paint-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  will-change: transform;
+}
+.paint-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(var(--paper-rgb), 0.88);
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.paint.is-painted .paint-hint {
+  opacity: 0;
+}
+.hint-touch {
+  display: none;
+}
+@media (hover: none) {
+  .hint-fine {
+    display: none;
+  }
+  .hint-touch {
+    display: inline;
+  }
+  .paint-canvas {
+    cursor: auto;
+  }
+}
+.paint.is-armed .paint-hint {
+  opacity: 1;
+}
+
+/* text layer sits above the portrait but lets the pointer through to it */
+.hero > .wrap {
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+.hero > .wrap a {
+  pointer-events: auto;
+}
+.hero > .wrap > .hero-meta {
+  margin: auto 0 20px;
+  align-self: flex-start;
+  max-width: 200px;
+  text-align: left;
+}
+.hero > .wrap > .role-foot {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+@media (max-width: 899px) {
+  .hero .fluid-text {
+    font-size: 15vw;
+  }
+  .hero-title {
+    top: 27%;
+  }
+  .paint {
+    height: 100%;
+    margin-top: 0;
+  }
+  .paint-hint {
+    bottom: auto;
+    top: 17%;
+  }
+  .hero > .wrap > .hero-meta .hero-name,
+  .hero > .wrap > .hero-meta .hero-tagline {
+    color: var(--paper);
+  }
+  .hero > .wrap > .hero-meta .cta {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .hero > .wrap > .role-foot {
+    color: var(--paper);
+  }
+}
+
+.hero > .wrap {
+  justify-content: flex-start;
+}
+.hero > .wrap > .hero-top {
+  margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  .hero > .wrap > .role-foot span:last-child {
+    display: none;
+  }
+}
+
+/* nav jumps: every section's label lands the same distance under the nav pill */
+#about {
+  scroll-margin-top: 70px;
+}
+#experience,
+#work,
+#stack,
+#credentials {
+  scroll-margin-top: 10px;
+}
+#contact {
+  scroll-margin-top: 36px;
+}
+
+.gradient-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+/* static film grain over the gradient, full resolution, never animates */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* smooth scrolling (Lenis) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.rise-wrap {
+  perspective: 1200px;
+}

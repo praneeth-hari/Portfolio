@@ -1,0 +1,56 @@
+/* ---------- preloader restyled to match the Aurora background ---------- */
+.preloader {
+  background:
+    radial-gradient(60% 70% at 18% 30%, rgba(184, 240, 219, 0.85), transparent 70%),
+    radial-gradient(55% 65% at 85% 25%, rgba(219, 204, 255, 0.9), transparent 70%),
+    radial-gradient(70% 60% at 55% 110%, rgba(184, 205, 255, 0.95), transparent 70%), var(--paper);
+  overflow: hidden;
+}
+.preloader::after {
+  /* same still grain as the page */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.pl-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  position: relative;
+  z-index: 1;
+}
+.pl-name {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+.pl-role {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pl-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--mint), var(--accent-light) 55%, var(--lilac));
+  box-shadow: 0 0 18px rgba(91, 140, 255, 0.55);
+  position: relative;
+  z-index: 1;
+}
+.pl-bottom {
+  position: relative;
+  z-index: 1;
+}
+.pl-percent .sign {
+  color: var(--accent);
+}
+@media (max-width: 640px) {
+  .pl-role {
+    display: none;
+  }
+}

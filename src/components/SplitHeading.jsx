@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 /*
  * Section heading that slides up word by word from behind a mask
@@ -10,7 +10,7 @@ export default function SplitHeading({ children, className = 'disp' }) {
   const words = String(children).split(' ');
   if (reduce) return <h2 className={className}>{children}</h2>;
   return (
-    <motion.h2
+    <m.h2
       className={className + ' split-h'}
       aria-label={children}
       initial="hidden"
@@ -21,17 +21,17 @@ export default function SplitHeading({ children, className = 'disp' }) {
       {words.map((w, i) => (
         <Fragment key={i}>
           <span className="split-w" aria-hidden="true">
-            <motion.span
+            <m.span
               className="split-i"
               variants={{ hidden: { y: '110%' }, show: { y: '0%' } }}
               transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}
             >
               {w}
-            </motion.span>
+            </m.span>
           </span>
           {i < words.length - 1 ? ' ' : null}
         </Fragment>
       ))}
-    </motion.h2>
+    </m.h2>
   );
 }

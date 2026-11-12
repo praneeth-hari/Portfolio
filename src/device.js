@@ -7,6 +7,8 @@
  * Touch/mobile devices with strong hardware stay 'capable' (only scroll
  * smoothing defers to native OS scrolling when pointer is coarse/small).
  */
+import { maxTablet } from './breakpoints.js';
+
 export function getDeviceProfile() {
   if (typeof window === 'undefined') {
     return {
@@ -26,7 +28,7 @@ export function getDeviceProfile() {
   }
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouchOrSmall = window.matchMedia('(pointer: coarse), (hover: none), (max-width: 900px)').matches;
+  const isTouchOrSmall = window.matchMedia(`(pointer: coarse), (hover: none), ${maxTablet}`).matches;
   const cores = navigator.hardwareConcurrency;
   const memory = navigator.deviceMemory;
   const conn = navigator.connection;
@@ -55,7 +57,7 @@ export function getDeviceProfile() {
   const presets = {
     capable: {
       bgScale: 0.45,
-      bgInterval: 32,       // ~30fps
+      bgInterval: 32, // ~30fps
       bgLerp: 0.068,
       paintDprCap: 1.5,
       paintStampSize: 128,
@@ -65,7 +67,7 @@ export function getDeviceProfile() {
     },
     constrained: {
       bgScale: 0.35,
-      bgInterval: 50,       // ~20fps
+      bgInterval: 50, // ~20fps
       bgLerp: 0.1,
       paintDprCap: 1,
       paintStampSize: 96,
@@ -75,7 +77,7 @@ export function getDeviceProfile() {
     },
     'low-end': {
       bgScale: 0.3,
-      bgInterval: 80,       // ~12fps
+      bgInterval: 80, // ~12fps
       bgLerp: 0.16,
       paintDprCap: 1,
       paintStampSize: 64,
@@ -93,4 +95,3 @@ export function getDeviceProfile() {
     ...presets[tier]
   };
 }
-

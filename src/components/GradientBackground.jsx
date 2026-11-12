@@ -11,22 +11,57 @@ import { getDeviceProfile } from '../device.js';
 const PALETTES = {
   // soft, light: keeps dark text readable on every section
   soft: {
-    base: [0.941, 0.933, 0.902],  // #F0EEE6 cream
-    a: [0.78, 0.85, 1.0],         // pale blue
-    b: [0.90, 0.84, 1.0],         // lilac
-    c: [1.0, 0.86, 0.80],         // peach
-    glow: [0.72, 0.80, 1.0],      // bottom glow
+    base: [0.941, 0.933, 0.902], // #F0EEE6 cream
+    a: [0.78, 0.85, 1.0], // pale blue
+    b: [0.9, 0.84, 1.0], // lilac
+    c: [1.0, 0.86, 0.8], // peach
+    glow: [0.72, 0.8, 1.0], // bottom glow
     strength: 0.95
   },
   // ---- more soft palettes (same cream base, different clouds) ----
-  ocean: { base: [0.941,0.933,0.902], a: [0.70,0.82,1.0], b: [0.66,0.90,0.98], c: [0.80,0.86,1.0], glow: [0.62,0.74,1.0], strength: 0.95 },
-  mint: { base: [0.941,0.933,0.902], a: [0.74,0.94,0.88], b: [0.78,0.88,1.0], c: [0.90,0.97,0.82], glow: [0.70,0.92,0.90], strength: 0.95 },
-  sunset: { base: [0.941,0.933,0.902], a: [1.0,0.82,0.72], b: [1.0,0.78,0.86], c: [1.0,0.90,0.70], glow: [1.0,0.76,0.70], strength: 0.95 },
-  aurora: { base: [0.941,0.933,0.902], a: [0.72,0.94,0.86], b: [0.86,0.80,1.0], c: [0.70,0.84,1.0], glow: [0.80,0.78,1.0], strength: 0.95 },
-  rose: { base: [0.941,0.933,0.902], a: [1.0,0.80,0.86], b: [0.92,0.82,1.0], c: [1.0,0.88,0.82], glow: [1.0,0.78,0.88], strength: 0.95 },
+  ocean: {
+    base: [0.941, 0.933, 0.902],
+    a: [0.7, 0.82, 1.0],
+    b: [0.66, 0.9, 0.98],
+    c: [0.8, 0.86, 1.0],
+    glow: [0.62, 0.74, 1.0],
+    strength: 0.95
+  },
+  mint: {
+    base: [0.941, 0.933, 0.902],
+    a: [0.74, 0.94, 0.88],
+    b: [0.78, 0.88, 1.0],
+    c: [0.9, 0.97, 0.82],
+    glow: [0.7, 0.92, 0.9],
+    strength: 0.95
+  },
+  sunset: {
+    base: [0.941, 0.933, 0.902],
+    a: [1.0, 0.82, 0.72],
+    b: [1.0, 0.78, 0.86],
+    c: [1.0, 0.9, 0.7],
+    glow: [1.0, 0.76, 0.7],
+    strength: 0.95
+  },
+  aurora: {
+    base: [0.941, 0.933, 0.902],
+    a: [0.72, 0.94, 0.86],
+    b: [0.86, 0.8, 1.0],
+    c: [0.7, 0.84, 1.0],
+    glow: [0.8, 0.78, 1.0],
+    strength: 0.95
+  },
+  rose: {
+    base: [0.941, 0.933, 0.902],
+    a: [1.0, 0.8, 0.86],
+    b: [0.92, 0.82, 1.0],
+    c: [1.0, 0.88, 0.82],
+    glow: [1.0, 0.78, 0.88],
+    strength: 0.95
+  },
   // vivid, like the reference video
   vivid: {
-    base: [0.80, 0.55, 0.95],
+    base: [0.8, 0.55, 0.95],
     a: [0.35, 0.65, 0.98],
     b: [0.72, 0.38, 0.97],
     c: [0.98, 0.52, 0.78],
@@ -36,7 +71,16 @@ const PALETTES = {
 };
 
 // each section tints the background differently; the colours glide between them as you scroll
-const SECTION_PAL = { top: 'aurora', about: 'mint', experience: 'ocean', work: 'aurora', stack: 'sunset', credentials: 'mint', thoughts: 'rose', contact: 'ocean' };
+const SECTION_PAL = {
+  top: 'aurora',
+  about: 'mint',
+  experience: 'ocean',
+  work: 'aurora',
+  stack: 'sunset',
+  credentials: 'mint',
+  thoughts: 'rose',
+  contact: 'ocean'
+};
 const SECTION_IDS = Object.keys(SECTION_PAL);
 
 const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
@@ -86,7 +130,12 @@ export default function GradientBackground({ palette = 'aurora' }) {
     const pal = PALETTES[palette] || PALETTES.soft;
     const { bgScale, bgInterval, bgLerp, reducedMotion: reduce } = getDeviceProfile();
 
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+    const sh = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
     const prog = gl.createProgram();
     gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
     gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
@@ -103,15 +152,20 @@ export default function GradientBackground({ palette = 'aurora' }) {
     const cur = { a: [...pal.a], b: [...pal.b], c: [...pal.c], glow: [...pal.glow] };
     let target = pal;
     const push = () => {
-      gl.uniform3fv(U('uBase'), pal.base); gl.uniform3fv(U('uA'), cur.a);
-      gl.uniform3fv(U('uB'), cur.b); gl.uniform3fv(U('uC'), cur.c);
-      gl.uniform3fv(U('uGlow'), cur.glow); gl.uniform1f(U('uStr'), pal.strength);
+      gl.uniform3fv(U('uBase'), pal.base);
+      gl.uniform3fv(U('uA'), cur.a);
+      gl.uniform3fv(U('uB'), cur.b);
+      gl.uniform3fv(U('uC'), cur.c);
+      gl.uniform3fv(U('uGlow'), cur.glow);
+      gl.uniform1f(U('uStr'), pal.strength);
     };
     push();
     const setTarget = (id) => {
       target = PALETTES[SECTION_PAL[id]] || pal;
       if (reduce) {
-        ['a', 'b', 'c', 'glow'].forEach((k) => { cur[k] = [...target[k]]; });
+        ['a', 'b', 'c', 'glow'].forEach((k) => {
+          cur[k] = [...target[k]];
+        });
         push();
         gl.uniform1f(U('uT'), 8);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -133,7 +187,10 @@ export default function GradientBackground({ palette = 'aurora' }) {
       let found = false;
       for (const k of SECTION_IDS) {
         const el = document.getElementById(k);
-        if (el) { io.observe(el); found = true; }
+        if (el) {
+          io.observe(el);
+          found = true;
+        }
       }
       if (!found) setTarget('top');
     };
@@ -156,7 +213,11 @@ export default function GradientBackground({ palette = 'aurora' }) {
     size();
     window.addEventListener('resize', size);
 
-    let raf = 0, timer = 0, t0 = performance.now(), running = true, drawnInitial = false;
+    let raf = 0,
+      timer = 0,
+      t0 = performance.now(),
+      running = true,
+      drawnInitial = false;
     const schedule = (covered) => {
       if (!running || reduce || timer || raf) return;
       const delay = covered ? 250 : Math.max(16, bgInterval - 6);
@@ -175,7 +236,9 @@ export default function GradientBackground({ palette = 'aurora' }) {
       }
       drawnInitial = true;
       if (!reduce) {
-        ['a', 'b', 'c', 'glow'].forEach((k) => { for (let i = 0; i < 3; i++) cur[k][i] += (target[k][i] - cur[k][i]) * bgLerp; });
+        ['a', 'b', 'c', 'glow'].forEach((k) => {
+          for (let i = 0; i < 3; i++) cur[k][i] += (target[k][i] - cur[k][i]) * bgLerp;
+        });
         push();
       }
       gl.uniform1f(U('uT'), reduce ? 8 : (now - t0) / 1000 + 8);
@@ -186,10 +249,13 @@ export default function GradientBackground({ palette = 'aurora' }) {
     const onVis = () => {
       running = !document.hidden;
       if (!running) {
-        clearTimeout(timer); timer = 0;
-        cancelAnimationFrame(raf); raf = 0;
+        clearTimeout(timer);
+        timer = 0;
+        cancelAnimationFrame(raf);
+        raf = 0;
       } else if (!reduce) {
-        clearTimeout(timer); timer = 0;
+        clearTimeout(timer);
+        timer = 0;
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(draw);
       }

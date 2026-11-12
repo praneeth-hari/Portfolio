@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
-import { PROJECTS as PROJECT_DETAILS } from '../data/projects.js';
 import { openProject } from '../route.js';
+import { BP, WORK_TRACK, maxTablet } from '../breakpoints.js';
 
 const PROJECTS = [
   {
@@ -43,7 +43,7 @@ const PROJECTS = [
     image: 'projects/bob-assistant.webp',
     category: 'Local LLM · Automation',
     name: 'BOB Personal AI Assistant',
-    desc: 'A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA\'s cloud decides, and 11 tools act, with allow-listed apps and protected system processes.',
+    desc: "A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA's cloud decides, and 11 tools act, with allow-listed apps and protected system processes.",
     meta: 'Python · Ollama · faster-whisper · Piper · 2026',
     href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
     study: 'bob' // opens the case-study page inside this site
@@ -62,7 +62,7 @@ function CardImage({ src, alt }) {
       src={src}
       alt={alt}
       widths={[640, 1024, 1448]}
-      sizes="(max-width: 900px) calc(100vw - 64px), min(64vw, 760px)"
+      sizes={`${maxTablet} calc(100vw - 64px), min(64vw, 760px)`}
       width={1448}
       height={1086}
       loading="eager"
@@ -77,14 +77,17 @@ const prefetched = new Set();
 function prefetchStudy(slug) {
   if (!slug || prefetched.has(slug)) return;
   prefetched.add(slug);
-  const study = PROJECT_DETAILS[slug];
-  if (!study) return;
-  const list = [...(study.shots || []), ...(study.shot ? [study.shot] : [])];
-  for (const item of list) {
-    const img = new Image();
-    img.decoding = 'async';
-    img.src = import.meta.env.BASE_URL + item.src;
-  }
+  // the case-study data is its own chunk; fetch it only when a card is hovered or focused
+  import('../data/projects.js').then(({ PROJECTS }) => {
+    const study = PROJECTS[slug];
+    if (!study) return;
+    const list = [...(study.shots || []), ...(study.shot ? [study.shot] : [])];
+    for (const item of list) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = import.meta.env.BASE_URL + item.src;
+    }
+  });
 }
 
 // Pinned horizontal scroll: the section sticks to the screen and the cards slide sideways
@@ -93,16 +96,16 @@ function HScroll({ children, count }) {
   const outer = useRef(null);
   const track = useRef(null);
   const reduce = useReducedMotion();
-  const [dist, setDist] = useState(0);   // how far the track must travel
+  const [dist, setDist] = useState(0); // how far the track must travel
   const distRef = useRef(0);
-  const [on, setOn] = useState(false);   // horizontal mode active?
+  const [on, setOn] = useState(false); // horizontal mode active?
 
   useEffect(() => {
     const measure = () => {
-      const wide = window.innerWidth > 900 && !reduce;
+      const wide = window.innerWidth > BP.tablet && !reduce;
       setOn(wide);
       if (wide && track.current) {
-        const pad = Math.max(24, (window.innerWidth - 1240) / 2 + 24);
+        const pad = Math.max(24, (window.innerWidth - WORK_TRACK) / 2 + 24);
         const d = Math.max(0, track.current.scrollWidth - window.innerWidth + pad);
         distRef.current = d;
         setDist(d);
@@ -111,7 +114,10 @@ function HScroll({ children, count }) {
     measure();
     window.addEventListener('resize', measure);
     const t = setTimeout(measure, 400);
-    return () => { window.removeEventListener('resize', measure); clearTimeout(t); };
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearTimeout(t);
+    };
   }, [reduce, count]);
 
   const { scrollYProgress } = useScroll({ target: outer, offset: ['start start', 'end end'] });
@@ -119,20 +125,35 @@ function HScroll({ children, count }) {
   const x = useTransform(p, (v) => -v * distRef.current);
   const bar = useTransform(p, [0, 1], [0, 1]);
   const [idx, setIdx] = useState(0);
-  useEffect(() => p.on('change', (v) => setIdx(Math.min(count - 1, Math.round(v * (count - 1))))), [p, count]);
+  useEffect(
+    () => p.on('change', (v) => setIdx(Math.min(count - 1, Math.round(v * (count - 1))))),
+    [p, count]
+  );
 
   return (
-    <div ref={outer} className={on ? 'hs-outer' : 'work-grid'} style={on ? { height: `calc(100vh + ${dist}px)` } : undefined}>
+    <div
+      ref={outer}
+      className={on ? 'hs-outer' : 'work-grid'}
+      style={on ? { height: `calc(100vh + ${dist}px)` } : undefined}
+    >
       {on ? (
         <div className="hs-stick">
           <div className="hs-meta">
-            <span className="hs-count"><b>{String(idx + 1).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}</span>
-            <span className="hs-line"><motion.i style={{ scaleX: bar }} /></span>
+            <span className="hs-count">
+              <b>{String(idx + 1).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}
+            </span>
+            <span className="hs-line">
+              <m.i style={{ scaleX: bar }} />
+            </span>
             <span className="hs-hint">Keep scrolling</span>
           </div>
-          <motion.div ref={track} className="hs-track" style={{ x }}>{children}</motion.div>
+          <m.div ref={track} className="hs-track" style={{ x }}>
+            {children}
+          </m.div>
         </div>
-      ) : children}
+      ) : (
+        children
+      )}
     </div>
   );
 }
@@ -143,9 +164,17 @@ export default function Work() {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Selected work</Reveal>
-          <SplitHeading>{"Featured Projects"}</SplitHeading>
+          <SplitHeading>{'Featured Projects'}</SplitHeading>
         </div>
-        <Reveal as="a" href="https://github.com/praneeth-hari" target="_blank" rel="noopener noreferrer" className="view-all">View GitHub ↗</Reveal>
+        <Reveal
+          as="a"
+          href="https://github.com/praneeth-hari"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="view-all"
+        >
+          View GitHub ↗
+        </Reveal>
       </div>
 
       <HScroll count={PROJECTS.length}>
@@ -156,36 +185,45 @@ export default function Work() {
             onMouseEnter={p.study ? () => prefetchStudy(p.study) : undefined}
             onFocus={p.study ? () => prefetchStudy(p.study) : undefined}
           >
-              <span className="hs-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <CardImage src={p.image} alt={p.name + ' preview'} />
-              <span className="card-badge">{p.category}</span>
-              <h3 className="disp">{p.name}</h3>
-              <p className="work-desc">{p.desc}</p>
-              <div className="sub">{p.meta}</div>
-              {/* whole card opens the case study (if there is one), the live demo, or the repo */}
-              {p.study ? (
-                <a
-                  className="card-hit"
-                  href={'#/project/' + p.study}
-                  aria-label={p.name + ' case study'}
-                  onClick={(e) => { e.preventDefault(); openProject(p.study); }}
-                />
-              ) : (
-                <a
-                  className="card-hit"
-                  href={p.demo || p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={p.name + (p.demo ? ' live demo' : ' on GitHub')}
-                />
+            <span className="hs-num" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <CardImage src={p.image} alt={p.name + ' preview'} />
+            <span className="card-badge">{p.category}</span>
+            <h3 className="disp">{p.name}</h3>
+            <p className="work-desc">{p.desc}</p>
+            <div className="sub">{p.meta}</div>
+            {/* whole card opens the case study (if there is one), the live demo, or the repo */}
+            {p.study ? (
+              <a
+                className="card-hit"
+                href={'#/project/' + p.study}
+                aria-label={p.name + ' case study'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openProject(p.study);
+                }}
+              />
+            ) : (
+              <a
+                className="card-hit"
+                href={p.demo || p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={p.name + (p.demo ? ' live demo' : ' on GitHub')}
+              />
+            )}
+            {p.study && <span className="card-case">Case study →</span>}
+            <span className="card-links">
+              {p.demo && (
+                <a href={p.demo} target="_blank" rel="noopener noreferrer">
+                  Live demo ↗
+                </a>
               )}
-              {p.study && <span className="card-case">Case study →</span>}
-              <span className="card-links">
-                {p.demo && (
-                  <a href={p.demo} target="_blank" rel="noopener noreferrer">Live demo ↗</a>
-                )}
-                <a href={p.href} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-              </span>
+              <a href={p.href} target="_blank" rel="noopener noreferrer">
+                GitHub ↗
+              </a>
+            </span>
           </div>
         ))}
       </HScroll>

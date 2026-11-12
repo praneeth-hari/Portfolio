@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 
 /* Skill detail dialog for the "AI Engineering" card. */
 export default function SkillModal({ open, onClose }) {
@@ -22,7 +22,9 @@ export default function SkillModal({ open, onClose }) {
       }
       if (e.key !== 'Tab' || !modalRef.current) return;
       const items = Array.from(
-        modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+        modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
       );
       if (!items.length) return;
       const first = items[0];
@@ -47,7 +49,7 @@ export default function SkillModal({ open, onClose }) {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="skill-modal-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -57,7 +59,7 @@ export default function SkillModal({ open, onClose }) {
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          <motion.div
+          <m.div
             className="skill-modal"
             role="dialog"
             aria-modal="true"
@@ -69,8 +71,12 @@ export default function SkillModal({ open, onClose }) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.98 }}
             transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 28 }}
           >
-            <button className="skill-modal-close" ref={closeRef} aria-label="Close" onClick={onClose}>✕</button>
-            <h3 className="disp skill-modal-title" id="skillModalTitle">AI Engineering</h3>
+            <button className="skill-modal-close" ref={closeRef} aria-label="Close" onClick={onClose}>
+              ✕
+            </button>
+            <h3 className="disp skill-modal-title" id="skillModalTitle">
+              AI Engineering
+            </h3>
             <p className="skill-modal-desc">
               Designing intelligent systems that connect models, retrieval, APIs, and software engineering.
             </p>
@@ -97,8 +103,8 @@ export default function SkillModal({ open, onClose }) {
                 <li>Medicinal Plant RAG</li>
               </ul>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

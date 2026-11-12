@@ -1,0 +1,101 @@
+/* ---------- about me (plain editorial paragraph + CV actions) ---------- */
+.about-section {
+  padding-top: 60px;
+  text-align: center;
+}
+
+.hero > .wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero > .wrap > .hero-top {
+  margin-top: auto;
+}
+
+.hero > .wrap > .role-foot {
+  margin-top: auto;
+}
+
+@media (max-width: 640px) {
+  .role-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: var(--fs-xs);
+  }
+}
+
+.about-text {
+  font-size: clamp(18px, 2.2vw, 22px);
+  line-height: 1.75;
+  color: var(--ink);
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about-text .rw {
+  opacity: 0.15;
+  transition: opacity 0.25s ease;
+}
+
+.cv-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 13px 26px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cv-btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+}
+
+.cv-btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.cv-btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.cv-btn-secondary:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-text .rw {
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .about-text {
+    line-height: 1.7;
+  }
+}
