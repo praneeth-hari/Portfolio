@@ -45,7 +45,7 @@
   background: var(--ink);
   border-radius: var(--r-md);
   border: 1px solid rgba(var(--ink-rgb), 0.12);
-  box-shadow: 0 30px 60px -30px rgba(var(--ink-rgb), 0.35);
+  box-shadow: 0 30px 60px -30px rgba(var(--shadow-rgb), 0.35);
 }
 .pj-demo-cap {
   margin-top: 14px;

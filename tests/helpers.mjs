@@ -27,3 +27,18 @@ export const PAGES = [
   ['project-securecloud', '#/project/securecloud', 1440, 900],
   ['project-bob', '#/project/bob', 390, 844]
 ];
+
+/** Both themes are tested; the saved choice is what the page's inline script reads before first paint. */
+export const THEMES = ['light', 'dark'];
+
+export async function newPage(browser, { width, height, theme = 'light', reducedMotion = 'reduce' }) {
+  const ctx = await browser.newContext({ viewport: { width, height }, reducedMotion });
+  await ctx.addInitScript((t) => {
+    try {
+      localStorage.setItem('hp-theme', t);
+    } catch {
+      /* ignore */
+    }
+  }, theme);
+  return { ctx, page: await ctx.newPage() };
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { getProjectSlug, goHome, onRouteChange } from '../route.js';
+import { toggleTheme, useTheme } from '../theme.js';
 
 const EMAIL = 'kurapatiharipraneeth2004@gmail.com';
 const GITHUB = 'https://github.com/praneeth-hari';
@@ -132,6 +133,7 @@ export default function Nav() {
     setTimeout(() => scrollTo(id), reduce ? 0 : 350);
   };
 
+  const theme = useTheme();
   const label = inProject ? 'Case study' : (SECTIONS.find((s) => s.id === active)?.label ?? 'Home');
   const dim = hovered ?? null;
 
@@ -163,6 +165,33 @@ export default function Nav() {
               </m.span>
             </AnimatePresence>
           </span>
+          <button
+            type="button"
+            className="mn-theme"
+            onClick={toggleTheme}
+            aria-pressed={theme === 'dark'}
+            aria-label="Dark theme"
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            <svg className="mn-theme-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="2" />
+              <path
+                d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3 7 7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+            <svg className="mn-theme-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
           <a href="#contact" className="mn-hire" onClick={(e) => goTo(e, 'contact')}>
             Hire me
           </a>

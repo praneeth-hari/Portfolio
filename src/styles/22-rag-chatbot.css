@@ -17,7 +17,7 @@
     600 13px/1 'Geist Sans',
     sans-serif;
   box-shadow:
-    0 10px 30px rgba(var(--ink-rgb), 0.25),
+    0 10px 30px rgba(var(--shadow-rgb), 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   transition:
     transform 0.25s ease,
@@ -62,11 +62,11 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--r-xl);
-  background: rgba(250, 249, 245, 0.92);
+  background: var(--panel);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  box-shadow: 0 30px 70px rgba(var(--ink-rgb), 0.22);
+  box-shadow: 0 30px 70px rgba(var(--shadow-rgb), 0.22);
   transform-origin: 100% 100%;
 }
 .chat-head {
@@ -139,7 +139,7 @@
   overflow-wrap: anywhere;
 }
 .chat-msg.assistant .chat-bubble {
-  background: #fff;
+  background: var(--bubble);
   color: var(--ink);
   border: 1px solid rgba(var(--ink-rgb), 0.07);
   border-bottom-left-radius: 6px;
@@ -167,7 +167,7 @@
   padding: 5px 8px;
   border-radius: var(--r-pill);
   background: rgba(47, 92, 255, 0.08);
-  color: var(--accent);
+  color: var(--link);
 }
 .chat-typing {
   display: inline-flex;
@@ -258,7 +258,7 @@
   flex: 1;
   min-width: 0;
   border: 1px solid rgba(var(--ink-rgb), 0.14);
-  background: #fff;
+  background: var(--bubble);
   border-radius: var(--r-pill);
   padding: 11px 16px;
   font:
