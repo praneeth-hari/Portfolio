@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
@@ -143,13 +143,13 @@ function HScroll({ children, count }) {
               <b>{String(idx + 1).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}
             </span>
             <span className="hs-line">
-              <motion.i style={{ scaleX: bar }} />
+              <m.i style={{ scaleX: bar }} />
             </span>
             <span className="hs-hint">Keep scrolling</span>
           </div>
-          <motion.div ref={track} className="hs-track" style={{ x }}>
+          <m.div ref={track} className="hs-track" style={{ x }}>
             {children}
-          </motion.div>
+          </m.div>
         </div>
       ) : (
         children

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 
@@ -61,7 +61,7 @@ function Timeline({ points }) {
   return (
     <div className="tl" ref={ref}>
       <div className="tl-track" aria-hidden="true">
-        <motion.div className="tl-fill" style={reduce ? { scaleY: 1 } : { scaleY: fill }} />
+        <m.div className="tl-fill" style={reduce ? { scaleY: 1 } : { scaleY: fill }} />
       </div>
       {points.map((p, i) => (
         <div

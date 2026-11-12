@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
 import { PROJECTS } from '../data/projects.js';
@@ -45,7 +45,7 @@ function Architecture({ rows }) {
 
       <div className="arch-panel" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <m.div
             key={node.id}
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -74,7 +74,7 @@ function Architecture({ rows }) {
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
     </div>
@@ -91,7 +91,7 @@ function Bar({ label, value, tone, max = 100, unit = '%' }) {
         {reduce ? (
           <div className={'bar-fill ' + tone} style={{ width }} />
         ) : (
-          <motion.div
+          <m.div
             className={'bar-fill ' + tone}
             initial={{ width: 0 }}
             whileInView={{ width }}

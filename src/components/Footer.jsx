@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Reveal from './Reveal.jsx';
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 
 const EMAIL = 'kurapatiharipraneeth2004@gmail.com';
 
@@ -56,7 +56,7 @@ function RoleRotator() {
     return () => clearInterval(id);
   }, [reduce, visible]);
   return (
-    <motion.span
+    <m.span
       ref={rotRef}
       className="role-rot"
       aria-live="off"
@@ -64,7 +64,7 @@ function RoleRotator() {
       transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
     >
       <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span
+        <m.span
           key={ROLES[i]}
           className="role-word"
           initial={reduce ? false : { y: '100%', opacity: 0 }}
@@ -73,7 +73,7 @@ function RoleRotator() {
           transition={reduce ? { duration: 0 } : { duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
         >
           {ROLES[i]}
-        </motion.span>
+        </m.span>
       </AnimatePresence>
       <span className="role-measure" aria-hidden="true">
         {ROLES.map((r, k) => (
@@ -88,7 +88,7 @@ function RoleRotator() {
           </span>
         ))}
       </span>
-    </motion.span>
+    </m.span>
   );
 }
 
@@ -127,7 +127,7 @@ export default function Footer() {
 
   return (
     <footer ref={ref} className="footer-band footer-curtain">
-      <motion.div className="wrap" style={{ y }}>
+      <m.div className="wrap" style={{ y }}>
         <div className="footer-top">
           <div className="status-strip">
             <span className="status-dot" aria-hidden="true" />
@@ -207,7 +207,7 @@ export default function Footer() {
           <span>© 2026 Hari Praneeth. All rights reserved.</span>
           <a href="#top">Back to top ↑</a>
         </div>
-      </motion.div>
+      </m.div>
     </footer>
   );
 }

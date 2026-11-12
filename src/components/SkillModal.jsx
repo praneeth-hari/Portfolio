@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 
 /* Skill detail dialog for the "AI Engineering" card. */
 export default function SkillModal({ open, onClose }) {
@@ -49,7 +49,7 @@ export default function SkillModal({ open, onClose }) {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="skill-modal-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -59,7 +59,7 @@ export default function SkillModal({ open, onClose }) {
             if (e.target === e.currentTarget) onClose();
           }}
         >
-          <motion.div
+          <m.div
             className="skill-modal"
             role="dialog"
             aria-modal="true"
@@ -103,8 +103,8 @@ export default function SkillModal({ open, onClose }) {
                 <li>Medicinal Plant RAG</li>
               </ul>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

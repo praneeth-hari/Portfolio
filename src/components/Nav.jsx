@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { getProjectSlug, goHome, onRouteChange } from '../route.js';
 
 const EMAIL = 'kurapatiharipraneeth2004@gmail.com';
@@ -152,7 +152,7 @@ export default function Nav() {
           <span className="mn-section" aria-hidden="true">
             <i className="mn-dot" />
             <AnimatePresence mode="wait" initial={false}>
-              <motion.span
+              <m.span
                 key={label}
                 initial={reduce ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -160,7 +160,7 @@ export default function Nav() {
                 transition={{ duration: 0.2 }}
               >
                 {label}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
           </span>
           <a href="#contact" className="mn-hire" onClick={(e) => goTo(e, 'contact')}>
@@ -185,7 +185,7 @@ export default function Nav() {
 
       <AnimatePresence>
         {open && (
-          <motion.nav
+          <m.nav
             id="mn-overlay"
             className="mn-overlay"
             aria-label="Primary"
@@ -211,7 +211,7 @@ export default function Nav() {
                   >
                     <span className="mn-num">{String(i + 1).padStart(2, '0')}</span>
                     <span className="mn-clip">
-                      <motion.span
+                      <m.span
                         className="mn-word"
                         initial={reduce ? false : { y: '110%' }}
                         animate={{ y: 0 }}
@@ -223,7 +223,7 @@ export default function Nav() {
                         }}
                       >
                         {s.label}
-                      </motion.span>
+                      </m.span>
                     </span>
                     <span className="mn-arrow" aria-hidden="true">
                       →
@@ -244,7 +244,7 @@ export default function Nav() {
                 </a>
               </span>
             </div>
-          </motion.nav>
+          </m.nav>
         )}
       </AnimatePresence>
     </>

@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 /*
  * Scroll-in reveal (replaces the old IntersectionObserver + .reveal class).
@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from 'framer-motion';
  */
 export default function Reveal({ as = 'div', delay = 0, y = 24, children, ...rest }) {
   const reduce = useReducedMotion();
-  const Comp = motion[as];
+  const Comp = m[as];
   return (
     <Comp
       initial={reduce ? false : { opacity: 0, y }}

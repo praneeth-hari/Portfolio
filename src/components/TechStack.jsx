@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion';
+import { m, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import { openProject } from '../route.js';
@@ -119,7 +119,7 @@ function Tile({ tile, index, onOpenSkill }) {
         canGlow ? { y: -4, transition: { type: 'spring', stiffness: 300, damping: 24 } } : undefined
       }
     >
-      {canGlow && <motion.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />}
+      {canGlow && <m.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />}
 
       <div className={'tile-face tile-front' + (flipped ? ' is-away' : '')} inert={flipped}>
         <div className="bento-main">
