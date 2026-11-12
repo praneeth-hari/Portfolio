@@ -60,6 +60,17 @@ Each section is its own component in `src/components/`. Placeholders look like `
 
 The preloader plays once per browser session (`sessionStorage` key `hp-preloader-seen`, see `src/App.jsx`). Reloads, return visits in the same tab and users with reduced motion go straight to the hero. To see it again, open the site in a new tab or private window, or clear that key in DevTools.
 
+## Page transitions
+
+Opening a case study from the Work section (and coming back) runs inside the browser's View Transitions API: the clicked card's image morphs into the case-study cover, the nav stays put and the rest of the page fades. It is wired up in `src/App.jsx` (`navigate`), `src/viewTransition.js` and `src/styles/31-view-transitions.css`. Browsers without the API, and visitors who prefer reduced motion, just get the plain page swap.
+
+Things to know if you touch it:
+
+- The case-study page is loaded _before_ the transition starts (`ProjectRoute.jsx`), so it never morphs into a loading placeholder.
+- The scroll position is restored inside the transition with an instant jump (`html` has `scroll-behavior: smooth`, which would otherwise visibly glide), and `useScrollSpring` snaps scroll-linked springs to the restored position.
+- Frames and scroll events are frozen while a transition's update callback runs, so never `await` animation frames in there.
+- `tests/transitions.mjs` guards all of this (one transition per navigation, exact scroll restore, the old page untouched until captured).
+
 ## Tests and CI
 
 `npm test` builds the site and runs two browser checks (headless Chromium, `tests/`):

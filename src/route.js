@@ -17,8 +17,17 @@ export const getProjectSlug = () => {
   return m ? m[1] : null;
 };
 
-export function openProject(slug) {
+// the card image the user clicked, so the page transition can morph it into the case-study cover
+let sharedElement = null;
+export const consumeSharedElement = () => {
+  const el = sharedElement;
+  sharedElement = null;
+  return el;
+};
+
+export function openProject(slug, fromElement = null) {
   window.__homeY = window.scrollY; // so "back" returns to the same spot
+  sharedElement = fromElement;
   window.location.hash = '#/project/' + slug;
 }
 

@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import useScrollSpring from './useScrollSpring.js';
 import Reveal from './Reveal.jsx';
 import FluidText from './FluidText.jsx';
 import PaintReveal from './PaintReveal.jsx';
@@ -10,7 +11,7 @@ export default function Hero() {
   const outer = useRef(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: outer, offset: ['start start', 'end end'] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const p = useScrollSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
 
   const titleScale = useTransform(p, [0, 1], [1, 2.4]);
   const titleOpacity = useTransform(p, [0, 0.55], [1, 0]);
