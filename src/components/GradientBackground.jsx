@@ -70,6 +70,20 @@ const PALETTES = {
   }
 };
 
+// Dark versions: the same hues at much lower lightness, on a near-black base (#11100e), so the sections keep
+// their individual tints in the dark theme.
+const DARK_BASE = [0.067, 0.063, 0.055];
+const darken = (p) => ({
+  base: DARK_BASE,
+  a: p.a.map((v) => v * 0.32),
+  b: p.b.map((v) => v * 0.32),
+  c: p.c.map((v) => v * 0.32),
+  glow: p.glow.map((v) => v * 0.3),
+  strength: p.strength
+});
+const DARK_PALETTES = Object.fromEntries(Object.entries(PALETTES).map(([k, p]) => [k, darken(p)]));
+const palettes = () => (document.documentElement.dataset.theme === 'dark' ? DARK_PALETTES : PALETTES);
+
 // each section tints the background differently; the colours glide between them as you scroll
 const SECTION_PAL = {
   top: 'aurora',
@@ -127,7 +141,7 @@ export default function GradientBackground({ palette = 'aurora' }) {
       powerPreference: 'low-power'
     });
     if (!gl) return; // CSS fallback colour stays
-    const pal = PALETTES[palette] || PALETTES.soft;
+    let pal = palettes()[palette] || palettes().soft;
     const { bgScale, bgInterval, bgLerp, reducedMotion: reduce } = getDeviceProfile();
 
     const sh = (type, src) => {
@@ -151,6 +165,7 @@ export default function GradientBackground({ palette = 'aurora' }) {
     const U = (n) => gl.getUniformLocation(prog, n);
     const cur = { a: [...pal.a], b: [...pal.b], c: [...pal.c], glow: [...pal.glow] };
     let target = pal;
+    let currentId = 'top';
     const push = () => {
       gl.uniform3fv(U('uBase'), pal.base);
       gl.uniform3fv(U('uA'), cur.a);
@@ -161,7 +176,8 @@ export default function GradientBackground({ palette = 'aurora' }) {
     };
     push();
     const setTarget = (id) => {
-      target = PALETTES[SECTION_PAL[id]] || pal;
+      currentId = id;
+      target = palettes()[SECTION_PAL[id]] || pal;
       if (reduce) {
         ['a', 'b', 'c', 'glow'].forEach((k) => {
           cur[k] = [...target[k]];
@@ -171,6 +187,17 @@ export default function GradientBackground({ palette = 'aurora' }) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
     };
+    // theme switch: take the other palette's colours straight away (the page itself cross-fades)
+    const onTheme = () => {
+      pal = palettes()[palette] || palettes().soft;
+      target = palettes()[SECTION_PAL[currentId]] || pal;
+      ['a', 'b', 'c', 'glow'].forEach((k) => {
+        cur[k] = [...target[k]];
+      });
+      push();
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    window.addEventListener('app:theme', onTheme);
     let io = null;
     let routeRaf = 0;
     const observeSections = () => {
@@ -271,6 +298,7 @@ export default function GradientBackground({ palette = 'aurora' }) {
       window.removeEventListener('hashchange', onRoute);
       window.removeEventListener('popstate', onRoute);
       window.removeEventListener('app:route', onRoute);
+      window.removeEventListener('app:theme', onTheme);
       document.removeEventListener('visibilitychange', onVis);
     };
   }, [palette]);

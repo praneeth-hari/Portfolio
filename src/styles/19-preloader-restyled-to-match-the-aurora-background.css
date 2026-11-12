@@ -47,7 +47,7 @@
   z-index: 1;
 }
 .pl-percent .sign {
-  color: var(--accent);
+  color: var(--link);
 }
 @media (max-width: 640px) {
   .pl-role {

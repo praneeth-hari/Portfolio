@@ -3,6 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f0eee6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#11100e" media="(prefers-color-scheme: dark)" />
+    <script>
+      /* set the theme before first paint: the saved choice, else the OS setting (keep in sync with src/theme.js) */
+      (function () {
+        var t = 'light';
+        try {
+          var saved = localStorage.getItem('hp-theme');
+          t =
+            saved === 'dark' || saved === 'light'
+              ? saved
+              : matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+        } catch (e) {
+          try {
+            if (matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+          } catch (e2) {}
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
     <title>PRANEETH - AI Engineer / Software Engineer</title>
     <meta
       name="description"

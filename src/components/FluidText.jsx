@@ -294,7 +294,8 @@ export default function FluidText() {
       octx.textBaseline = 'alphabetic';
       octx.textAlign = 'left';
 
-      const ink = '#121210';
+      // the hero text follows the theme's ink colour (dark text on light, light text on dark)
+      const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#121210';
       // one line: solid "AI" + outlined "ENGINEER", centred as a pair
       const measure = () => ({
         wAI: octx.measureText('AI').width,
@@ -495,6 +496,8 @@ export default function FluidText() {
       resizeTimer = setTimeout(resize, 150);
     };
     window.addEventListener('resize', onWinResize);
+    const onTheme = () => resize(); // redraw the text texture in the new ink colour
+    window.addEventListener('app:theme', onTheme);
 
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
@@ -512,6 +515,7 @@ export default function FluidText() {
       clearTimeout(resizeTimer);
       clearTimeout(settleTimer);
       window.removeEventListener('resize', onWinResize);
+      window.removeEventListener('app:theme', onTheme);
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerenter', onMove);
       canvas.removeEventListener('pointerleave', onLeave);

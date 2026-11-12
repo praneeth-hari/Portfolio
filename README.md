@@ -60,6 +60,18 @@ Each section is its own component in `src/components/`. Placeholders look like `
 
 The preloader plays once per browser session (`sessionStorage` key `hp-preloader-seen`, see `src/App.jsx`). Reloads, return visits in the same tab and users with reduced motion go straight to the hero. To see it again, open the site in a new tab or private window, or clear that key in DevTools.
 
+## Dark theme
+
+The theme lives on `<html data-theme="light|dark">`. An inline script in `index.html` sets it before first paint (saved choice, else the OS setting), so there is no flash; `src/theme.js` holds the toggle logic (saved in `localStorage` key `hp-theme`, cross-faded with a view transition). The sun/moon button is in the nav.
+
+How it is built, and what to know when you add UI:
+
+- Only token values change in dark (`src/styles/32-dark-theme.css`). Write new CSS with the tokens (`--paper`, `--ink`, `--ink-soft`, `--link`, `--card`...), not literal colours, and it will follow the theme.
+- `--ink` is "the text colour", so buttons and pills that use `background: var(--ink)` invert in dark. Surfaces that must stay dark in both themes (footer, awards, certificates, contact panel, preloader pill...) are listed in the `:is(...)` block of `32-dark-theme.css`; inside them the light-theme token values are restored.
+- White "glass" panels use `rgba(var(--glass-rgb), calc(<alpha> * var(--glass-k)))`, which becomes a faint lift in dark. Shadows use `--shadow-rgb` (always dark).
+- The WebGL background has darkened versions of every palette (`GradientBackground.jsx`) and the hero text reads `--ink`; both react to the `app:theme` event.
+- `tests/theme.mjs` covers the behaviour; the accessibility and style-snapshot tests run in both themes.
+
 ## Page transitions
 
 Opening a case study from the Work section (and coming back) runs inside the browser's View Transitions API: the clicked card's image morphs into the case-study cover, the nav stays put and the rest of the page fades. It is wired up in `src/App.jsx` (`navigate`), `src/viewTransition.js` and `src/styles/31-view-transitions.css`. Browsers without the API, and visitors who prefer reduced motion, just get the plain page swap.
