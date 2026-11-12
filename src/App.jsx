@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Preloader from './components/Preloader.jsx';
 import Nav from './components/Nav.jsx';
@@ -19,7 +19,8 @@ import ScrollProgress from './components/ScrollProgress.jsx';
 import ChatBot from './components/ChatBot.jsx';
 import SectionRail from './components/SectionRail.jsx';
 import SkillModal from './components/SkillModal.jsx';
-import ProjectPage from './components/ProjectPage.jsx';
+// case-study pages (and their data) only load when someone opens one
+const ProjectPage = lazy(() => import('./components/ProjectPage.jsx'));
 import { getProjectSlug, onRouteChange } from './route.js';
 
 const prefersReducedMotion = () =>
@@ -45,6 +46,14 @@ export default function App() {
   }, []);
   useSmoothScroll(loading || skillOpen);
   useMagnetic();
+  // hash routing owns location.hash, so the skip link moves focus instead of navigating
+  const skipToContent = useCallback((e) => {
+    e.preventDefault();
+    const main = document.getElementById('main-content');
+    if (!main) return;
+    main.focus({ preventScroll: true });
+    main.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }, []);
   const openSkill = useCallback(() => setSkillOpen(true), []);
   const closeSkill = useCallback(() => setSkillOpen(false), []);
 
@@ -85,14 +94,17 @@ export default function App() {
   return (
     <>
       <AnimatePresence>{loading && <Preloader key="preloader" onDone={done} />}</AnimatePresence>
+      <a className="skip-link" href="#main-content" onClick={skipToContent}>Skip to content</a>
       <GradientBackground palette="aurora" />
       <ScrollProgress />
       <Nav />
       {!slug && !loading && <SectionRail />}
       {slug ? (
-        <ProjectPage slug={slug} />
+        <Suspense fallback={<main id="main-content" tabIndex={-1} className="pj" aria-busy="true" />}>
+          <ProjectPage slug={slug} />
+        </Suspense>
       ) : (
-        <main>
+        <main id="main-content" tabIndex={-1}>
           <Hero />
           <About />
           <Experience />

@@ -100,7 +100,7 @@ export default function Footer() {
   const y = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : -110, 0]);
 
   return (
-    <div ref={ref} className="footer-band footer-curtain">
+    <footer ref={ref} className="footer-band footer-curtain">
       <motion.div className="wrap" style={{ y }}>
         <div className="footer-top">
           <div className="status-strip">
@@ -145,6 +145,6 @@ export default function Footer() {
           <a href="#top">Back to top ↑</a>
         </div>
       </motion.div>
-    </div>
+    </footer>
   );
 }

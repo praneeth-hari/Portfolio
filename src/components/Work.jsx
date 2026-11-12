@@ -3,7 +3,6 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'fr
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
-import { PROJECTS as PROJECT_DETAILS } from '../data/projects.js';
 import { openProject } from '../route.js';
 
 const PROJECTS = [
@@ -77,14 +76,17 @@ const prefetched = new Set();
 function prefetchStudy(slug) {
   if (!slug || prefetched.has(slug)) return;
   prefetched.add(slug);
-  const study = PROJECT_DETAILS[slug];
-  if (!study) return;
-  const list = [...(study.shots || []), ...(study.shot ? [study.shot] : [])];
-  for (const item of list) {
-    const img = new Image();
-    img.decoding = 'async';
-    img.src = import.meta.env.BASE_URL + item.src;
-  }
+  // the case-study data is its own chunk; fetch it only when a card is hovered or focused
+  import('../data/projects.js').then(({ PROJECTS }) => {
+    const study = PROJECTS[slug];
+    if (!study) return;
+    const list = [...(study.shots || []), ...(study.shot ? [study.shot] : [])];
+    for (const item of list) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = import.meta.env.BASE_URL + item.src;
+    }
+  });
 }
 
 // Pinned horizontal scroll: the section sticks to the screen and the cards slide sideways
