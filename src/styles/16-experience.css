@@ -37,7 +37,7 @@
 .exp-project {
   margin-top: 8px;
   font-size: var(--fs-md);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -60,7 +60,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .exp-tags {
@@ -126,7 +126,7 @@
   color: var(--ink);
 }
 .tl-item .num {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
 }
 .tl-dot {
@@ -165,7 +165,7 @@
   display: inline-block;
 }
 .sw-hl {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 .sw-u {

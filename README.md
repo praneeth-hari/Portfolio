@@ -11,6 +11,7 @@ npm run build      # production build -> dist/
 npm run preview    # serve the production build locally
 npm run lint       # ESLint (React, hooks and jsx-a11y rules)
 npm run format     # Prettier
+npm test           # build, then axe accessibility scan + style snapshot (needs a Chromium; `npx playwright install chromium`)
 ```
 
 ## Fonts (do this once)
@@ -52,3 +53,12 @@ Each section is its own component in `src/components/`. Placeholders look like `
 ## Deploy
 
 `npm run build`, then upload `dist/` to Vercel, Netlify or GitHub Pages (the build uses relative paths).
+
+## Tests and CI
+
+`npm test` builds the site and runs two browser checks (headless Chromium, `tests/`):
+
+- **`tests/a11y.mjs`** runs axe-core (WCAG 2 A/AA and best practices) on the home page and the four case studies, on desktop and mobile sizes.
+- **`tests/style-snapshot.mjs`** compares the computed design properties of every element with `tests/style-baseline.json`. Use it around CSS refactors: if nothing was meant to change, nothing may differ. When a visual change is intended, accept it with `npm run test:styles -- --update` and commit the new baseline.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, format check and build, and in a second job `npm test`, on every push.
