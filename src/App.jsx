@@ -1,4 +1,5 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { AnimatePresence } from 'framer-motion';
 import Preloader from './components/Preloader.jsx';
 import Nav from './components/Nav.jsx';
@@ -20,8 +21,10 @@ import ChatBot from './components/ChatBot.jsx';
 import SectionRail from './components/SectionRail.jsx';
 import SkillModal from './components/SkillModal.jsx';
 // case-study pages (and their data) only load when someone opens one
-const ProjectPage = lazy(() => import('./components/ProjectPage.jsx'));
-import { getProjectSlug, onRouteChange } from './route.js';
+import ProjectRoute, { loadProjectPage } from './components/ProjectRoute.jsx';
+import { consumeSharedElement, getProjectSlug, onRouteChange } from './route.js';
+import { SHARED_NAME, canViewTransition, visibleCardImage } from './viewTransition.js';
+import { SETTLE_EVENT } from './components/useScrollSpring.js';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -43,6 +46,46 @@ const markPreloaderSeen = () => {
     /* storage unavailable: the loading screen simply plays again next time */
   }
 };
+
+// Where the page should be after a route change: the top of a case study, or (back on the home page)
+// the requested section / the spot the visitor left.
+// `html { scroll-behavior: smooth }` would turn window.scrollTo into a visible glide, so jump explicitly.
+const jumpTo = (top) => window.scrollTo({ top, left: 0, behavior: 'instant' });
+
+function scrollForRoute(slug) {
+  const lenis = window.__lenis;
+  if (slug) {
+    jumpTo(0);
+    lenis?.scrollTo(0, { immediate: true, force: true });
+    return;
+  }
+  const id = window.__pendingScroll;
+  window.__pendingScroll = null;
+  const el = id && document.getElementById(id);
+  if (el) {
+    const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    jumpTo(el.getBoundingClientRect().top + window.scrollY - margin);
+  } else {
+    jumpTo(window.__homeY || 0);
+  }
+  lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
+}
+
+// resolves after n animation frames (with a timeout, in case frames are paused)
+const nextFrames = (n) =>
+  new Promise((resolve) => {
+    const timer = setTimeout(resolve, 200);
+    const step = (left) =>
+      requestAnimationFrame(() => {
+        if (left <= 1) {
+          clearTimeout(timer);
+          resolve();
+        } else {
+          step(left - 1);
+        }
+      });
+    step(n);
+  });
 
 export default function App() {
   const [loading, setLoading] = useState(() => !prefersReducedMotion() && !preloaderSeen());
@@ -76,34 +119,68 @@ export default function App() {
   const openSkill = useCallback(() => setSkillOpen(true), []);
   const closeSkill = useCallback(() => setSkillOpen(false), []);
 
-  // case-study pages live at #/project/<name>
-  useEffect(() => onRouteChange(() => setSlug(getProjectSlug())), []);
+  // case-study pages live at #/project/<name>. Moving between them and the home page runs inside a
+  // view transition: the clicked card's image morphs into the case-study cover and back.
+  const slugRef = useRef(slug);
+  const positionedByTransition = useRef(false); // the transition already scrolled the page
+  useEffect(() => {
+    const navigate = async () => {
+      const next = getProjectSlug();
+      const prev = slugRef.current;
+      // popstate and hashchange both fire for one navigation; the second one has nothing left to do (and
+      // must not touch the DOM, or the transition would capture the wrong "old" page)
+      if (next === prev) return;
+      if (next) await loadProjectPage(); // so the transition lands on the real page, not a placeholder
+      slugRef.current = next;
+      const fromCard = consumeSharedElement();
+      if (!canViewTransition()) {
+        setSlug(next);
+        return;
+      }
+      if (fromCard) fromCard.style.viewTransitionName = SHARED_NAME;
+      let toCard = null;
+      const transition = document.startViewTransition(() => {
+        positionedByTransition.current = true;
+        flushSync(() => setSlug(next));
+        scrollForRoute(next);
+        if (!next) {
+          toCard = visibleCardImage(prev);
+          if (toCard) toCard.style.viewTransitionName = SHARED_NAME;
+        }
+      });
+      const cleanup = () => {
+        if (fromCard) fromCard.style.viewTransitionName = '';
+        if (toCard) toCard.style.viewTransitionName = '';
+      };
+      // Frames (and scroll events) are frozen while the update callback runs, so the scroll-linked springs
+      // can only be snapped to the restored position once the transition is under way. The incoming page
+      // is still almost transparent at that point, so the correction is not visible.
+      transition.ready
+        .then(() => nextFrames(2))
+        .then(() => window.dispatchEvent(new Event(SETTLE_EVENT)))
+        .then(() => nextFrames(4)) // once more, in case the first pass ran before the scroll event was handled
+        .then(() => window.dispatchEvent(new Event(SETTLE_EVENT)))
+        .catch(() => {});
+      transition.finished.then(cleanup, cleanup);
+    };
+    return onRouteChange(navigate);
+  }, []);
   const firstRoute = useRef(true);
   useEffect(() => {
     if (firstRoute.current) {
       firstRoute.current = false;
-      return;
+      return undefined;
     }
-    const lenis = window.__lenis;
+    if (positionedByTransition.current) {
+      positionedByTransition.current = false;
+      return undefined;
+    }
     if (slug) {
-      window.scrollTo(0, 0);
-      lenis?.scrollTo(0, { immediate: true, force: true });
-      return;
+      scrollForRoute(slug);
+      return undefined;
     }
-    // back on the home page: go to the requested section, or return to where we were
-    const id = window.__pendingScroll;
-    window.__pendingScroll = null;
-    const y = window.__homeY || 0;
-    const t = setTimeout(() => {
-      const el = id && document.getElementById(id);
-      if (el) {
-        const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
-        window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - margin);
-      } else {
-        window.scrollTo(0, y);
-      }
-      lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
-    }, 60);
+    // back on the home page without a transition: wait a moment for the layout, then scroll
+    const t = setTimeout(() => scrollForRoute(null), 60);
     return () => clearTimeout(t);
   }, [slug]);
 
@@ -124,9 +201,7 @@ export default function App() {
       <Nav />
       {!slug && !loading && <SectionRail />}
       {slug ? (
-        <Suspense fallback={<main id="main-content" tabIndex={-1} className="pj" aria-busy="true" />}>
-          <ProjectPage slug={slug} />
-        </Suspense>
+        <ProjectRoute slug={slug} />
       ) : (
         <main id="main-content" tabIndex={-1}>
           <Hero />

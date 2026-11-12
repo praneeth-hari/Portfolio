@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef } from 'react';
-import { useMotionValueEvent, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
+import useScrollSpring from './useScrollSpring.js';
 
 const TEXT =
   'Hi, I\u2019m Hari Praneeth, a Generative AI Engineer building LLM and RAG applications in Python. ' +
@@ -22,7 +23,7 @@ export default function About() {
     offset: ['start 0.92', 'end 0.3']
   });
   // spring smoothing so fast scrolling still reveals gently
-  const smooth = useSpring(scrollYProgress, { stiffness: 70, damping: 22, mass: 0.6 });
+  const smooth = useScrollSpring(scrollYProgress, { stiffness: 70, damping: 22, mass: 0.6 });
 
   const applyProgress = (v) => {
     if (reduce) return;

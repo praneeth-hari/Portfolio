@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { m, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { m, useReducedMotion, useScroll } from 'framer-motion';
+import useScrollSpring from './useScrollSpring.js';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 
@@ -38,7 +39,7 @@ function Timeline({ points }) {
   const ref = useRef(null);
   const itemRefs = useRef([]);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 65%', 'end 55%'] });
-  const fill = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4 });
+  const fill = useScrollSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4 });
 
   useEffect(() => {
     const items = itemRefs.current.filter(Boolean);
