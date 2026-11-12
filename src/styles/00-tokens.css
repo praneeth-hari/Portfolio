@@ -21,6 +21,8 @@
   --card-2: #1b1a17;
   --line: rgba(var(--ink-rgb), 0.12);
   --accent: #2f5cff;
+  /* slightly deeper blue for small text on the paper background (4.41:1 -> 5:1 contrast) */
+  --accent-text: #2a54ee;
   --accent-light: #5b8cff;
   --accent-deep: #1f45d6;
   --mint: #6fd6b0;

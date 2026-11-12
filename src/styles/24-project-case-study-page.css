@@ -301,7 +301,7 @@
 }
 .arch-hint {
   font-size: var(--fs-xs);
-  opacity: 0.55;
+  opacity: 0.72;
   margin: 4px 0 14px;
 }
 .arch-panel {
@@ -364,7 +364,7 @@
   flex-wrap: wrap;
   gap: 6px 14px;
   font-size: var(--fs-xs);
-  opacity: 0.55;
+  opacity: 0.72;
 }
 
 /* before / after bars */
