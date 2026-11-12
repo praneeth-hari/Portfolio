@@ -11,23 +11,24 @@
 }
 
 /* Short blurbs (card descriptions, the contact line) read best with evenly balanced lines. */
-:is(.work-desc, .bento-desc, .thought-excerpt, .contact-left p) {
+:is(.work-desc, .bento-desc, .thought-excerpt, .contact-left p, .arch-panel-text, .pj-limits li) {
   text-wrap: balance;
 }
 
-/* Comfortable line length for long reading: about 65-75 characters per line. (`ch` is the width of a "0",
-   wider than an average letter, so these caps are in the mid-50s.) */
-.pj-body {
-  max-width: 56ch;
+/* Comfortable line length for long reading: about 60-75 characters per line. `ch` is the width of a "0", and in
+   Geist that is about 1.5 average letters, so the caps below are around 50. Measured, not guessed:
+   tests/typography.mjs counts the characters on every rendered line. */
+.pj-body,
+.arch-panel-text,
+.pj-decision p {
+  max-width: 50ch;
 }
-.arch-panel-text {
-  max-width: 58ch;
-}
-.pj-limits {
-  max-width: 62ch;
+.pj-limits,
+.pj-demo-cap {
+  max-width: 52ch;
 }
 .tl {
-  max-width: 62ch;
+  max-width: 54ch; /* includes the timeline's own 38px left padding */
 }
 
 /* Numbers in the body face (Geist Sans has proportional digits by default) line up in dates, data labels
