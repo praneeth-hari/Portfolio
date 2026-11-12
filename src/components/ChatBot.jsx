@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { BotAvatar } from 'bot-avatars';
 
 /*
@@ -165,7 +165,7 @@ export default function ChatBot() {
 
       <AnimatePresence>
         {open && (
-          <motion.section
+          <m.section
             id="chat-panel"
             className="chat-panel"
             role="dialog"
@@ -241,7 +241,7 @@ export default function ChatBot() {
               </button>
             </form>
             <div className="chat-note">AI answers can be wrong. For anything important, email Hari.</div>
-          </motion.section>
+          </m.section>
         )}
       </AnimatePresence>
     </>

@@ -28,15 +28,17 @@ Without them the site falls back to system fonts.
 
 ## Where Framer Motion is used
 
-| Feature                                                                                     | File                            |
-| ------------------------------------------------------------------------------------------- | ------------------------------- |
-| Scroll-in reveals (`whileInView`)                                                           | `src/components/Reveal.jsx`     |
-| Preloader counter and slide-up exit                                                         | `src/components/Preloader.jsx`  |
-| Nav: shared-layout sliding highlight (`layoutId`), label morph, scroll-progress ring, toast | `src/components/Nav.jsx`        |
-| Hero tagline rotator (`AnimatePresence`)                                                    | `src/components/Hero.jsx`       |
-| About: scroll-linked word reveal (`useScroll` + `useTransform`)                             | `src/components/About.jsx`      |
-| Tech stack fan: spring-animated cards                                                       | `src/components/TechStack.jsx`  |
-| Skills dialog enter/exit                                                                    | `src/components/SkillModal.jsx` |
+Components use the small `m` component inside `<LazyMotion>` (`src/main.jsx`), and the animation features load as their own chunk (`src/motionFeatures.js`). `strict` mode turns a stray full `motion.*` component into an error, so the bundle can't quietly grow back. Layout animations and drag are not loaded; if you need them, switch the loader to `domMax`.
+
+| Feature                                                         | File                            |
+| --------------------------------------------------------------- | ------------------------------- |
+| Scroll-in reveals (`whileInView`)                               | `src/components/Reveal.jsx`     |
+| Preloader counter and slide-up exit                             | `src/components/Preloader.jsx`  |
+| Nav: full-screen menu (`AnimatePresence`), label morph          | `src/components/Nav.jsx`        |
+| Hero tagline rotator (`AnimatePresence`)                        | `src/components/Hero.jsx`       |
+| About: scroll-linked word reveal (`useScroll` + `useTransform`) | `src/components/About.jsx`      |
+| Tech stack fan: spring-animated cards                           | `src/components/TechStack.jsx`  |
+| Skills dialog enter/exit                                        | `src/components/SkillModal.jsx` |
 
 The WebGL fluid text (`src/components/FluidText.jsx`) is plain WebGL, ported as-is with cleanup.
 

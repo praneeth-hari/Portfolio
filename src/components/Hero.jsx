@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import FluidText from './FluidText.jsx';
 import PaintReveal from './PaintReveal.jsx';
@@ -23,15 +23,15 @@ export default function Hero() {
     <div className="hero-scroll" ref={outer}>
       <section className="hero" id="top">
         <div className="hero-stage">
-          <motion.div
+          <m.div
             className="hero-layer hl-title"
             style={fx ? undefined : { scale: titleScale, opacity: titleOpacity }}
           >
             <Reveal className="hero-title">
               <FluidText />
             </Reveal>
-          </motion.div>
-          <motion.div
+          </m.div>
+          <m.div
             className="hero-layer hl-portrait"
             style={fx ? undefined : { scale: portraitScale, y: portraitY, opacity: portraitOpacity }}
           >
@@ -44,7 +44,7 @@ export default function Hero() {
                 alt="Portrait of Hari Praneeth"
               />
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>
