@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 
 // Small fixed marker on the left edge: "03 / Work". Updates as you scroll.
 const LIST = [
-  ['top', 'Intro'], ['about', 'About'], ['experience', 'Experience'], ['work', 'Work'],
-  ['stack', 'Stack'], ['credentials', 'Credentials'], ['thoughts', 'Highlights'], ['contact', 'Contact']
+  ['top', 'Intro'],
+  ['about', 'About'],
+  ['experience', 'Experience'],
+  ['work', 'Work'],
+  ['stack', 'Stack'],
+  ['credentials', 'Credentials'],
+  ['thoughts', 'Highlights'],
+  ['contact', 'Contact']
 ];
 
 export default function SectionRail() {
@@ -20,7 +26,10 @@ export default function SectionRail() {
         }
         let n = -1;
         for (let k = active.length - 1; k >= 0; k--) {
-          if (active[k]) { n = k; break; }
+          if (active[k]) {
+            n = k;
+            break;
+          }
         }
         if (n >= 0) setI(n);
       },
@@ -34,7 +43,9 @@ export default function SectionRail() {
   }, []);
   return (
     <div className="rail" aria-hidden="true">
-      <span className="rail-num" key={i}>{String(i + 1).padStart(2, '0')}</span>
+      <span className="rail-num" key={i}>
+        {String(i + 1).padStart(2, '0')}
+      </span>
       <span className="rail-name">{LIST[i][1]}</span>
       <span className="rail-total">/ {String(LIST.length).padStart(2, '0')}</span>
     </div>

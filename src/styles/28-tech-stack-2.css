@@ -1,0 +1,164 @@
+/* ---------- tech stack: flip tiles ("Where I used it") ---------- */
+.bento-tile {
+  padding: 0;
+}
+.tile-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform 0.75s cubic-bezier(0.3, 0.8, 0.2, 1),
+    opacity 0.4s ease 0.1s;
+}
+.tile-front {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 28px;
+  transform: perspective(1400px) rotateY(0deg);
+}
+.t-feature .tile-front {
+  padding: 36px;
+}
+.t-strip .tile-front {
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.tile-front.is-away {
+  transform: perspective(1400px) rotateY(-180deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.tile-back {
+  position: absolute;
+  inset: 0;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+  transform: perspective(1400px) rotateY(0deg);
+}
+.t-feature .tile-back {
+  padding: 36px;
+}
+.tile-back.is-away {
+  transform: perspective(1400px) rotateY(180deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.t-strip .tile-back {
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+}
+.back-k {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.back-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
+}
+.t-strip .back-list {
+  flex-direction: row;
+}
+.back-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 14px;
+  border-left: 2px solid currentColor;
+  border-left-color: rgba(127, 127, 127, 0.4);
+}
+.back-list b {
+  font:
+    700 15px 'Archivo',
+    sans-serif;
+}
+.back-list span {
+  font-size: 13.5px;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+.back-list a {
+  align-self: flex-start;
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #fff;
+}
+.back-list a:hover {
+  background: var(--accent-deep);
+}
+.flip-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 3;
+  font:
+    600 12px 'Archivo',
+    sans-serif;
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1px solid rgba(127, 127, 127, 0.45);
+  background: rgba(255, 255, 255, 0.22);
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.flip-btn:hover {
+  background: rgba(127, 127, 127, 0.25);
+  transform: translateY(-1px);
+}
+.tile-back .flip-btn {
+  top: auto;
+  bottom: 18px;
+  right: 20px;
+}
+.t-strip .tile-back .flip-btn {
+  position: static;
+  margin-left: auto;
+  align-self: center;
+}
+@media (max-width: 640px) {
+  .t-strip .tile-back {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .t-strip .back-list {
+    flex-direction: column;
+  }
+  .t-strip .tile-back .flip-btn {
+    margin-left: 0;
+  }
+}
+.bento-tile.t-feature {
+  padding: 0;
+}
+@media (max-width: 900px) {
+  .bento-tile.t-feature {
+    padding: 0;
+  }
+  .t-feature .tile-front,
+  .t-feature .tile-back {
+    padding: 28px;
+  }
+}

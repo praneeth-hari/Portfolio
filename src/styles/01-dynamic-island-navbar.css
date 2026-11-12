@@ -1,0 +1,184 @@
+/* ---------- dynamic island navbar ---------- */
+.dyn-nav {
+  position: fixed;
+  top: 22px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.dyn-nav-pill {
+  max-width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid rgba(var(--paper-rgb), 0.14);
+  border-radius: var(--r-pill);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  transition:
+    box-shadow 0.4s ease,
+    border-radius 0.4s ease;
+}
+
+.dyn-nav-pill.open {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+}
+
+.dyn-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px 9px 16px;
+}
+
+/* grid trick (both directions): animates to/from intrinsic content width
+   with spring easing, no JS measuring - label and links swap places in
+   the same slot instead of sitting side by side */
+.dyn-nav-label-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: grid-template-columns 0.4s ease;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dyn-nav-pill.open .dyn-nav-label-wrap {
+  grid-template-columns: 0fr;
+}
+
+.dyn-nav-label {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.28s ease,
+    filter 0.28s ease,
+    transform 0.28s ease;
+}
+
+.dyn-nav-label.notransition {
+  transition: none;
+}
+
+.dyn-nav-label.out {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(-6px);
+}
+
+.dyn-nav-label.enter {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(6px);
+}
+
+.dyn-nav-toggle {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--paper);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dyn-nav-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dyn-nav-icon {
+  display: inline-block;
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: transform 0.5s var(--ease-spring);
+}
+
+.dyn-nav-icon::before {
+  content: '+';
+}
+
+.dyn-nav-pill.open .dyn-nav-icon {
+  transform: rotate(45deg);
+}
+
+.dyn-nav-links {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.5s var(--ease-spring);
+  min-width: 0;
+  max-width: min(80vw, 560px);
+}
+
+.dyn-nav-pill.open .dyn-nav-links {
+  grid-template-columns: 1fr;
+}
+
+/* single row always - on narrow viewports the six links scroll
+   horizontally inside the pill rather than wrapping into a second row
+   or forcing the pill wider than the viewport */
+.dyn-nav-links-inner {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.dyn-nav-links-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.dyn-nav-links-inner a {
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  flex-shrink: 0;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease 0.1s,
+    color 0.2s ease;
+}
+
+.dyn-nav-pill.open .dyn-nav-links-inner a {
+  opacity: 1;
+}
+
+.dyn-nav-links-inner a.is-active {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .dyn-nav-row {
+    gap: var(--space-2);
+    padding: 8px 8px 8px 14px;
+  }
+
+  .dyn-nav-label {
+    font-size: var(--fs-sm);
+  }
+
+  .dyn-nav-links {
+    max-width: min(75vw, 420px);
+  }
+
+  .dyn-nav-links-inner a {
+    padding: 8px 12px;
+    font-size: var(--fs-sm);
+  }
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion } from 'framer-motion';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
@@ -15,18 +15,46 @@ import { getDeviceProfile } from '../device.js';
 const USED = {
   'AI Engineering': [
     { name: 'Navent AI · Breviq', result: 'Recall@10 rose from 61.3% to 84.7% on BGE + Pinecone.' },
-    { name: 'Medicinal Plant Detection', result: '78 plants in about 9 ms, answers cite sources.', study: 'mediplant' },
-    { name: 'BOB Assistant', result: 'Fully offline voice assistant, 11 tools.', href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant' }
+    {
+      name: 'Medicinal Plant Detection',
+      result: '78 plants in about 9 ms, answers cite sources.',
+      study: 'mediplant'
+    },
+    {
+      name: 'BOB Assistant',
+      result: 'Fully offline voice assistant, 11 tools.',
+      href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant'
+    }
   ],
   'Backend & Data': [
     { name: 'Navent AI · Breviq', result: 'FastAPI with SQS batches, S3/STS and PostgreSQL.' },
-    { name: 'Medicinal Plant Detection', result: 'FAISS retrieval over reviewed monographs.', study: 'mediplant' },
-    { name: 'Secure Cloud ML', result: 'JWT-secured API, AES-256 encrypted transfer.', href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml' }
+    {
+      name: 'Medicinal Plant Detection',
+      result: 'FAISS retrieval over reviewed monographs.',
+      study: 'mediplant'
+    },
+    {
+      name: 'Secure Cloud ML',
+      result: 'JWT-secured API, AES-256 encrypted transfer.',
+      href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml'
+    }
   ],
   'Frontend & Delivery': [
-    { name: 'Medicinal Plant Detection', result: 'React app: photo in, plant out, then ask.', study: 'mediplant' },
-    { name: 'Secure Cloud ML', result: 'Flask app packaged with Docker.', href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml' },
-    { name: 'BOB Assistant', result: 'Local LLM through Ollama, no cloud.', href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant' }
+    {
+      name: 'Medicinal Plant Detection',
+      result: 'React app: photo in, plant out, then ask.',
+      study: 'mediplant'
+    },
+    {
+      name: 'Secure Cloud ML',
+      result: 'Flask app packaged with Docker.',
+      href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml'
+    },
+    {
+      name: 'BOB Assistant',
+      result: 'Local LLM through Ollama, no cloud.',
+      href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant'
+    }
   ]
 };
 
@@ -57,6 +85,19 @@ function Tile({ tile, index, onOpenSkill }) {
   const { tier, isTouchOrSmall } = getDeviceProfile();
   const canGlow = !reduce && !isTouchOrSmall && tier !== 'low-end';
   const [flipped, setFlipped] = useState(false);
+  // the face that is turned away is `inert`, so keyboard users never land on invisible links;
+  // after a flip, focus follows the user to the button on the visible face
+  const frontBtn = useRef(null);
+  const backBtn = useRef(null);
+  const userFlipped = useRef(false);
+  useEffect(() => {
+    if (!userFlipped.current) return;
+    (flipped ? backBtn : frontBtn).current?.focus();
+  }, [flipped]);
+  const flip = (next) => {
+    userFlipped.current = true;
+    setFlipped(next);
+  };
   const used = USED[tile.title] || [];
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -74,11 +115,13 @@ function Tile({ tile, index, onOpenSkill }) {
       className={'bento-tile ' + tile.cls}
       delay={index * 0.07}
       onMouseMove={canGlow ? onMove : undefined}
-      whileHover={canGlow ? { y: -4, transition: { type: 'spring', stiffness: 300, damping: 24 } } : undefined}
+      whileHover={
+        canGlow ? { y: -4, transition: { type: 'spring', stiffness: 300, damping: 24 } } : undefined
+      }
     >
       {canGlow && <motion.div className="bento-glow" style={{ background: glow }} aria-hidden="true" />}
 
-      <div className={'tile-face tile-front' + (flipped ? ' is-away' : '')} aria-hidden={flipped}>
+      <div className={'tile-face tile-front' + (flipped ? ' is-away' : '')} inert={flipped}>
         <div className="bento-main">
           <div className="bento-index mono">{String(index + 1).padStart(2, '0')}</div>
           <h3 className="bento-title disp">{tile.title}</h3>
@@ -105,10 +148,12 @@ function Tile({ tile, index, onOpenSkill }) {
             </button>
           )}
         </div>
-        <button type="button" className="flip-btn" onClick={() => setFlipped(true)} tabIndex={flipped ? -1 : 0}>Where I used it <span aria-hidden="true">↻</span></button>
+        <button type="button" className="flip-btn" ref={frontBtn} onClick={() => flip(true)}>
+          Where I used it <span aria-hidden="true">↻</span>
+        </button>
       </div>
 
-      <div className={'tile-face tile-back' + (flipped ? '' : ' is-away')} aria-hidden={!flipped}>
+      <div className={'tile-face tile-back' + (flipped ? '' : ' is-away')} inert={!flipped}>
         <div className="back-k mono">{String(index + 1).padStart(2, '0')} · Where I used it</div>
         <ul className="back-list">
           {used.map((u) => (
@@ -116,15 +161,25 @@ function Tile({ tile, index, onOpenSkill }) {
               <b>{u.name}</b>
               <span>{u.result}</span>
               {u.study && (
-                <a href={'#/project/' + u.study} onClick={(e) => { e.preventDefault(); openProject(u.study); }}>Case study →</a>
+                <a
+                  href={'#/project/' + u.study}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openProject(u.study);
+                  }}
+                >
+                  Case study →
+                </a>
               )}
               {!u.study && u.href && (
-                <a href={u.href} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+                <a href={u.href} target="_blank" rel="noopener noreferrer">
+                  GitHub ↗
+                </a>
               )}
             </li>
           ))}
         </ul>
-        <button type="button" className="flip-btn" onClick={() => setFlipped(false)} tabIndex={flipped ? 0 : -1}>
+        <button type="button" className="flip-btn" ref={backBtn} onClick={() => flip(false)}>
           <span aria-hidden="true">↺</span> Back
         </button>
       </div>
@@ -138,7 +193,7 @@ export default function TechStack({ onOpenSkill }) {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Core expertise</Reveal>
-          <SplitHeading>{"Tech Stack"}</SplitHeading>
+          <SplitHeading>{'Tech Stack'}</SplitHeading>
         </div>
       </div>
 

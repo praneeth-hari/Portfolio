@@ -34,6 +34,8 @@ export default function Nav() {
   /* scroll-spy */
   useEffect(() => {
     let lastScrolled = window.scrollY > 40;
+    // one-time read of the real scroll position (it is not available during render)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScrolled(lastScrolled);
     const onScroll = () => {
       const next = window.scrollY > 40;
@@ -56,7 +58,10 @@ export default function Nav() {
           }
           let n = -1;
           for (let k = vis.length - 1; k >= 0; k--) {
-            if (vis[k]) { n = k; break; }
+            if (vis[k]) {
+              n = k;
+              break;
+            }
           }
           if (n >= 0) setActive(SECTIONS[n].id);
         },
@@ -76,15 +81,30 @@ export default function Nav() {
 
   /* Esc closes; page scroll is paused while the menu is open */
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape' && open) { setOpen(false); btnRef.current?.focus(); } };
+    const onKey = (e) => {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+        btnRef.current?.focus();
+      }
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
+  /* the page behind the full-screen menu must not take focus (or be read out) while it is open */
+  useEffect(() => {
+    const main = document.getElementById('main-content');
+    if (!main) return undefined;
+    main.inert = open;
+    return () => {
+      main.inert = false;
+    };
+  }, [open, inProject]);
+
   useEffect(() => {
     const l = window.__lenis;
     document.documentElement.classList.toggle('menu-open', open);
-    if (l) (open ? l.stop() : l.start());
+    if (l) open ? l.stop() : l.start();
     return () => document.documentElement.classList.remove('menu-open');
   }, [open]);
 
@@ -103,7 +123,10 @@ export default function Nav() {
   const goTo = (e, id) => {
     e.preventDefault();
     setOpen(false);
-    if (getProjectSlug()) { goHome(id); return; } // leave the case-study page first
+    if (getProjectSlug()) {
+      goHome(id);
+      return;
+    } // leave the case-study page first
     setActive(id);
     // wait a moment so the menu has started to close, then scroll
     setTimeout(() => scrollTo(id), reduce ? 0 : 350);
@@ -115,7 +138,12 @@ export default function Nav() {
   return (
     <>
       <header className={'mn-bar' + (scrolled ? ' is-scrolled' : '')}>
-        <a href="#top" className="mn-logo" onClick={(e) => goTo(e, 'top')} aria-label="Hari Praneeth, back to top">
+        <a
+          href="#top"
+          className="mn-logo"
+          onClick={(e) => goTo(e, 'top')}
+          aria-label="Hari Praneeth, back to top"
+        >
           <span className="mn-mark">HP</span>
           <span className="mn-name">Hari Praneeth</span>
         </a>
@@ -135,7 +163,9 @@ export default function Nav() {
               </motion.span>
             </AnimatePresence>
           </span>
-          <a href="#contact" className="mn-hire" onClick={(e) => goTo(e, 'contact')}>Hire me</a>
+          <a href="#contact" className="mn-hire" onClick={(e) => goTo(e, 'contact')}>
+            Hire me
+          </a>
           <button
             ref={btnRef}
             type="button"
@@ -145,7 +175,10 @@ export default function Nav() {
             onClick={() => setOpen((o) => !o)}
           >
             <span className="mn-btn-text">{open ? 'Close' : 'Menu'}</span>
-            <span className="mn-burger" aria-hidden="true"><i /><i /></span>
+            <span className="mn-burger" aria-hidden="true">
+              <i />
+              <i />
+            </span>
           </button>
         </div>
       </header>
@@ -170,7 +203,12 @@ export default function Nav() {
                   }
                   onMouseEnter={() => setHovered(s.id)}
                 >
-                  <a href={'#' + s.id} onClick={(e) => goTo(e, s.id)} onFocus={() => setHovered(s.id)} onBlur={() => setHovered(null)}>
+                  <a
+                    href={'#' + s.id}
+                    onClick={(e) => goTo(e, s.id)}
+                    onFocus={() => setHovered(s.id)}
+                    onBlur={() => setHovered(null)}
+                  >
                     <span className="mn-num">{String(i + 1).padStart(2, '0')}</span>
                     <span className="mn-clip">
                       <motion.span
@@ -178,12 +216,18 @@ export default function Nav() {
                         initial={reduce ? false : { y: '110%' }}
                         animate={{ y: 0 }}
                         exit={{ y: 0 }}
-                        transition={{ delay: reduce ? 0 : 0.28 + i * 0.05, duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+                        transition={{
+                          delay: reduce ? 0 : 0.28 + i * 0.05,
+                          duration: 0.7,
+                          ease: [0.2, 0.8, 0.2, 1]
+                        }}
                       >
                         {s.label}
                       </motion.span>
                     </span>
-                    <span className="mn-arrow" aria-hidden="true">→</span>
+                    <span className="mn-arrow" aria-hidden="true">
+                      →
+                    </span>
                   </a>
                 </li>
               ))}
@@ -192,8 +236,12 @@ export default function Nav() {
             <div className="mn-foot">
               <a href={'mailto:' + EMAIL}>{EMAIL}</a>
               <span className="mn-social">
-                <a href={GITHUB} target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <a href={GITHUB} target="_blank" rel="noopener noreferrer">
+                  GitHub
+                </a>
+                <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">
+                  LinkedIn
+                </a>
               </span>
             </div>
           </motion.nav>

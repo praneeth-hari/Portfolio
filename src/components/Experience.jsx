@@ -23,7 +23,15 @@ const JOBS = [
 
 // wrap the numbers in a bullet so the impact stands out
 const hi = (text) =>
-  text.split(/((?<![A-Za-z])\d+(?:\.\d+)?%?)/g).map((part, i) => (i % 2 ? <b key={i} className="num">{part}</b> : part));
+  text.split(/((?<![A-Za-z])\d+(?:\.\d+)?%?)/g).map((part, i) =>
+    i % 2 ? (
+      <b key={i} className="num">
+        {part}
+      </b>
+    ) : (
+      part
+    )
+  );
 
 function Timeline({ points }) {
   const reduce = useReducedMotion();
@@ -58,7 +66,9 @@ function Timeline({ points }) {
       {points.map((p, i) => (
         <div
           key={p}
-          ref={(el) => { itemRefs.current[i] = el; }}
+          ref={(el) => {
+            itemRefs.current[i] = el;
+          }}
           className={'tl-item' + (reduce ? ' is-in' : '')}
         >
           <span className="tl-dot" aria-hidden="true" />
@@ -75,7 +85,7 @@ export default function Experience() {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Experience</Reveal>
-          <SplitHeading>{"Where I’ve worked"}</SplitHeading>
+          <SplitHeading>{'Where I’ve worked'}</SplitHeading>
         </div>
       </div>
 

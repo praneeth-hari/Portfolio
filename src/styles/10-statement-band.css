@@ -1,0 +1,14 @@
+/* ---------- statement band ---------- */
+.statement {
+  padding-top: 120px;
+  padding-bottom: 0;
+}
+
+.statement p {
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1.3;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  color: var(--ink);
+}

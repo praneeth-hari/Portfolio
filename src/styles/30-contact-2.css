@@ -1,0 +1,86 @@
+/* ---------- contact: real social icons ---------- */
+.socials {
+  gap: 14px;
+}
+.socials a {
+  width: 54px;
+  height: 54px;
+}
+.social-svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+.socials a .social-icon {
+  display: grid;
+  place-items: center;
+}
+.socials a[data-b='li']::before {
+  background: #0a66c2;
+}
+.socials a[data-b='ig']::before {
+  background: linear-gradient(45deg, #f9a03f, #e1306c 55%, #7a3bd1);
+}
+.socials a[data-b='gh']::before {
+  background: var(--ink);
+}
+.socials a:hover {
+  border-color: transparent;
+  transform: translateY(-3px);
+}
+.socials a {
+  transition:
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* ---- case study demo video ---- */
+.pj-demo {
+  margin: 0;
+}
+.pj-demo-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--ink);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
+  box-shadow: 0 30px 60px -30px rgba(var(--ink-rgb), 0.35);
+}
+.pj-demo-cap {
+  margin-top: 14px;
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  opacity: 0.65;
+  max-width: 62ch;
+}
+
+.pj-shot {
+  height: auto;
+  aspect-ratio: auto;
+  background: #fff;
+  object-fit: contain;
+}
+
+.pj-shot-wrap {
+  margin-top: 28px;
+}
+.pj-shot-wrap:first-of-type {
+  margin-top: 0;
+}
+
+/* Highlights: two landscape cards so the group photos show everyone (tall cards on phones) */
+.thought-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+.thought {
+  aspect-ratio: 4 / 3;
+}
+@media (max-width: 900px) {
+  .thought-grid {
+    grid-template-columns: 1fr;
+  }
+  .thought {
+    aspect-ratio: 3 / 3.6;
+  }
+}

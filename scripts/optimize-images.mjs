@@ -40,7 +40,13 @@ async function run() {
   }
 
   // Video poster -> WebP
-  await makeVariant('projects/medicinal-plant-demo-poster.jpg', 'projects/medicinal-plant-demo-poster.webp', null, 'webp', { quality: 82 });
+  await makeVariant(
+    'projects/medicinal-plant-demo-poster.jpg',
+    'projects/medicinal-plant-demo-poster.webp',
+    null,
+    'webp',
+    { quality: 82 }
+  );
 
   // Awards / Highlights JPEGs -> WebP + AVIF
   await makeVariant('awards/expo-1.jpg', 'awards/expo-1-640.webp', 640, 'webp', { quality: 80 });
@@ -56,4 +62,3 @@ run().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

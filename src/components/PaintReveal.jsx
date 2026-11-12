@@ -8,10 +8,10 @@ import { getDeviceProfile } from '../device.js';
  * reveals the second image. Each stroke fades away after a few seconds.
  * Own canvas implementation, no external libraries.
  */
-const HOLD = 1500;      // ms a dab stays fully visible
-const FADE = 1900;      // ms it then takes to fade out
+const HOLD = 1500; // ms a dab stays fully visible
+const FADE = 1900; // ms it then takes to fade out
 const LIFE = HOLD + FADE;
-const BRUSH = 0.085;    // brush radius as a fraction of the canvas width
+const BRUSH = 0.085; // brush radius as a fraction of the canvas width
 
 // A rough, hand-painted looking stamp (irregular edge, soft shadow).
 function makeStamps(size) {
@@ -71,7 +71,9 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
     img.decoding = 'async';
     let imgReady = false;
     img.onload = () => {
-      const finalize = () => { if (!cancelled) imgReady = true; };
+      const finalize = () => {
+        if (!cancelled) imgReady = true;
+      };
       if (img.decode) img.decode().then(finalize, finalize);
       else finalize();
     };
@@ -108,12 +110,13 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
       baseImg.addEventListener('load', markBaseReady, { once: true });
     }
 
-    let W = 0, H = 0;
+    let W = 0,
+      H = 0;
     let dabs = [];
     let raf = 0;
     let dirty = false;
     let visible = true;
-    let last = null;      // last painted point
+    let last = null; // last painted point
     let down = false;
     let touchArmed = false;
     let armTimer = 0;
@@ -133,12 +136,16 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
     size();
     const ro = new ResizeObserver(size);
     ro.observe(box);
-    const io = 'IntersectionObserver' in window
-      ? new IntersectionObserver(([en]) => {
-          visible = en.isIntersecting;
-          if (visible && dabs.length && !raf) raf = requestAnimationFrame(frame);
-        }, { threshold: 0.01 })
-      : null;
+    const io =
+      'IntersectionObserver' in window
+        ? new IntersectionObserver(
+            ([en]) => {
+              visible = en.isIntersecting;
+              if (visible && dabs.length && !raf) raf = requestAnimationFrame(frame);
+            },
+            { threshold: 0.01 }
+          )
+        : null;
     if (io) io.observe(box);
 
     const frame = (now) => {
@@ -175,7 +182,9 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
       }
       if (dabs.length && visible) raf = requestAnimationFrame(frame);
     };
-    const kick = () => { if (!raf && visible) raf = requestAnimationFrame(frame); };
+    const kick = () => {
+      if (!raf && visible) raf = requestAnimationFrame(frame);
+    };
 
     const toLocal = (e) => {
       const r = box.getBoundingClientRect();
@@ -185,19 +194,29 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
     const stamp = (x, y, scale) => {
       dirty = true;
       dabs.push({
-        x: x * scale, y: y * scale, t: performance.now(),
+        x: x * scale,
+        y: y * scale,
+        t: performance.now(),
         s: (Math.random() * stamps.length) | 0,
         rot: Math.random() * Math.PI * 2,
         k: 0.85 + Math.random() * 0.4
       });
       if (dabs.length > paintMaxDabs) dabs.shift();
-      if (!everPainted) { everPainted = true; setPainted(true); }
+      if (!everPainted) {
+        everPainted = true;
+        setPainted(true);
+      }
     };
 
     const paintTo = (p) => {
       const step = BRUSH * p.w * 0.45;
-      if (!last) { stamp(p.x, p.y, p.scale); last = p; return; }
-      const dx = p.x - last.x, dy = p.y - last.y;
+      if (!last) {
+        stamp(p.x, p.y, p.scale);
+        last = p;
+        return;
+      }
+      const dx = p.x - last.x,
+        dy = p.y - last.y;
       const dist = Math.hypot(dx, dy);
       const n = Math.max(1, Math.floor(dist / step));
       for (let i = 1; i <= n; i++) stamp(last.x + (dx * i) / n, last.y + (dy * i) / n, p.scale);
@@ -213,9 +232,13 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
       ring.style.opacity = show ? '1' : '0';
     };
 
-    const disarm = () => { touchArmed = false; setArmed(false); };
+    const disarm = () => {
+      touchArmed = false;
+      setArmed(false);
+    };
     const arm = () => {
-      touchArmed = true; setArmed(true);
+      touchArmed = true;
+      setArmed(true);
       clearTimeout(armTimer);
       armTimer = setTimeout(disarm, 6000);
     };
@@ -225,9 +248,11 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
       if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
         if (e.button !== 0) return;
         e.preventDefault(); // no text selection while painting
-        down = true; last = null;
+        down = true;
+        last = null;
         canvas.setPointerCapture?.(e.pointerId);
-        paintTo(p); moveRing(p, true);
+        paintTo(p);
+        moveRing(p, true);
         return;
       }
       // touch: needs a double-tap first so normal scrolling still works
@@ -236,30 +261,43 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
       lastTap = { t: now, x: p.x, y: p.y };
       if (isDouble && !touchArmed) arm();
       if (touchArmed) {
-        down = true; last = null;
+        down = true;
+        last = null;
         clearTimeout(armTimer);
-        paintTo(p); moveRing(p, true);
+        paintTo(p);
+        moveRing(p, true);
       }
     };
     const onMove = (e) => {
       const p = toLocal(e);
       if (e.pointerType === 'touch') {
-        if (down && touchArmed) { paintTo(p); moveRing(p, true); }
+        if (down && touchArmed) {
+          paintTo(p);
+          moveRing(p, true);
+        }
         return;
       }
       moveRing(p, true);
       if (down) paintTo(p);
     };
     const onUp = (e) => {
-      down = false; last = null;
+      down = false;
+      last = null;
       if (e.pointerType === 'touch') {
-        if (touchArmed) { clearTimeout(armTimer); armTimer = setTimeout(disarm, 4000); }
+        if (touchArmed) {
+          clearTimeout(armTimer);
+          armTimer = setTimeout(disarm, 4000);
+        }
         if (ring) ring.style.opacity = '0';
       }
     };
-    const onLeave = () => { if (ring) ring.style.opacity = '0'; };
+    const onLeave = () => {
+      if (ring) ring.style.opacity = '0';
+    };
     // once armed, a drag on the portrait must paint instead of scroll
-    const onTouchMove = (e) => { if (touchArmed && e.cancelable) e.preventDefault(); };
+    const onTouchMove = (e) => {
+      if (touchArmed && e.cancelable) e.preventDefault();
+    };
 
     canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('pointermove', onMove);
@@ -285,7 +323,15 @@ export default function PaintReveal({ base, baseSrcSet, reveal, revealSmall, alt
   }, [reduce, reveal, revealSmall, base]);
 
   return (
-    <div className={'paint' + (armed ? ' is-armed' : '') + (painted ? ' is-painted' : '') + (baseReady ? ' base-ready' : '')} ref={boxRef}>
+    <div
+      className={
+        'paint' +
+        (armed ? ' is-armed' : '') +
+        (painted ? ' is-painted' : '') +
+        (baseReady ? ' base-ready' : '')
+      }
+      ref={boxRef}
+    >
       <img
         ref={baseImgRef}
         className="paint-base"

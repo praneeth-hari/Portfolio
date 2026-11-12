@@ -22,7 +22,9 @@ export default function SkillModal({ open, onClose }) {
       }
       if (e.key !== 'Tab' || !modalRef.current) return;
       const items = Array.from(
-        modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+        modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
       );
       if (!items.length) return;
       const first = items[0];
@@ -69,8 +71,12 @@ export default function SkillModal({ open, onClose }) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.98 }}
             transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 28 }}
           >
-            <button className="skill-modal-close" ref={closeRef} aria-label="Close" onClick={onClose}>✕</button>
-            <h3 className="disp skill-modal-title" id="skillModalTitle">AI Engineering</h3>
+            <button className="skill-modal-close" ref={closeRef} aria-label="Close" onClick={onClose}>
+              ✕
+            </button>
+            <h3 className="disp skill-modal-title" id="skillModalTitle">
+              AI Engineering
+            </h3>
             <p className="skill-modal-desc">
               Designing intelligent systems that connect models, retrieval, APIs, and software engineering.
             </p>

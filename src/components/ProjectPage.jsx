@@ -4,6 +4,7 @@ import Reveal from './Reveal.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
 import { PROJECTS } from '../data/projects.js';
 import { goHome } from '../route.js';
+import { maxTablet } from '../breakpoints.js';
 
 /* ---------- clickable architecture diagram ---------- */
 function Architecture({ rows }) {
@@ -30,7 +31,9 @@ function Architecture({ rows }) {
                   <span className="arch-sub">{n.sub}</span>
                 </button>
                 {i < row.nodes.length - 1 && (
-                  <span className="arch-link" aria-hidden="true"><i /></span>
+                  <span className="arch-link" aria-hidden="true">
+                    <i />
+                  </span>
                 )}
               </div>
             ))}
@@ -59,12 +62,16 @@ function Architecture({ rows }) {
             )}
             {node.facts && (
               <ul className="arch-facts">
-                {node.facts.map((f) => <li key={f}>{f}</li>)}
+                {node.facts.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
               </ul>
             )}
             {node.files && (
               <div className="arch-files mono">
-                {node.files.map((f) => <span key={f}>{f}</span>)}
+                {node.files.map((f) => (
+                  <span key={f}>{f}</span>
+                ))}
               </div>
             )}
           </motion.div>
@@ -93,7 +100,10 @@ function Bar({ label, value, tone, max = 100, unit = '%' }) {
           />
         )}
       </div>
-      <span className="bar-val">{value}{unit}</span>
+      <span className="bar-val">
+        {value}
+        {unit}
+      </span>
     </div>
   );
 }
@@ -108,7 +118,7 @@ function CoverBg({ src }) {
         src={src}
         alt=""
         widths={[640, 1024, 1448]}
-        sizes="(max-width: 900px) 100vw, 62vw"
+        sizes={`${maxTablet} 100vw, 62vw`}
         width={1448}
         height={1086}
         loading="eager"
@@ -129,7 +139,10 @@ function Demo({ video }) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
     const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); },
+      ([e]) => {
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      },
       { threshold: 0.5 }
     );
     io.observe(v);
@@ -160,7 +173,9 @@ export default function ProjectPage({ slug }) {
   if (!p) {
     return (
       <main className="wrap pj" id="main-content" tabIndex={-1}>
-        <button type="button" className="pj-back" onClick={() => goHome('work')}>← All projects</button>
+        <button type="button" className="pj-back" onClick={() => goHome('work')}>
+          ← All projects
+        </button>
         <h1 className="pj-title disp">Project not found</h1>
       </main>
     );
@@ -170,15 +185,27 @@ export default function ProjectPage({ slug }) {
     <main className="pj" id="main-content" tabIndex={-1}>
       <CoverBg src={p.cover} />
       <div className="wrap">
-        <button type="button" className="pj-back" onClick={() => goHome('work')}>← All projects</button>
+        <button type="button" className="pj-back" onClick={() => goHome('work')}>
+          ← All projects
+        </button>
 
         <header className="pj-head">
           <Reveal className="eyebrow">{p.category}</Reveal>
-          <Reveal as="h1" className="pj-title disp" delay={0.05}>{p.title}</Reveal>
-          <Reveal as="p" className="pj-lead" delay={0.1}>{p.lead}</Reveal>
+          <Reveal as="h1" className="pj-title disp" delay={0.05}>
+            {p.title}
+          </Reveal>
+          <Reveal as="p" className="pj-lead" delay={0.1}>
+            {p.lead}
+          </Reveal>
           <Reveal className="pj-actions" delay={0.15}>
-            {p.demo && <a className="pj-btn is-primary" href={p.demo} target="_blank" rel="noopener noreferrer">Live demo ↗</a>}
-            <a className="pj-btn" href={p.github} target="_blank" rel="noopener noreferrer">View code ↗</a>
+            {p.demo && (
+              <a className="pj-btn is-primary" href={p.demo} target="_blank" rel="noopener noreferrer">
+                Live demo ↗
+              </a>
+            )}
+            <a className="pj-btn" href={p.github} target="_blank" rel="noopener noreferrer">
+              View code ↗
+            </a>
           </Reveal>
         </header>
 
@@ -194,21 +221,29 @@ export default function ProjectPage({ slug }) {
 
         <section className="pj-sec">
           <Reveal className="eyebrow">The problem</Reveal>
-          <Reveal as="p" className="pj-body pj-body-lg">{p.problem}</Reveal>
+          <Reveal as="p" className="pj-body pj-body-lg">
+            {p.problem}
+          </Reveal>
         </section>
 
         {p.video && (
           <section className="pj-sec">
             <Reveal className="eyebrow">See it work</Reveal>
-            <Reveal as="h2" className="pj-h2 disp">The whole flow, live</Reveal>
-            <Reveal><Demo video={p.video} /></Reveal>
+            <Reveal as="h2" className="pj-h2 disp">
+              The whole flow, live
+            </Reveal>
+            <Reveal>
+              <Demo video={p.video} />
+            </Reveal>
           </section>
         )}
 
         {(p.shots || (p.shot ? [p.shot] : [])).length > 0 && (
           <section className="pj-sec">
             <Reveal className="eyebrow">{(p.shotsTitle || {}).eyebrow || 'The dashboard'}</Reveal>
-            <Reveal as="h2" className="pj-h2 disp">{(p.shotsTitle || {}).heading || 'Where I watch it run'}</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">
+              {(p.shotsTitle || {}).heading || 'Where I watch it run'}
+            </Reveal>
             {(p.shots || [p.shot]).map((sh) => (
               <Reveal key={sh.src} className="pj-shot-wrap">
                 <figure className="pj-demo">
@@ -217,7 +252,7 @@ export default function ProjectPage({ slug }) {
                     src={sh.src}
                     alt={sh.alt}
                     widths={sh.width ? [720, sh.width] : undefined}
-                    sizes="(max-width: 900px) calc(100vw - 48px), 1116px"
+                    sizes={`${maxTablet} calc(100vw - 48px), 1116px`}
                     width={sh.width}
                     height={sh.height}
                     loading="eager"
@@ -232,24 +267,40 @@ export default function ProjectPage({ slug }) {
 
         <section className="pj-sec">
           <Reveal className="eyebrow">How it works</Reveal>
-          <Reveal as="h2" className="pj-h2 disp">Architecture</Reveal>
-          <Reveal><Architecture rows={p.rows} /></Reveal>
+          <Reveal as="h2" className="pj-h2 disp">
+            Architecture
+          </Reveal>
+          <Reveal>
+            <Architecture rows={p.rows} />
+          </Reveal>
         </section>
 
         <section className="pj-sec">
           <Reveal className="eyebrow">Biggest challenge</Reveal>
-          <Reveal as="h2" className="pj-h2 disp">{p.challenge.title}</Reveal>
-          <Reveal as="p" className="pj-body">{p.challenge.text}</Reveal>
+          <Reveal as="h2" className="pj-h2 disp">
+            {p.challenge.title}
+          </Reveal>
+          <Reveal as="p" className="pj-body">
+            {p.challenge.text}
+          </Reveal>
           <Reveal className="bars">
             {p.challenge.bars.map((b) => (
               <div className="bars-group" key={b.name}>
                 <div className="bars-name">{b.name}</div>
-                {(p.challenge.series || [
-                  { label: 'Normal test photos', key: 'clean', tone: 'is-clean' },
-                  { label: 'Backgrounds swapped', key: 'swapped', tone: 'is-swap' }
-                ]).map((sr) => (
-                  <Bar key={sr.key} label={sr.label} value={b[sr.key]} tone={sr.tone}
-                    max={p.challenge.max || 100} unit={p.challenge.unit || '%'} />
+                {(
+                  p.challenge.series || [
+                    { label: 'Normal test photos', key: 'clean', tone: 'is-clean' },
+                    { label: 'Backgrounds swapped', key: 'swapped', tone: 'is-swap' }
+                  ]
+                ).map((sr) => (
+                  <Bar
+                    key={sr.key}
+                    label={sr.label}
+                    value={b[sr.key]}
+                    tone={sr.tone}
+                    max={p.challenge.max || 100}
+                    unit={p.challenge.unit || '%'}
+                  />
                 ))}
               </div>
             ))}
@@ -259,8 +310,12 @@ export default function ProjectPage({ slug }) {
         {p.rag && (
           <section className="pj-sec">
             <Reveal className="eyebrow">{p.rag.eyebrow || 'Retrieval quality'}</Reveal>
-            <Reveal as="h2" className="pj-h2 disp">{p.rag.title}</Reveal>
-            <Reveal as="p" className="pj-body">{p.rag.text}</Reveal>
+            <Reveal as="h2" className="pj-h2 disp">
+              {p.rag.title}
+            </Reveal>
+            <Reveal as="p" className="pj-body">
+              {p.rag.text}
+            </Reveal>
             <div className="pj-stats pj-stats-tight">
               {p.rag.stats.map((s) => (
                 <Reveal className="pj-stat" key={s.label}>
@@ -275,7 +330,9 @@ export default function ProjectPage({ slug }) {
 
         <section className="pj-sec">
           <Reveal className="eyebrow">Decisions</Reveal>
-          <Reveal as="h2" className="pj-h2 disp">What I changed, and why</Reveal>
+          <Reveal as="h2" className="pj-h2 disp">
+            What I changed, and why
+          </Reveal>
           <div className="pj-decisions">
             {p.decisions.map((d, i) => (
               <Reveal className="pj-decision" key={d.title}>
@@ -290,20 +347,30 @@ export default function ProjectPage({ slug }) {
         <section className="pj-sec">
           <Reveal className="eyebrow">Honest limits</Reveal>
           <ul className="pj-limits">
-            {p.limits.map((l) => <Reveal as="li" key={l}>{l}</Reveal>)}
+            {p.limits.map((l) => (
+              <Reveal as="li" key={l}>
+                {l}
+              </Reveal>
+            ))}
           </ul>
         </section>
 
         <section className="pj-sec">
           <Reveal className="eyebrow">Built with</Reveal>
           <Reveal as="ul" className="pj-chips">
-            {p.stack.map((s) => <li key={s}>{s}</li>)}
+            {p.stack.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
           </Reveal>
         </section>
 
         <div className="pj-end">
-          <button type="button" className="pj-btn is-primary" onClick={() => goHome('work')}>← Back to all projects</button>
-          <a className="pj-btn" href={p.github} target="_blank" rel="noopener noreferrer">View code ↗</a>
+          <button type="button" className="pj-btn is-primary" onClick={() => goHome('work')}>
+            ← Back to all projects
+          </button>
+          <a className="pj-btn" href={p.github} target="_blank" rel="noopener noreferrer">
+            View code ↗
+          </a>
         </div>
       </div>
     </main>

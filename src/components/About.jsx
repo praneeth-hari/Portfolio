@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef } from 'react';
 import { useMotionValueEvent, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 
 const TEXT =
-  "Hi, I\u2019m Hari Praneeth, a Generative AI Engineer building LLM and RAG applications in Python. " +
+  'Hi, I\u2019m Hari Praneeth, a Generative AI Engineer building LLM and RAG applications in Python. ' +
   'As an AI Engineering Intern at Breviq AI, I work on clinical AI workflows with FastAPI, LangGraph ' +
   'and Pinecone, from retrieval and evaluation to real-time voice. I care about systems that are ' +
   'measured, reliable and useful.';
@@ -41,7 +41,11 @@ export default function About() {
   };
 
   useMotionValueEvent(smooth, 'change', applyProgress);
-  useEffect(() => { applyProgress(smooth.get()); }, [reduce]);
+  // re-apply only when reduced-motion flips; applyProgress is recreated every render on purpose
+  useEffect(() => {
+    applyProgress(smooth.get());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
   return (
     <section className="wrap about-section" id="about">
@@ -51,7 +55,9 @@ export default function About() {
           <Fragment key={i}>
             <span
               className="rw"
-              ref={(el) => { wordRefs.current[i] = el; }}
+              ref={(el) => {
+                wordRefs.current[i] = el;
+              }}
               style={reduce ? { opacity: 1 } : undefined}
             >
               {w}
@@ -61,8 +67,23 @@ export default function About() {
       </p>
 
       <div className="cv-actions">
-        <a href="./Hari_Praneeth_Resume.pdf" target="_blank" rel="noopener noreferrer" className="cv-btn cv-btn-primary" data-magnetic>Read My CV</a>
-        <a href="./Hari_Praneeth_Resume.pdf" download="Hari_Praneeth_Resume.pdf" className="cv-btn cv-btn-secondary" data-magnetic>Download CV ↓</a>
+        <a
+          href="./Hari_Praneeth_Resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cv-btn cv-btn-primary"
+          data-magnetic
+        >
+          Read My CV
+        </a>
+        <a
+          href="./Hari_Praneeth_Resume.pdf"
+          download="Hari_Praneeth_Resume.pdf"
+          className="cv-btn cv-btn-secondary"
+          data-magnetic
+        >
+          Download CV ↓
+        </a>
       </div>
     </section>
   );
