@@ -23,12 +23,18 @@ export default function Hero() {
     <div className="hero-scroll" ref={outer}>
       <section className="hero" id="top">
         <div className="hero-stage">
-          <motion.div className="hero-layer hl-title" style={fx ? undefined : { scale: titleScale, opacity: titleOpacity }}>
+          <motion.div
+            className="hero-layer hl-title"
+            style={fx ? undefined : { scale: titleScale, opacity: titleOpacity }}
+          >
             <Reveal className="hero-title">
               <FluidText />
             </Reveal>
           </motion.div>
-          <motion.div className="hero-layer hl-portrait" style={fx ? undefined : { scale: portraitScale, y: portraitY, opacity: portraitOpacity }}>
+          <motion.div
+            className="hero-layer hl-portrait"
+            style={fx ? undefined : { scale: portraitScale, y: portraitY, opacity: portraitOpacity }}
+          >
             <div className="hero-portrait">
               <PaintReveal
                 base={import.meta.env.BASE_URL + 'hero/hero-base.webp'}

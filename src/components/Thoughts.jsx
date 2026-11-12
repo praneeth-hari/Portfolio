@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
+import { maxTablet } from '../breakpoints.js';
 
 // Highlight cards. Add a new object here when you have another highlight.
 // A card with an `href` becomes a link; `image` is optional (file in public/).
@@ -19,7 +20,8 @@ const POSTS = [
   {
     date: '2023 · Volunteering',
     title: 'Volunteering for the Go Extra Mile app',
-    excerpt: 'Explained the app, helped run the event and spoke on stage, and learned to make a product simple for anyone.',
+    excerpt:
+      'Explained the app, helped run the event and spoke on stage, and learned to make a product simple for anyone.',
     image: 'awards/volunteer-1.jpg',
     width: 580,
     height: 580
@@ -36,7 +38,7 @@ function CardImage({ src, width, height, widths }) {
       src={src}
       alt=""
       widths={widths}
-      sizes="(max-width: 900px) calc(100vw - 64px), 570px"
+      sizes={`${maxTablet} calc(100vw - 64px), 570px`}
       width={width}
       height={height}
       loading="eager"
@@ -53,7 +55,7 @@ export default function Thoughts() {
       <div className="section-head">
         <div>
           <Reveal className="eyebrow">Moments</Reveal>
-          <SplitHeading>{"Highlights"}</SplitHeading>
+          <SplitHeading>{'Highlights'}</SplitHeading>
         </div>
       </div>
 
@@ -67,7 +69,13 @@ export default function Thoughts() {
               {p.excerpt && <p className="thought-excerpt">{p.excerpt}</p>}
             </div>
             {p.href && (
-              <a className="card-hit" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={p.title + ' on LinkedIn'} />
+              <a
+                className="card-hit"
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={p.title + ' on LinkedIn'}
+              />
             )}
           </Reveal>
         ))}

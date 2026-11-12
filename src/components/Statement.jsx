@@ -2,7 +2,8 @@ import { Fragment, useEffect, useRef } from 'react';
 import { useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 
 // words wrapped in * get the accent colour and a drawn underline
-const TEXT = 'I build *AI* *systems* that hold up in *production:* retrieval, agents and validation, shipped for *healthcare.*';
+const TEXT =
+  'I build *AI* *systems* that hold up in *production:* retrieval, agents and validation, shipped for *healthcare.*';
 const TOKENS = TEXT.split(' ').map((raw) => {
   const hl = raw.startsWith('*') && raw.endsWith('*');
   return { hl, word: hl ? raw.slice(1, -1) : raw };
@@ -46,7 +47,11 @@ export default function Statement() {
   };
 
   useMotionValueEvent(scrollYProgress, 'change', applyProgress);
-  useEffect(() => { applyProgress(scrollYProgress.get()); }, [reduce]);
+  // re-apply only when reduced-motion flips; applyProgress is recreated every render on purpose
+  useEffect(() => {
+    applyProgress(scrollYProgress.get());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
   return (
     <section className="statement wrap" ref={ref}>
@@ -54,14 +59,18 @@ export default function Statement() {
         {TOKENS.map(({ hl, word }, i) => (
           <Fragment key={i}>
             <span
-              ref={(el) => { wordRefs.current[i] = el; }}
+              ref={(el) => {
+                wordRefs.current[i] = el;
+              }}
               style={{ opacity: reduce ? 1 : 0.14 }}
               className={'sw' + (hl ? ' sw-hl' : '')}
             >
               {word}
               {hl && (
                 <i
-                  ref={(el) => { lineRefs.current[i] = el; }}
+                  ref={(el) => {
+                    lineRefs.current[i] = el;
+                  }}
                   className="sw-u"
                   style={{ transform: reduce ? 'scaleX(1)' : 'scaleX(0)' }}
                   aria-hidden="true"

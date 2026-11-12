@@ -9,6 +9,8 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # production build -> dist/
 npm run preview    # serve the production build locally
+npm run lint       # ESLint (React, hooks and jsx-a11y rules)
+npm run format     # Prettier
 ```
 
 ## Fonts (do this once)
@@ -25,21 +27,21 @@ Without them the site falls back to system fonts.
 
 ## Where Framer Motion is used
 
-| Feature | File |
-| --- | --- |
-| Scroll-in reveals (`whileInView`) | `src/components/Reveal.jsx` |
-| Preloader counter and slide-up exit | `src/components/Preloader.jsx` |
-| Nav: shared-layout sliding highlight (`layoutId`), label morph, scroll-progress ring, toast | `src/components/Nav.jsx` |
-| Hero tagline rotator (`AnimatePresence`) | `src/components/Hero.jsx` |
-| About: scroll-linked word reveal (`useScroll` + `useTransform`) | `src/components/About.jsx` |
-| Tech stack fan: spring-animated cards | `src/components/TechStack.jsx` |
-| Skills dialog enter/exit | `src/components/SkillModal.jsx` |
+| Feature                                                                                     | File                            |
+| ------------------------------------------------------------------------------------------- | ------------------------------- |
+| Scroll-in reveals (`whileInView`)                                                           | `src/components/Reveal.jsx`     |
+| Preloader counter and slide-up exit                                                         | `src/components/Preloader.jsx`  |
+| Nav: shared-layout sliding highlight (`layoutId`), label morph, scroll-progress ring, toast | `src/components/Nav.jsx`        |
+| Hero tagline rotator (`AnimatePresence`)                                                    | `src/components/Hero.jsx`       |
+| About: scroll-linked word reveal (`useScroll` + `useTransform`)                             | `src/components/About.jsx`      |
+| Tech stack fan: spring-animated cards                                                       | `src/components/TechStack.jsx`  |
+| Skills dialog enter/exit                                                                    | `src/components/SkillModal.jsx` |
 
 The WebGL fluid text (`src/components/FluidText.jsx`) is plain WebGL, ported as-is with cleanup.
 
 ## Editing content
 
-Each section is its own component in `src/components/`. Placeholders look like `[[ PROJECT NAME ]]` (Work, Thoughts). Styles live in `src/styles.css`; the block at the bottom ("Framer Motion overrides") switches off the old CSS transitions that Framer Motion now handles.
+Each section is its own component in `src/components/`. Placeholders look like `[[ PROJECT NAME ]]` (Work, Thoughts). Styles live in `src/styles/`: `00-tokens.css` holds every colour, size, radius, easing curve and spacing value as a CSS variable, and the numbered files (one per section) are imported in order by `index.css`, because the cascade depends on that order. Breakpoints are listed in `00-tokens.css` and mirrored in `src/breakpoints.js` for scripts.
 
 ## Known to-dos
 

@@ -61,7 +61,10 @@ export default function App() {
   useEffect(() => onRouteChange(() => setSlug(getProjectSlug())), []);
   const firstRoute = useRef(true);
   useEffect(() => {
-    if (firstRoute.current) { firstRoute.current = false; return; }
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
     const lenis = window.__lenis;
     if (slug) {
       window.scrollTo(0, 0);
@@ -94,7 +97,9 @@ export default function App() {
   return (
     <>
       <AnimatePresence>{loading && <Preloader key="preloader" onDone={done} />}</AnimatePresence>
-      <a className="skip-link" href="#main-content" onClick={skipToContent}>Skip to content</a>
+      <a className="skip-link" href="#main-content" onClick={skipToContent}>
+        Skip to content
+      </a>
       <GradientBackground palette="aurora" />
       <ScrollProgress />
       <Nav />

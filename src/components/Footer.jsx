@@ -6,8 +6,14 @@ const EMAIL = 'kurapatiharipraneeth2004@gmail.com';
 
 function useISTClock() {
   const fmt = () =>
-    new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' })
-      .format(new Date()).toUpperCase();
+    new Intl.DateTimeFormat('en-IN', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'Asia/Kolkata'
+    })
+      .format(new Date())
+      .toUpperCase();
   const [t, setT] = useState(fmt);
   useEffect(() => {
     const id = setInterval(() => setT(fmt()), 15000);
@@ -27,7 +33,8 @@ function RoleRotator() {
   const measure = useRef([]);
   const [widths, setWidths] = useState(null);
   useLayoutEffect(() => {
-    const read = () => setWidths(measure.current.map((el) => (el ? Math.ceil(el.getBoundingClientRect().width) : 0)));
+    const read = () =>
+      setWidths(measure.current.map((el) => (el ? Math.ceil(el.getBoundingClientRect().width) : 0)));
     read();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(read);
     window.addEventListener('resize', read);
@@ -35,11 +42,11 @@ function RoleRotator() {
   }, []);
   useEffect(() => {
     const el = rotRef.current;
-    if (!el || !('IntersectionObserver' in window)) { setVisible(true); return; }
-    const io = new IntersectionObserver(
-      ([en]) => setVisible(en.isIntersecting),
-      { rootMargin: '200px 0px' }
-    );
+    if (!el || !('IntersectionObserver' in window)) {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(([en]) => setVisible(en.isIntersecting), { rootMargin: '200px 0px' });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -70,7 +77,15 @@ function RoleRotator() {
       </AnimatePresence>
       <span className="role-measure" aria-hidden="true">
         {ROLES.map((r, k) => (
-          <span key={r} className="role-word" ref={(el) => { measure.current[k] = el; }}>{r}</span>
+          <span
+            key={r}
+            className="role-word"
+            ref={(el) => {
+              measure.current[k] = el;
+            }}
+          >
+            {r}
+          </span>
         ))}
       </span>
     </motion.span>
@@ -80,14 +95,25 @@ function RoleRotator() {
 function CopyEmail() {
   const [copied, setCopied] = useState(false);
   const onClick = async () => {
-    try { await navigator.clipboard.writeText(EMAIL); } catch { /* clipboard blocked: mailto still works */ }
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+    } catch {
+      /* clipboard blocked: mailto still works */
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
   return (
-    <button type="button" className="email email-copy" onClick={onClick} aria-label={'Copy email address ' + EMAIL}>
+    <button
+      type="button"
+      className="email email-copy"
+      onClick={onClick}
+      aria-label={'Copy email address ' + EMAIL}
+    >
       <span className="email-text">{EMAIL}</span>
-      <span className={'copy-tag' + (copied ? ' is-done' : '')} aria-live="polite">{copied ? 'Copied ✓' : 'Copy'}</span>
+      <span className={'copy-tag' + (copied ? ' is-done' : '')} aria-live="polite">
+        {copied ? 'Copied ✓' : 'Copy'}
+      </span>
     </button>
   );
 }
@@ -107,23 +133,39 @@ export default function Footer() {
             <span className="status-dot" aria-hidden="true" />
             <span>Open to roles:</span>
             <RoleRotator />
-            <span className="status-sep" aria-hidden="true">·</span>
+            <span className="status-sep" aria-hidden="true">
+              ·
+            </span>
             <span className="status-time">{time} IST</span>
           </div>
-          <a className="cv-foot" href="./Hari_Praneeth_Resume.pdf" download="Hari_Praneeth_Resume.pdf">Download CV <span aria-hidden="true">↓</span></a>
+          <a className="cv-foot" href="./Hari_Praneeth_Resume.pdf" download="Hari_Praneeth_Resume.pdf">
+            Download CV <span aria-hidden="true">↓</span>
+          </a>
         </div>
 
-        <Reveal as="h2" className="disp footer-headline">PRANEETH.</Reveal>
+        <Reveal as="h2" className="disp footer-headline">
+          PRANEETH.
+        </Reveal>
 
         <div className="footer-cols">
           <div>
             <h3>Quick links</h3>
             <div className="chip-row">
-              <a className="chip" href="#top">Home</a>
-              <a className="chip" href="#about">About</a>
-              <a className="chip" href="#experience">Experience</a>
-              <a className="chip" href="#work">Work</a>
-              <a className="chip" href="#contact">Contact</a>
+              <a className="chip" href="#top">
+                Home
+              </a>
+              <a className="chip" href="#about">
+                About
+              </a>
+              <a className="chip" href="#experience">
+                Experience
+              </a>
+              <a className="chip" href="#work">
+                Work
+              </a>
+              <a className="chip" href="#contact">
+                Contact
+              </a>
             </div>
           </div>
           <div>
@@ -133,9 +175,30 @@ export default function Footer() {
           <div>
             <h3>Elsewhere</h3>
             <div className="chip-row">
-              <a className="chip" href="https://github.com/praneeth-hari" target="_blank" rel="noopener noreferrer">GitHub</a>
-              <a className="chip" href="https://www.instagram.com/harii_praneeth/" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a className="chip" href="https://www.linkedin.com/in/kurapati-hari-praneeth-0a6699259/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a
+                className="chip"
+                href="https://github.com/praneeth-hari"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+              <a
+                className="chip"
+                href="https://www.instagram.com/harii_praneeth/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </a>
+              <a
+                className="chip"
+                href="https://www.linkedin.com/in/kurapati-hari-praneeth-0a6699259/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                LinkedIn
+              </a>
             </div>
           </div>
         </div>

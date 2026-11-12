@@ -1,0 +1,43 @@
+/* ---------- hero: scroll-driven (pinned) ---------- */
+.hero-scroll {
+  height: 210svh;
+  position: relative;
+}
+.hero-scroll > .hero {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+.hero-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 50% 38%;
+  will-change: transform;
+}
+.hl-title {
+  z-index: 1;
+}
+.hl-portrait {
+  z-index: 2;
+}
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: var(--paper);
+}
+@media (max-width: 899px) {
+  .hero-scroll {
+    height: 170svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll {
+    height: auto;
+  }
+  .hero-scroll > .hero {
+    position: relative;
+  }
+}

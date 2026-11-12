@@ -22,11 +22,20 @@ Rules:
 - Keep answers short: 1 to 4 sentences, plain text, no markdown headings. Bullet points with "- " are fine for lists.`;
 
 /* ---------- retrieval ---------- */
-const tokenize = (s) => s.toLowerCase().replace(/[^a-z0-9%.@+ ]/g, ' ').split(/\s+/).filter((w) => w.length > 1);
+const tokenize = (s) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9%.@+ ]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 1);
 const DOCS = KNOWLEDGE.map((k) => ({ ...k, tokens: tokenize(k.title + ' ' + k.text) }));
 const AVG_LEN = DOCS.reduce((n, d) => n + d.tokens.length, 0) / DOCS.length;
 const DF = {};
-DOCS.forEach((d) => new Set(d.tokens).forEach((t) => { DF[t] = (DF[t] || 0) + 1; }));
+DOCS.forEach((d) =>
+  new Set(d.tokens).forEach((t) => {
+    DF[t] = (DF[t] || 0) + 1;
+  })
+);
 
 function bm25(query) {
   const q = tokenize(query);
@@ -36,7 +45,7 @@ function bm25(query) {
       const f = d.tokens.filter((x) => x === t).length;
       if (!f) continue;
       const idf = Math.log(1 + (DOCS.length - DF[t] + 0.5) / (DF[t] + 0.5));
-      score += idf * (f * 2.2) / (f + 1.2 * (0.25 + 0.75 * d.tokens.length / AVG_LEN));
+      score += (idf * (f * 2.2)) / (f + 1.2 * (0.25 + (0.75 * d.tokens.length) / AVG_LEN));
     }
     return score;
   });
@@ -62,24 +71,46 @@ function limited(ip) {
 
 export default async function handler(req, res) {
   // Local only: the live site (Vercel) does not serve the chatbot.
-  if (process.env.VERCEL) { res.statusCode = 404; return res.end('Not found'); }
+  if (process.env.VERCEL) {
+    res.statusCode = 404;
+    return res.end('Not found');
+  }
   res.setHeader('Content-Type', 'application/json');
-  if (req.method !== 'POST') { res.statusCode = 405; return res.end(JSON.stringify({ error: 'POST only' })); }
+  if (req.method !== 'POST') {
+    res.statusCode = 405;
+    return res.end(JSON.stringify({ error: 'POST only' }));
+  }
 
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) { res.statusCode = 500; return res.end(JSON.stringify({ error: 'The chatbot is not configured yet (missing ANTHROPIC_API_KEY).' })); }
+  if (!key) {
+    res.statusCode = 500;
+    return res.end(
+      JSON.stringify({ error: 'The chatbot is not configured yet (missing ANTHROPIC_API_KEY).' })
+    );
+  }
 
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
-  if (limited(ip)) { res.statusCode = 429; return res.end(JSON.stringify({ error: 'Too many questions at once. Please wait a minute.' })); }
+  const ip =
+    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (limited(ip)) {
+    res.statusCode = 429;
+    return res.end(JSON.stringify({ error: 'Too many questions at once. Please wait a minute.' }));
+  }
 
   let body = req.body;
   if (!body || typeof body === 'string') {
-    try { body = JSON.parse(body || (await readBody(req)) || '{}'); } catch { body = {}; }
+    try {
+      body = JSON.parse(body || (await readBody(req)) || '{}');
+    } catch {
+      body = {};
+    }
   }
   const history = Array.isArray(body.messages) ? body.messages.slice(-MAX_HISTORY) : [];
   const last = history[history.length - 1];
   const question = typeof last?.content === 'string' ? last.content.trim().slice(0, MAX_QUESTION) : '';
-  if (!question || last.role !== 'user') { res.statusCode = 400; return res.end(JSON.stringify({ error: 'Please type a question.' })); }
+  if (!question || last.role !== 'user') {
+    res.statusCode = 400;
+    return res.end(JSON.stringify({ error: 'Please type a question.' }));
+  }
 
   try {
     const chunks = retrieve(question);
@@ -89,7 +120,8 @@ export default async function handler(req, res) {
     for (const m of history) {
       const role = m.role === 'assistant' ? 'assistant' : 'user';
       const content = String(m.content).slice(0, MAX_QUESTION * 2);
-      if (turns.length && turns[turns.length - 1].role === role) turns[turns.length - 1].content += '\n' + content;
+      if (turns.length && turns[turns.length - 1].role === role)
+        turns[turns.length - 1].content += '\n' + content;
       else turns.push({ role, content });
     }
     while (turns.length && turns[0].role !== 'user') turns.shift();
@@ -107,11 +139,25 @@ export default async function handler(req, res) {
       const detail = await r.text();
       console.error('Anthropic error', r.status, detail.slice(0, 300));
       res.statusCode = 502;
-      return res.end(JSON.stringify({ error: r.status === 429 ? 'The bot is busy right now. Please try again in a minute.' : 'The bot could not answer right now.' }));
+      return res.end(
+        JSON.stringify({
+          error:
+            r.status === 429
+              ? 'The bot is busy right now. Please try again in a minute.'
+              : 'The bot could not answer right now.'
+        })
+      );
     }
     const data = await r.json();
-    const answer = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
-    if (!answer) { res.statusCode = 502; return res.end(JSON.stringify({ error: 'The bot could not answer right now.' })); }
+    const answer = (data.content || [])
+      .filter((b) => b.type === 'text')
+      .map((b) => b.text)
+      .join('')
+      .trim();
+    if (!answer) {
+      res.statusCode = 502;
+      return res.end(JSON.stringify({ error: 'The bot could not answer right now.' }));
+    }
     res.statusCode = 200;
     return res.end(JSON.stringify({ answer, sources: chunks.slice(0, 3).map((c) => c.title) }));
   } catch (e) {
@@ -124,7 +170,10 @@ export default async function handler(req, res) {
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
-    req.on('data', (c) => { data += c; if (data.length > 20_000) req.destroy(); });
+    req.on('data', (c) => {
+      data += c;
+      if (data.length > 20_000) req.destroy();
+    });
     req.on('end', () => resolve(data));
     req.on('error', reject);
   });

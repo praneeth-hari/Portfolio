@@ -1,0 +1,32 @@
+/* ---------- tech stack: short version (3 tiles in one row) ---------- */
+.bento-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.bento-3 .bento-tile,
+.bento-3 .bento-tile.t-feature {
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 340px;
+}
+.bento-3 .t-feature .tile-front {
+  padding: 28px;
+}
+.bento-3 .bento-title,
+.bento-3 .t-feature .bento-title {
+  font-size: clamp(24px, 2.2vw, 31px);
+  line-height: 1.08;
+  margin-bottom: 12px;
+}
+.bento-3 .t-feature .bento-desc {
+  font-size: var(--fs-base);
+  opacity: 0.85;
+}
+@media (max-width: 900px) {
+  .bento-3 {
+    grid-template-columns: 1fr;
+  }
+  .bento-3 .bento-tile,
+  .bento-3 .bento-tile.t-feature {
+    min-height: 300px;
+  }
+}

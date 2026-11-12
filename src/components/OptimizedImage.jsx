@@ -24,10 +24,14 @@ export default function OptimizedImage({
 }) {
   const fullSrc = BASE + src;
   const avifSet = widths?.length
-    ? widths.map((w, i) => `${BASE}${swapExt(src, 'avif', i < widths.length - 1 ? `-${w}` : '')} ${w}w`).join(', ')
+    ? widths
+        .map((w, i) => `${BASE}${swapExt(src, 'avif', i < widths.length - 1 ? `-${w}` : '')} ${w}w`)
+        .join(', ')
     : `${BASE}${swapExt(src, 'avif')}`;
   const webpSet = widths?.length
-    ? widths.map((w, i) => `${BASE}${swapExt(src, 'webp', i < widths.length - 1 ? `-${w}` : '')} ${w}w`).join(', ')
+    ? widths
+        .map((w, i) => `${BASE}${swapExt(src, 'webp', i < widths.length - 1 ? `-${w}` : '')} ${w}w`)
+        .join(', ')
     : `${BASE}${swapExt(src, 'webp')}`;
 
   return (

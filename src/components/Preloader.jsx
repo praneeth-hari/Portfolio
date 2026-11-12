@@ -45,7 +45,13 @@ export default function Preloader({ onDone }) {
     >
       <div className="pl2-top">
         <span className="pl2-name">Hari Praneeth</span>
-        <span className="pl2-bars" aria-hidden="true"><i /><i /><i /><i /><i /></span>
+        <span className="pl2-bars" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
       </div>
 
       <div className="pl2-marquee" aria-hidden="true">
@@ -53,7 +59,10 @@ export default function Preloader({ onDone }) {
           {[0, 1].map((k) => (
             <div className="pl2-set" key={k}>
               {WORDS.map((w) => (
-                <span key={w + k}>{w}<i /></span>
+                <span key={w + k}>
+                  {w}
+                  <i />
+                </span>
               ))}
             </div>
           ))}
@@ -65,13 +74,33 @@ export default function Preloader({ onDone }) {
         initial={false}
         animate={
           grow
-            ? { width: window.innerWidth, height: window.innerHeight, borderRadius: 0, color: '#121210', boxShadow: '0 0 0 rgba(18,18,16,0)' }
+            ? {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                borderRadius: 0,
+                color: '#121210',
+                boxShadow: '0 0 0 rgba(18,18,16,0)'
+              }
             : { width: done ? 260 : 156, height: done ? 62 : 46, borderRadius: 100 }
         }
-        transition={grow ? { duration: 0.75, ease: [0.76, 0, 0.24, 1] } : { duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+        transition={
+          grow ? { duration: 0.75, ease: [0.76, 0, 0.24, 1] } : { duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }
+        }
       >
-        <motion.span className="pl2-fill" aria-hidden="true" initial={false} animate={{ opacity: grow ? 1 : 0 }} transition={{ duration: 0.6 }} />
-        <motion.span className="pl2-glow" aria-hidden="true" initial={false} animate={{ opacity: grow ? 0 : 1 }} transition={{ duration: 0.4 }} />
+        <motion.span
+          className="pl2-fill"
+          aria-hidden="true"
+          initial={false}
+          animate={{ opacity: grow ? 1 : 0 }}
+          transition={{ duration: 0.6 }}
+        />
+        <motion.span
+          className="pl2-glow"
+          aria-hidden="true"
+          initial={false}
+          animate={{ opacity: grow ? 0 : 1 }}
+          transition={{ duration: 0.4 }}
+        />
         {done ? (
           <motion.span
             className="pl2-welcome"
