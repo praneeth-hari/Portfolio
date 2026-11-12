@@ -1,0 +1,47 @@
+/* ---------- page transitions (View Transitions API: home <-> case study) ---------- */
+
+/* the case-study cover and the clicked card image share this name, so the image morphs between them */
+.pj-bg {
+  view-transition-name: project-cover;
+}
+
+/* the nav stays put while the rest of the page changes */
+.mn-bar {
+  view-transition-name: site-nav;
+}
+
+/* The old page stays fully opaque underneath while the new page fades in on top, so there is never a
+   moment where only the incoming page (still settling its scroll-linked effects) is visible. */
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 0.45s var(--ease-out) both;
+  mix-blend-mode: normal;
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+::view-transition-group(project-cover) {
+  animation-duration: 0.75s;
+  animation-timing-function: var(--ease-out);
+  /* keep the morphing image above the nav's fade while it travels */
+  z-index: 1;
+}
+
+::view-transition-group(site-nav) {
+  animation-duration: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

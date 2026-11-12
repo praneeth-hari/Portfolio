@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { m, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import useScrollSpring from './useScrollSpring.js';
 import Reveal from './Reveal.jsx';
 import SplitHeading from './SplitHeading.jsx';
 import OptimizedImage from './OptimizedImage.jsx';
 import { openProject } from '../route.js';
-import { BP, WORK_TRACK, maxTablet } from '../breakpoints.js';
+import { loadProjectPage } from './ProjectRoute.jsx';
+import { BP, maxTablet } from '../breakpoints.js';
 
 const PROJECTS = [
   {
@@ -77,6 +79,7 @@ const prefetched = new Set();
 function prefetchStudy(slug) {
   if (!slug || prefetched.has(slug)) return;
   prefetched.add(slug);
+  loadProjectPage(); // the page code too, so opening a case study never waits
   // the case-study data is its own chunk; fetch it only when a card is hovered or focused
   import('../data/projects.js').then(({ PROJECTS }) => {
     const study = PROJECTS[slug];
@@ -98,14 +101,19 @@ function HScroll({ children, count }) {
   const reduce = useReducedMotion();
   const [dist, setDist] = useState(0); // how far the track must travel
   const distRef = useRef(0);
-  const [on, setOn] = useState(false); // horizontal mode active?
+  // Horizontal mode is decided on the very first render and measured in a layout effect, so the section
+  // already has its full scroll height when the page mounts (a view transition restores the scroll
+  // position right away, and a short placeholder layout would clamp it to the wrong spot).
+  const isWide = () => window.innerWidth > BP.tablet && !reduce;
+  const [on, setOn] = useState(isWide); // horizontal mode active?
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const measure = () => {
-      const wide = window.innerWidth > BP.tablet && !reduce;
+      const wide = isWide();
       setOn(wide);
       if (wide && track.current) {
-        const pad = Math.max(24, (window.innerWidth - WORK_TRACK) / 2 + 24);
+        // the left padding of the track is set in CSS (25-projects.css); read it so the two cannot drift apart
+        const pad = parseFloat(getComputedStyle(track.current).paddingLeft) || 24;
         const d = Math.max(0, track.current.scrollWidth - window.innerWidth + pad);
         distRef.current = d;
         setDist(d);
@@ -118,10 +126,11 @@ function HScroll({ children, count }) {
       window.removeEventListener('resize', measure);
       clearTimeout(t);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce, count]);
 
   const { scrollYProgress } = useScroll({ target: outer, offset: ['start start', 'end end'] });
-  const p = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const p = useScrollSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
   const x = useTransform(p, (v) => -v * distRef.current);
   const bar = useTransform(p, [0, 1], [0, 1]);
   const [idx, setIdx] = useState(0);
@@ -182,6 +191,7 @@ export default function Work() {
           <div
             key={i}
             className={'work-card hs-card ' + p.cls}
+            data-study={p.study}
             onMouseEnter={p.study ? () => prefetchStudy(p.study) : undefined}
             onFocus={p.study ? () => prefetchStudy(p.study) : undefined}
           >
@@ -201,7 +211,7 @@ export default function Work() {
                 aria-label={p.name + ' case study'}
                 onClick={(e) => {
                   e.preventDefault();
-                  openProject(p.study);
+                  openProject(p.study, e.currentTarget.closest('.work-card')?.querySelector('.work-img'));
                 }}
               />
             ) : (

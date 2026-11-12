@@ -9,7 +9,4 @@ export const BP = {
   narrow: 520
 };
 
-// width of the centred content track used by the pinned Work section
-export const WORK_TRACK = 1240;
-
 export const maxTablet = `(max-width: ${BP.tablet}px)`;

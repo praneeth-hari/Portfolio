@@ -1,8 +1,9 @@
-import { m, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { m, useReducedMotion, useScroll } from 'framer-motion';
+import useScrollSpring from './useScrollSpring.js';
 
 function ScrollProgressBar() {
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const scaleX = useScrollSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
   return <m.div className="scroll-progress" style={{ scaleX }} aria-hidden="true" />;
 }
 
