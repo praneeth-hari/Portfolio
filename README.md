@@ -74,9 +74,9 @@ How it is built, and what to know when you add UI:
 
 ## Typography
 
-`src/styles/35-typography.css` holds the text rules: headings use `text-wrap: balance`, running text uses `text-wrap: pretty`, short blurbs (card descriptions, the contact line) use `balance`, long-reading columns are capped at about 55-60ch (65-75 characters per line), and numbers set in Geist Sans use tabular figures (Archivo and Geist Mono already do). Sizes, letter-spacing and line-height live with each component.
+`src/styles/35-typography.css` holds the text rules: headings use `text-wrap: balance`, running text uses `text-wrap: pretty`, short blurbs (card descriptions, the contact line) use `balance`, long-reading columns are capped at about 50ch (the longest real line on the site is 77 characters), and numbers set in Geist Sans use tabular figures (Archivo and Geist Mono already do). Sizes, letter-spacing and line-height live with each component.
 
-`tests/typography.mjs` measures the real wrapping at 1440 and 1920 wide: stranded last words, unevenly wrapped headings, over-wide prose and text under 12px. It allows a tiny budget so copy edits do not break it; if it fails after you edit text, look at the element it prints.
+`tests/typography.mjs` measures the real wrapping at 1440 and 1920 wide: stranded last words, unevenly wrapped headings, any line over 85 characters (counted per line; display-size text is exempt) and text under 12px. It allows a tiny budget so copy edits do not break it; if it fails after you edit text, look at the element it prints.
 
 ## Cursor label and press feel
 
