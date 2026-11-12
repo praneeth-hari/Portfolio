@@ -4,9 +4,10 @@ import { animate, m } from 'framer-motion';
 /*
  * Loading screen: your role words slide across the screen while a pill counts
  * 0 -> 100%, turns into "WELCOME", then swells to fill the screen and the site fades in from black.
- * Change the words here:
+ * Change the words here. The longest word goes first: the largest text then paints on the very first
+ * frame, so the browser's Largest Contentful Paint is not pushed back as the marquee scrolls a wider word in.
  */
-const WORDS = ['AI ENGINEER', 'SOFTWARE ENGINEER'];
+const WORDS = ['SOFTWARE ENGINEER', 'AI ENGINEER'];
 
 export default function Preloader({ onDone }) {
   const [n, setN] = useState(0);
