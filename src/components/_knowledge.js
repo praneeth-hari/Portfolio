@@ -47,7 +47,7 @@ const KNOWLEDGE = [
   {
     id: 'proj-overview',
     title: 'Projects overview',
-    text: 'Hari has four main projects. 1) MediPlant AI: identifies 78 medicinal plant species from a photo, with a local RAG assistant that cites sources (PyTorch, FastAPI, FAISS, Ollama, React). 2) Secure Cloud ML: a Flask network intrusion detection system on the NSL-KDD dataset where XGBoost reached 99.99% accuracy, with AES-256 encryption, JWT APIs and Docker. 3) AI Stock Trader: a paper-trading system for 25 US stocks with ML signals, a risk engine and a live dashboard (paper trading only, not real money). 4) BOB Personal AI Assistant: a 100% offline Windows assistant with a local LLM, 11 PC-control tools and voice input and output. Code for the projects is on github.com/praneeth-hari.'
+    text: 'Hari has four main projects. 1) MediPlant AI: identifies 78 medicinal plant species from a photo, with a local RAG assistant that cites sources (PyTorch, FastAPI, FAISS, Ollama, React). 2) Secure Cloud ML: a Flask network intrusion detection system on the NSL-KDD dataset where XGBoost reached 99.99% accuracy, with AES-256 encryption, JWT APIs and Docker. 3) AI Stock Trader: a paper-trading system for 25 US stocks with ML signals, a risk engine and a live dashboard (paper trading only, not real money). 4) ServiceDesk-AI: a full-stack IT helpdesk (FastAPI, React, MySQL) with business-hours SLA tracking and AI ticket triage that shows the resolved tickets behind each suggestion. Code for the projects is on github.com/praneeth-hari.'
   },
   {
     id: 'proj-mediplant',
@@ -70,9 +70,9 @@ const KNOWLEDGE = [
     text: 'AI Stock Trader (2026) is a paper-trading system for 25 US stocks with ML signals, a risk engine that can veto any trade, walk-forward backtests and a live dashboard, benchmarked honestly against SPY. It is paper trading only, not real money. Stack: Python, scikit-learn, Streamlit, SQLAlchemy. Code: github.com/praneeth-hari/ai-stock-trader.'
   },
   {
-    id: 'proj-bob',
-    title: 'Project: BOB Personal AI Assistant',
-    text: 'BOB Personal AI Assistant (2026) is a 100% offline Windows assistant: a local LLM through Ollama, 11 PC-control tools, and voice input and output with faster-whisper and Piper. Code: github.com/praneeth-hari/BOB-Personal-AI-Assistant.'
+    id: 'proj-servicedesk',
+    title: 'Project: ServiceDesk-AI',
+    text: 'ServiceDesk-AI (2026) is a full-stack IT helpdesk. Requesters raise tickets and agents work them against business-hours SLAs (09:00 to 18:00 IST, Monday to Friday, holidays skipped, with the clock paused while a ticket waits on the requester). An AI assistant suggests a category and priority as the requester types and shows the closest resolved tickets as evidence; it never changes a ticket by itself. On a synthetic benchmark of 120 held-out tickets the default method scored 62.5% category accuracy, a small sentence-embedding model 76.7%, and a local LLM shown five similar tickets 87.5%, while always guessing the biggest class scores 16.7%. It also has a prompt-injection guard, 485 backend tests and 12 automated CI checks. Stack: Python, FastAPI, SQLAlchemy, MySQL, Redis, React, TypeScript, Docker and GitHub Actions. It has not been run in production. Code: github.com/praneeth-hari/ServiceDesk-AI.'
   },
   {
     id: 'education',
