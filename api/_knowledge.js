@@ -17,7 +17,7 @@ const KNOWLEDGE = [
   {
     id: 'skills',
     title: 'Skills',
-    text: 'Languages: Python. AI / ML: PyTorch, TensorFlow/Keras, scikit-learn, XGBoost, Hugging Face Transformers, Sentence-Transformers. Generative AI: LLMs, RAG, LangGraph, prompt engineering, LLM evaluation, Ollama. Retrieval and data: Pinecone, FAISS, PostgreSQL. Backend and web: FastAPI, Flask, REST APIs, JWT, React, AWS (S3, STS, SQS, Chime, Polly, Transcribe), Docker, Git, GitHub.'
+    text: 'Languages: Python, TypeScript. AI / ML: PyTorch, TensorFlow/Keras, scikit-learn, XGBoost, Hugging Face Transformers, Sentence-Transformers. Generative AI: LLMs, RAG, LangGraph, prompt engineering, LLM evaluation, Ollama. Retrieval and data: Pinecone, FAISS, PostgreSQL, MySQL, Redis. Backend and web: FastAPI, Flask, REST APIs, JWT, React, AWS (S3, STS, SQS, Chime, Polly, Transcribe), Docker, Git, GitHub Actions.'
   },
   {
     id: 'exp-role',
