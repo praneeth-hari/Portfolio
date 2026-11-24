@@ -199,7 +199,13 @@ export default function ProjectPage({ slug }) {
           </Reveal>
           <Reveal className="pj-actions" delay={0.15}>
             {p.demo && (
-              <a className="pj-btn is-primary" href={p.demo} target="_blank" rel="noopener noreferrer">
+              <a
+                className="pj-btn is-primary"
+                data-magnetic
+                href={p.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Live demo ↗
               </a>
             )}
