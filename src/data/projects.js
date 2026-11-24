@@ -546,10 +546,7 @@ export const PROJECTS = {
             sub: '15 rules, then isolation',
             what: 'Before any text reaches an LLM, 15 pattern rules look for instruction overrides, fake system headers, pasted JSON answers and executive-urgency tricks, after undoing hidden characters and letter-spacing. A flagged ticket skips the LLM and falls back to the kNN vote. Text that passes is still wrapped in escaped delimiters and labelled as untrusted.',
             why: 'The pattern rules are a cheap first filter, not the whole defence. On an independent set of 30 attacks they caught 11, and the prompt isolation did most of the work (attack success 6.7%).',
-            facts: [
-              '0.0% false positives on 220 clean tickets',
-              'Never stores or returns the ticket text'
-            ],
+            facts: ['0.0% false positives on 220 clean tickets', 'Never stores or returns the ticket text'],
             files: ['app/ai/injection_guard.py', 'app/ai/llm_triage.py']
           },
           {
@@ -581,10 +578,7 @@ export const PROJECTS = {
             label: 'Safety rails',
             sub: 'Rate limits · locks',
             what: 'Sign-in locks after 5 failed tries in 5 minutes for an email and address. Registration, triage and assist have their own limits, shared across servers when Redis is configured. The last active admin cannot be demoted or deactivated, even by two admins acting at the same moment.',
-            facts: [
-              'Passwords are hashed with bcrypt',
-              'Sign-in takes the same time for unknown emails'
-            ],
+            facts: ['Passwords are hashed with bcrypt', 'Sign-in takes the same time for unknown emails'],
             files: ['app/core/rate_limit.py', 'app/services/users.py']
           },
           {

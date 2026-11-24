@@ -13,7 +13,8 @@ export default function useMagnetic() {
     const RANGE = 70; // px around the button where the pull starts
     const PULL = 0.32; // how far it follows the cursor
     // keep the buttons' own hover transitions working alongside the pull
-    const KEEP = ', background-color .25s, color .25s, border-color .25s, box-shadow .25s, gap .25s';
+    const KEEP =
+      ', background-color .25s, color .25s, border-color .25s, box-shadow .25s, gap .25s, scale .15s';
     const EASE_IN = 'transform .18s ease-out' + KEEP;
     const EASE_OUT = 'transform .5s cubic-bezier(.2,.7,.2,1)' + KEEP;
     let raf = 0;
