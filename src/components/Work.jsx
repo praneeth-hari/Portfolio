@@ -42,13 +42,13 @@ const PROJECTS = [
   },
   {
     cls: 'work-4',
-    image: 'projects/bob-assistant.webp',
-    category: 'Local LLM · Automation',
-    name: 'BOB Personal AI Assistant',
-    desc: "A local-first Windows voice assistant: Whisper listens, a local Ollama model or NVIDIA's cloud decides, and 11 tools act, with allow-listed apps and protected system processes.",
-    meta: 'Python · Ollama · faster-whisper · Piper · 2026',
-    href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
-    study: 'bob' // opens the case-study page inside this site
+    image: 'projects/servicedesk-ai.webp',
+    category: 'Full-stack · AI Triage',
+    name: 'ServiceDesk-AI',
+    desc: 'An IT helpdesk with business-hours SLA tracking and AI ticket triage that shows the resolved tickets behind every suggestion. 87.5% category accuracy with a local LLM on a synthetic benchmark.',
+    meta: 'FastAPI · React · MySQL · Redis · 2026',
+    href: 'https://github.com/praneeth-hari/ServiceDesk-AI',
+    study: 'servicedesk' // opens the case-study page inside this site
   }
 ];
 

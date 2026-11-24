@@ -127,10 +127,10 @@ try {
   await rp.goto(BASE + '/');
   await rp.waitForTimeout(2000);
   await rp.evaluate(() => {
-    location.hash = '#/project/bob';
+    location.hash = '#/project/servicedesk';
   });
   await rp.waitForFunction(
-    () => document.querySelector('main h1')?.textContent === 'BOB Personal AI Assistant',
+    () => document.querySelector('main h1')?.textContent === 'ServiceDesk-AI',
     null,
     { timeout: 10000 }
   );

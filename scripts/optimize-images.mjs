@@ -24,7 +24,7 @@ async function run() {
   }
 
   // Project covers (1448x1086 -> 640w, 1024w + AVIF)
-  for (const name of ['ai-stock-trader', 'medicinal-plant', 'secure-cloud-ml', 'bob-assistant']) {
+  for (const name of ['ai-stock-trader', 'medicinal-plant', 'secure-cloud-ml', 'servicedesk-ai']) {
     await makeVariant(`projects/${name}.webp`, `projects/${name}-640.webp`, 640, 'webp', { quality: 80 });
     await makeVariant(`projects/${name}.webp`, `projects/${name}-1024.webp`, 1024, 'webp', { quality: 82 });
     await makeVariant(`projects/${name}.webp`, `projects/${name}-640.avif`, 640, 'avif', { quality: 58 });
@@ -33,7 +33,14 @@ async function run() {
   }
 
   // Case study screenshots
-  for (const name of ['ai-stock-trader-dashboard', 'secure-cloud-dashboard', 'secure-cloud-predict']) {
+  for (const name of [
+    'ai-stock-trader-dashboard',
+    'secure-cloud-dashboard',
+    'secure-cloud-predict',
+    'servicedesk-triage',
+    'servicedesk-ticket',
+    'servicedesk-reports'
+  ]) {
     await makeVariant(`projects/${name}.webp`, `projects/${name}-720.webp`, 720, 'webp', { quality: 82 });
     await makeVariant(`projects/${name}.webp`, `projects/${name}-720.avif`, 720, 'avif', { quality: 60 });
     await makeVariant(`projects/${name}.webp`, `projects/${name}.avif`, null, 'avif', { quality: 62 });
