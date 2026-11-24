@@ -21,9 +21,9 @@ const USED = {
       study: 'mediplant'
     },
     {
-      name: 'BOB Assistant',
-      result: 'Fully offline voice assistant, 11 tools.',
-      href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant'
+      name: 'ServiceDesk-AI',
+      result: 'AI triage with evidence, 87.5% with a local LLM.',
+      study: 'servicedesk'
     }
   ],
   'Backend & Data': [
@@ -51,9 +51,9 @@ const USED = {
       href: 'https://github.com/praneeth-hari/Secure-Cloud-Ml'
     },
     {
-      name: 'BOB Assistant',
-      result: 'Local LLM through Ollama, no cloud.',
-      href: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant'
+      name: 'ServiceDesk-AI',
+      result: 'React + TypeScript app served by FastAPI.',
+      study: 'servicedesk'
     }
   ]
 };
