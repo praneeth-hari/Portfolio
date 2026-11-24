@@ -396,177 +396,274 @@ export const PROJECTS = {
     ]
   },
 
-  bob: {
-    title: 'BOB Personal AI Assistant',
-    category: 'Local LLM · Voice · Automation',
-    lead: 'A voice assistant for Windows that listens with Whisper, decides with a local Ollama model or NVIDIA’s cloud, and acts through 11 tools. Apps are allow-listed and system processes are protected, so it can open, close and adjust things but cannot delete files or shut the PC down.',
-    github: 'https://github.com/praneeth-hari/BOB-Personal-AI-Assistant',
-    cover: 'projects/bob-assistant.webp',
+  servicedesk: {
+    title: 'ServiceDesk-AI',
+    category: 'Full-stack · AI Triage',
+    lead: 'An IT helpdesk where requesters raise tickets, agents work them against business-hours SLAs, and an AI assistant suggests the category and priority while the requester types, showing the resolved tickets behind every suggestion.',
+    github: 'https://github.com/praneeth-hari/ServiceDesk-AI',
+    cover: 'projects/servicedesk-ai.webp',
+    shotsTitle: { eyebrow: 'See it work', heading: 'From a typed sentence to an SLA clock' },
+    shots: [
+      {
+        src: 'projects/servicedesk-triage.webp',
+        width: 1440,
+        height: 900,
+        alt: 'New ticket form with an AI Triage Advisory panel suggesting the Network category, a priority hint and the five closest resolved tickets',
+        caption:
+          'The new-ticket page. As the requester types, the panel suggests a category and priority and lists the closest resolved tickets as evidence, with the measured accuracy printed underneath. A suggestion only fills the form when the user clicks Apply.'
+      },
+      {
+        src: 'projects/servicedesk-ticket.webp',
+        width: 1440,
+        height: 900,
+        alt: 'Ticket detail page with SLA status, activity history, a reply box with an internal note option, and similar tickets',
+        caption:
+          'A resolved ticket as an agent sees it: SLA status, the full status history with who changed what, a reply box with a private internal-note option, and similar tickets. AI assist shows as off because it needs a local Ollama model.'
+      },
+      {
+        src: 'projects/servicedesk-reports.webp',
+        width: 1440,
+        height: 900,
+        alt: 'Reports page with ticket totals, tickets created per day, tickets by status and SLA by priority',
+        caption:
+          'The admin reports page. Every figure is computed by raw SQL (CTEs and window functions) on the live database. Dates on this page are in UTC.'
+      }
+    ],
     stack: [
       'Python',
-      'faster-whisper',
+      'FastAPI',
+      'SQLAlchemy',
+      'Alembic',
+      'MySQL 8',
+      'Redis',
+      'React',
+      'TypeScript',
+      'Tailwind CSS',
+      'Vite',
+      'scikit-learn',
       'Ollama',
-      'Qwen 2.5 3B',
-      'NVIDIA NIM',
-      'Piper TTS',
-      'ONNX Runtime',
-      'sounddevice',
-      'pywin32',
-      'pycaw',
-      'psutil',
-      'DuckDuckGo search',
-      'pytest'
+      'Docker',
+      'Caddy',
+      'GitHub Actions',
+      'pytest',
+      'Playwright'
     ],
     stats: [
-      { value: '11', label: 'tools BOB can call', note: '10 PC controls + web search' },
-      { value: '19 / 20', label: 'spoken commands routed to the right tool', note: 'local qwen2.5 3B' },
-      { value: '728', label: 'automated tests passing', note: '0 failed, 1 skipped' },
-      { value: '0', label: 'tools that can delete files or shut down', note: 'apps are allow-listed' }
+      { value: '485', label: 'backend tests passing', note: '7 more need a MySQL server' },
+      {
+        value: '12',
+        label: 'automated checks on every pull request',
+        note: 'tests, MySQL, browser, security'
+      },
+      {
+        value: '87.5%',
+        label: 'category accuracy with an LLM and examples',
+        note: '120 held-out tickets, synthetic'
+      },
+      { value: '9', label: 'reports written as raw SQL', note: 'CTEs and RANK()' }
     ],
     problem:
-      'BOB is a local-first assistant: it should run on my own laptop without a paid API, keep the conversation on the machine when it uses the local model, and only be able to do safe things on the PC, even when the language model makes a mistake.',
+      'Most helpdesk demos stop at a ticket list. I wanted the parts that make a real one hard: a clock that counts only working hours and pauses while the requester is slow to reply, roles that cannot see each other’s tickets, and an AI that helps without ever being trusted blindly. So every AI suggestion shows the resolved tickets it came from, never changes a ticket by itself, and sits next to its measured accuracy.',
     rows: [
       {
-        title: '1 · Hear and decide',
+        title: '1 · A ticket’s life',
         nodes: [
           {
-            id: 'mic',
-            label: 'Microphone',
-            sub: 'Voice activity detection',
-            what: 'Typing "voice" in the terminal starts listening. BOB records 16 kHz mono audio and decides a phrase has ended after 1.2 seconds of silence, measured by audio energy. Saying "stop listening" ends voice mode.',
+            id: 'app',
+            label: 'React + FastAPI',
+            sub: 'One service, three roles',
+            what: 'The React 19 and TypeScript app is built once and served by FastAPI itself, so the whole thing runs as one service on one port. Requesters, agents and admins sign in with JWTs. A requester who asks for someone else’s ticket gets a 404, not a 403, so the ticket’s existence is not revealed.',
             facts: [
-              'Silence threshold 0.015 RMS',
-              'Up to 30 seconds per phrase',
-              'Stops voice mode after 3 audio-device errors in a row'
+              'Roles: requester, agent, admin',
+              'Internal notes are hidden from requesters',
+              'Signing out revokes all of a user’s tokens'
             ],
-            files: ['app/voice/audio_recorder.py', 'app/interfaces/cli.py']
+            files: ['app/main.py', 'app/api/deps.py', 'web/src/']
           },
           {
-            id: 'stt',
-            label: 'faster-whisper',
-            sub: 'base model · 141 MB',
-            what: 'Turns speech into text and detects the language automatically. On start-up it runs a 100 ms silent test clip on the GPU; if the CUDA libraries are missing it falls back to the CPU with int8 instead of crashing.',
-            why: 'The app keeps working on machines without a full CUDA setup. The cost on my laptop: 4.79 seconds to transcribe a 5-second clip on the CPU.',
-            facts: ['GPU float16, or CPU int8 as the fallback', 'Median 4.79 s for a 5-second clip (CPU)'],
-            files: ['app/voice/stt.py']
+            id: 'flow',
+            label: 'Status workflow',
+            sub: 'Invalid moves return 409',
+            what: 'A ticket moves open, in progress, waiting on requester, resolved, closed, and a resolved ticket can be reopened. Any other move is rejected with a 409. Every change is written to a history table with who made it.',
+            why: 'Two agents can click at the same moment. The ticket row is locked while the change is checked and saved, so they are applied one after the other instead of both acting on the old state.',
+            facts: [
+              'Row lock on status, assign and edit',
+              'History keeps the old status, the new status and the author'
+            ],
+            files: ['app/services/tickets.py']
           },
           {
-            id: 'llm',
-            label: 'LLM',
-            sub: 'Ollama local · NVIDIA cloud',
-            what: 'Either qwen2.5 3B (1.9 GB) running in Ollama on the laptop, or gpt-oss-20b on NVIDIA NIM. When the cloud is the main model, the local one is registered as a silent fallback: if the cloud call fails, BOB rolls the turn back and retries locally.',
-            why: 'The assistant only depends on a small client interface, so switching between cloud, local or a test client needs no change to the assistant code.',
-            facts: ['Local model talks to Ollama on localhost only', 'Up to 4,096 tokens per cloud reply'],
-            files: ['app/llm/factory.py', 'app/llm/ollama_client.py', 'app/llm/nvidia_client.py']
+            id: 'sla',
+            label: 'SLA clock',
+            sub: '09:00–18:00 IST, holidays skipped',
+            what: 'Due dates count only working hours, Monday to Friday, and skip the holidays that admins manage. While a ticket waits on the requester the clock is paused. When it resumes, the due date moves forward by the exact business minutes spent waiting.',
+            facts: [
+              'Pause time is rebuilt from the status history',
+              'Property-based tests generate dates to check the maths'
+            ],
+            files: ['app/core/sla.py', 'app/services/holidays.py']
           },
           {
-            id: 'calls',
-            label: 'Tool calling',
-            sub: 'Native + text fallback',
-            what: 'The model gets a schema for every tool and replies with a structured tool call. Small models sometimes write the call as JSON text instead, so a fallback parser reads it and only accepts it if the name matches a real tool.',
-            why: 'Without the fallback, a 3B model that writes {"name": "get_system_info"} as text would simply fail to act.',
-            facts: ['19 of 20 test commands picked the right tool', 'Unknown tool names are rejected'],
-            files: ['app/core/assistant.py']
+            id: 'db',
+            label: 'MySQL',
+            sub: '12 migrations',
+            what: 'SQLAlchemy 2 models and 12 Alembic migrations on MySQL 8. Most tests run on in-memory SQLite for speed, and a separate CI job runs the migrations and the MySQL-only tests against a real MySQL server.',
+            facts: ['Raw SQL for the 9 reports', 'Schema changes are always migrations'],
+            files: ['alembic/versions/', 'app/models/', 'app/services/reports.py']
           }
         ]
       },
       {
-        title: '2 · Act and answer',
+        title: '2 · AI triage',
         nodes: [
           {
-            id: 'tools',
-            label: '11 tools',
-            sub: '10 PC controls + web search',
-            what: 'System info (CPU, RAM, disk, GPU), open and close apps, list running apps, search files, search the whole computer, battery status, volume, screen brightness, window control and web search.',
+            id: 'embed',
+            label: 'Embedding',
+            sub: 'Hashing · 4,096 numbers',
+            what: 'Each ticket’s title and description become a vector of 4,096 numbers built from word pairs and 3 to 5 letter fragments, scaled to length 1. It needs no model download and gives the same result every time. A sentence-embedding model (MiniLM) can be swapped in.',
+            why: 'No setup and about a millisecond per ticket, at the cost of matching words rather than meaning (see the chart below).',
             facts: [
-              'Read-only: system info, running apps, file search, battery, web search',
-              'Changes things: open / close apps, volume, brightness, windows',
-              'Windows APIs through pywin32, pycaw and psutil'
+              'Stored with each ticket and refreshed when the text changes',
+              'Optional sentence-transformers embedder'
             ],
-            files: ['app/tools/registry.py', 'app/tools/']
+            files: ['app/ai/embedder.py', 'app/services/triage.py']
+          },
+          {
+            id: 'suggest',
+            label: 'Suggest',
+            sub: 'kNN vote · duplicates',
+            what: 'The new ticket is compared with resolved and closed tickets. The five nearest each vote for their category and priority, weighted by similarity, and the winning share of the vote is the confidence. Unresolved tickets above 0.80 similarity are flagged as possible duplicates.',
+            why: 'A vote over real past tickets can be explained: the panel lists the tickets behind it. Nothing is written to the ticket unless the user clicks Apply.',
+            facts: [
+              'k = 5, minimum similarity 0.12, duplicate threshold 0.80',
+              'Requesters only ever see their own tickets as evidence'
+            ],
+            files: ['app/services/triage.py', 'app/api/routes/triage.py']
+          },
+          {
+            id: 'guard',
+            label: 'Injection guard',
+            sub: '15 rules, then isolation',
+            what: 'Before any text reaches an LLM, 15 pattern rules look for instruction overrides, fake system headers, pasted JSON answers and executive-urgency tricks, after undoing hidden characters and letter-spacing. A flagged ticket skips the LLM and falls back to the kNN vote. Text that passes is still wrapped in escaped delimiters and labelled as untrusted.',
+            why: 'The pattern rules are a cheap first filter, not the whole defence. On an independent set of 30 attacks they caught 11, and the prompt isolation did most of the work (attack success 6.7%).',
+            facts: ['0.0% false positives on 220 clean tickets', 'Never stores or returns the ticket text'],
+            files: ['app/ai/injection_guard.py', 'app/ai/llm_triage.py']
+          },
+          {
+            id: 'llm',
+            label: 'Optional LLM',
+            sub: 'Ollama · five examples',
+            what: 'When switched on, a local model through Ollama gets the ticket plus the five closest resolved tickets and answers with a category and a priority from fixed lists. If Ollama is down, slow or answers badly, the app falls back to the kNN vote, so ticket creation never waits on the model.',
+            facts: [
+              'The answer must match the allowed category and priority lists',
+              'About 2.4 seconds per ticket in the benchmark run'
+            ],
+            files: ['app/ai/llm_triage.py', 'app/services/triage.py']
+          }
+        ]
+      },
+      {
+        title: '3 · Keep it running',
+        nodes: [
+          {
+            id: 'assist',
+            label: 'Agent assist',
+            sub: 'Summary and draft reply',
+            what: 'Agents can ask a local model for a ticket summary or a draft reply. Internal notes are never sent. Key facts in a summary are dropped unless their exact value appears in the ticket text, and a draft is only inserted into the reply box, never posted.',
+            facts: ['Off by default, agents and admins only', '10 requests a minute per user'],
+            files: ['app/ai/assist.py', 'app/api/routes/assist.py']
           },
           {
             id: 'rails',
             label: 'Safety rails',
-            sub: 'Allow-list · blocklist',
-            what: 'Only 7 allow-listed apps can be opened (Notepad, Calculator, Paint, Explorer, WordPad, VS Code, Snipping Tool), always without a shell. 14 system processes, including Ollama itself, cannot be closed. File search skips Windows, Program Files, AppData and other system folders.',
-            why: 'The model decides what to do, but the code decides what is possible. No tool can delete or move files, format drives or shut down.',
-            facts: ['subprocess with shell=False', '14 protected processes', '7 protected folder names'],
-            files: [
-              'app/tools/open_application.py',
-              'app/tools/close_application.py',
-              'app/tools/search_computer.py'
-            ]
+            sub: 'Rate limits · locks',
+            what: 'Sign-in locks after 5 failed tries in 5 minutes for an email and address. Registration, triage and assist have their own limits, shared across servers when Redis is configured. The last active admin cannot be demoted or deactivated, even by two admins acting at the same moment.',
+            facts: ['Passwords are hashed with bcrypt', 'Sign-in takes the same time for unknown emails'],
+            files: ['app/core/rate_limit.py', 'app/services/users.py']
           },
           {
-            id: 'answer',
-            label: 'Reply',
-            sub: 'Result back to the model',
-            what: 'The tool result goes back into the conversation and the model writes the answer. Before it is spoken, code blocks, URLs, markdown symbols and emojis are stripped so the voice does not read out "backtick backtick".',
-            facts: ['Conversation history kept in memory for the session'],
-            files: ['app/core/assistant.py', 'app/voice/tts.py']
+            id: 'ci',
+            label: 'CI',
+            sub: '12 checks per pull request',
+            what: 'GitHub Actions runs the unit tests with coverage, the MySQL migrations, browser tests in Playwright, lint, CodeQL, a Trivy container scan, Bandit and pip-audit, npm audit and a secret scan on every change.',
+            facts: ['485 backend tests pass, 7 need a MySQL server', 'Dependabot keeps dependencies updated'],
+            files: ['.github/workflows/']
           },
           {
-            id: 'tts',
-            label: 'Piper TTS',
-            sub: 'en_US-lessac-medium · 60 MB',
-            what: 'A neural voice running on ONNX Runtime turns the reply into 22,050 Hz audio and plays it through the speakers.',
-            facts: ['Median 0.34 s to synthesise a 14-word sentence', 'Runs locally'],
-            files: ['app/voice/tts.py']
+            id: 'deploy',
+            label: 'Deploy',
+            sub: 'Docker · Caddy · metrics',
+            what: 'A multi-stage Dockerfile builds the web app and the API into one image. A production compose file adds Caddy for HTTPS, Redis for shared rate limits and optional Prometheus metrics. Production mode refuses to start with a placeholder secret key or with demo sign-in switched on.',
+            facts: ['Configuration checked, not yet run on a live server'],
+            files: ['Dockerfile', 'docker-compose.prod.yml']
           }
         ]
       }
     ],
     challenge: {
-      title: 'The small local model beat the cloud',
-      text: 'BOB can use a 20B model on NVIDIA’s cloud or a 3B model running in Ollama on the laptop. For a short command like "open notepad", the local model finished its reply in a median of 1.03 seconds, against 16.28 seconds for the cloud model, which also took 7.7 seconds before its first word. Cloud times swing with the network and rate limits (one run took 48 seconds), which is why the local model is kept as an automatic fallback.',
-      unit: ' s',
-      max: 17,
+      title: 'The default scores 62.5%; the best setup scores 87.5%',
+      text: 'I measured every triage method on the same 120 held-out tickets (ServiceDesk-600, which is synthetic). The default needs no downloads and answers in about a millisecond, but it only matches words, so it gets 62.5%. A small sentence-embedding model reaches 76.7%, and a local LLM shown the five closest resolved tickets reaches 87.5% at about 2.4 seconds per ticket. Always guessing the biggest class scores 16.7%. So the app keeps the cheap method as the default and as the fallback, and lets you switch the LLM on.',
+      unit: '%',
+      max: 100,
       series: [
-        { label: 'Local: qwen2.5 3B in Ollama', key: 'local', tone: 'is-clean' },
-        { label: 'Cloud: gpt-oss-20b on NVIDIA NIM', key: 'cloud', tone: 'is-swap' }
+        { label: 'Always guess the biggest class', key: 'majority', tone: 'is-clean' },
+        { label: 'Default: hashing + kNN', key: 'hashing', tone: 'is-clean' },
+        { label: 'MiniLM + kNN', key: 'minilm', tone: 'is-clean' },
+        { label: 'LLM, no examples', key: 'zero', tone: 'is-clean' },
+        { label: 'LLM + 5 closest tickets', key: 'rag', tone: 'is-swap' }
       ],
       bars: [
-        { name: 'Time to first token', local: 0.03, cloud: 7.72 },
-        { name: 'Full reply to "open notepad"', local: 1.03, cloud: 16.28 }
+        {
+          name: 'Category accuracy on 120 held-out tickets',
+          majority: 16.7,
+          hashing: 62.5,
+          minilm: 76.7,
+          zero: 79.2,
+          rag: 87.5
+        }
       ]
     },
     rag: {
-      eyebrow: 'Measured on my laptop',
-      title: 'Where a voice turn spends its time',
-      text: 'Median of 5 runs each on a Ryzen 7 4800H with an RTX 3050 (4 GB) and 16 GB of RAM, using the local stack. Whisper fell back to the CPU because a CUDA library was missing, which makes listening the slowest step.',
+      eyebrow: 'Measured on 5,000 tickets',
+      title: 'Making a request cheap',
+      text: 'Triage compares each new ticket with up to 5,000 stored ones. While reviewing my own code I found two problems and measured both before fixing them. These are the before and after numbers on the same data, and the suggestions did not change: 152 saved outputs matched exactly.',
       stats: [
-        { value: '4.79 s', label: 'speech to text', note: '5-second clip, CPU int8' },
-        { value: '1.03 s', label: 'local model reply', note: '"open notepad", qwen2.5 3B' },
-        { value: '0.34 s', label: 'text to speech', note: '14-word sentence' },
-        { value: '12.8 s', label: 'full voice turn', note: 'end of speech to reply ready' }
+        { value: '264 → 21 MB', label: 'memory per request', note: 'vectors scored in chunks of 500' },
+        { value: '771 → 543 ms', label: 'median time per request', note: 'SQLite, 7 runs each' },
+        {
+          value: '48 s → 13 ms',
+          label: 'injection guard on a 10,000-character ticket',
+          note: 'worst case: one rule before, the whole guard after'
+        },
+        { value: '0', label: 'suggestions changed by the fixes', note: '152 outputs, before and after' }
       ]
     },
     decisions: [
       {
-        title: 'A fallback parser for small models',
-        text: 'Small local models do not always return a proper tool call; some write it as a JSON block in plain text. BOB reads those blocks and accepts them only when the name matches a registered tool, so a 3B model can still act reliably.'
+        title: 'A clock that can pause',
+        text: 'The pause time is rebuilt from the status history instead of being stored, so a priority change recalculates the due date correctly. I also found and fixed a case where changing the priority while a ticket was waiting on the requester left the due date stale.'
       },
       {
-        title: 'The cloud is optional, the laptop is not',
-        text: 'When the NVIDIA cloud is the main model, the local Ollama model is registered as a silent fallback. A rate limit or dropped connection rolls the turn back and retries locally, so the session keeps going.'
+        title: 'Lock the row, then decide',
+        text: 'Changing a status reads the ticket, checks the move and writes it back. Without a lock, two agents acting together could both pass the check and the pause adjustment could be applied twice. The ticket row is now locked for that whole step, and a test checks that the query asks for the lock.'
       },
       {
-        title: 'Test the GPU before trusting it',
-        text: 'Instead of failing when CUDA libraries are missing, the speech model runs a 100 ms silent clip at start-up and falls back to the CPU with int8 if the GPU path breaks.'
+        title: 'Show the evidence, not just the answer',
+        text: 'The AI never edits a ticket. It shows the five resolved tickets behind its suggestion and the measured accuracy, so a person can overrule it in a second. If the AI layer fails, creating a ticket still works.'
       },
       {
-        title: 'Clean text before speaking it',
-        text: 'Model replies are full of markdown, code, links and emojis. A normaliser strips them before the voice model sees the text, so the spoken answer sounds like a sentence, not a document.'
+        title: 'Fix the guard without changing what it catches',
+        text: 'The guard’s patterns could take minutes on a few hundred characters of carefully repeated words, which would freeze the server. I rewrote them so the time grows with the length of the text, then compared old and new on 200,000 generated inputs and every dataset text: identical results.'
       }
     ],
     limits: [
-      'There is no confirmation step: once the model picks a tool such as close_application it runs straight away, so unsaved work in that app can be lost.',
-      'It is fully offline only with the local Ollama model and no web search. The NVIDIA cloud mode and web search need the internet.',
-      'On my laptop speech recognition fell back to the CPU, so a full voice turn takes about 13 seconds.',
-      'There is no wake word, and BOB cannot be interrupted while it is speaking except with Ctrl+C.',
-      'It is Windows only and terminal only, with an English voice and no memory between sessions.',
-      'The 19 / 20 tool score comes from a small set of test commands. The one miss sent a request for a poem to web search.'
+      'The benchmark is synthetic: an LLM wrote the 600 tickets and I corrected 27 of them by hand. Real tickets are messier, so real accuracy would be lower, and 120 test tickets give wide confidence intervals (87.5% is 80.4% to 92.3%).',
+      'The default method matches words, not meaning, so it scores 62.5%. The better setups need either a downloaded embedding model or a local LLM at about 2.4 seconds per ticket, and I have only measured them on this one dataset.',
+      'The injection guard is a heuristic. On an independent set of 30 attacks it caught 11. The escaped prompt boundary did most of the defending, and 30 tickets are too few for firm conclusions. Keyword stuffing aimed at the similarity search is not covered at all.',
+      'It has never run in production. The Docker and Caddy stack is checked for configuration only, not load-tested on a live server.',
+      'Keyword search is a substring match with no full-text index, so it slows down on very large ticket tables, and pagination is offset-based.',
+      'Rate limits are per process unless Redis is configured, and with Redis they let requests through if Redis cannot be reached.',
+      'There are no email notifications, no refresh tokens (sessions last 30 minutes) and no two-factor sign-in.'
     ]
   },
 

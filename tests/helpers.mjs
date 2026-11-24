@@ -25,7 +25,7 @@ export const PAGES = [
   ['project-trader', '#/project/trader', 1440, 900],
   ['project-mediplant', '#/project/mediplant', 1440, 900],
   ['project-securecloud', '#/project/securecloud', 1440, 900],
-  ['project-bob', '#/project/bob', 390, 844]
+  ['project-servicedesk', '#/project/servicedesk', 390, 844]
 ];
 
 /** Both themes are tested; the saved choice is what the page's inline script reads before first paint. */
