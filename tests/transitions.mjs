@@ -129,11 +129,9 @@ try {
   await rp.evaluate(() => {
     location.hash = '#/project/servicedesk';
   });
-  await rp.waitForFunction(
-    () => document.querySelector('main h1')?.textContent === 'ServiceDesk-AI',
-    null,
-    { timeout: 10000 }
-  );
+  await rp.waitForFunction(() => document.querySelector('main h1')?.textContent === 'ServiceDesk-AI', null, {
+    timeout: 10000
+  });
   check('reduced motion: no view transition', (await rp.evaluate(() => window.__vtCalls)) === 0);
   await reduced.close();
 } finally {

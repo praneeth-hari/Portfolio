@@ -18,6 +18,7 @@ import useSmoothScroll from './components/useSmoothScroll.js';
 import useMagnetic from './components/useMagnetic.js';
 import ScrollProgress from './components/ScrollProgress.jsx';
 import ChatBot from './components/ChatBot.jsx';
+import CursorLabel from './components/CursorLabel.jsx';
 import SectionRail from './components/SectionRail.jsx';
 import SkillModal from './components/SkillModal.jsx';
 // case-study pages (and their data) only load when someone opens one
@@ -200,6 +201,7 @@ export default function App() {
       <ScrollProgress />
       <Nav />
       {!slug && !loading && <SectionRail />}
+      <CursorLabel />
       {slug ? (
         <ProjectRoute slug={slug} />
       ) : (
